@@ -30,9 +30,9 @@
               </div>
             </div>
           </div>
-          <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer" @click="signIn">
-            <span v-if="user !== null"></span>
-            <span v-else>{{  }}</span>
+          <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer" @click="user == null ? signIn : false">
+            <span v-if="user == null">Login</span>
+            <span v-else>{{ user.name }}</span>
           </div>
         </div>
       </div>
@@ -55,21 +55,25 @@ export default {
       this.scroll = window.scrollY
     })
     for (let i = 0; i < 23; i++) {
-      this.huddles = this.huddles.push({ id: i, hue: Math.floor(Math.random() * 357) + 0 })
+      this.huddles.push({ id: i, hue: Math.floor(Math.random() * 357) + 0 })
     }
     if(blockstack.isUserSignedIn()) {
-      this.user = blockstack.loadUserData().profile
+      const userData = blockstack.loadUserData()
+      this.user = new blockstack.Person(userData.profile)
+      this.user.name = userData.username
+      this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
+      console.log(this.user)
     } else if (blockstack.isSignInPending()) {
       blockstack.handlePendingSignIn()
       .then((userData) => {
-        console.log(userData)
         window.location = window.location.origin
       })
     }
   },
   methods: {
     signIn () {
-      blockstack.redirectToSignIn()
+      const origin = window.location.origin
+      blockstack.redirectToSignIn(origin, `${origin}/manifest.json`, ['scope_write', 'publish_data', 'email'])
     }
   },
 }
