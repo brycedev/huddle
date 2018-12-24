@@ -30,7 +30,7 @@
               </div>
             </div>
           </div>
-          <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer" @click="user == null ? signIn : false">
+          <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer" @click="!user ? signIn() : logout()">
             <span v-if="!user">Login</span>
             <span v-else>{{ user.name }}</span>
           </div>
@@ -59,21 +59,27 @@ export default {
     }
     if(blockstack.isUserSignedIn()) {
       const userData = blockstack.loadUserData()
-      this.user = new blockstack.Person(userData.profile)
-      this.user.name = userData.username
-      this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
-      console.log(this.user)
+      this.setUser(userData)
     } else if (blockstack.isSignInPending()) {
-      blockstack.handlePendingSignIn()
-      .then((userData) => {
-        window.location = window.location.origin
+      blockstack.handlePendingSignIn().then(userData => {
+        this.setUser(userData)
+        this.$router.push('/')
       })
     }
   },
   methods: {
+    logout () {
+      blockstack.signUserOut(window.location.origin)
+    },
+    setUser(data){
+      this.user = new blockstack.Person(data.profile)
+      this.user.name = data.username
+      this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
+    },
     signIn () {
-      const origin = window.location.origin
-      blockstack.redirectToSignIn(origin, `${origin}/manifest.json`, ['scope_write', 'publish_data', 'email'])
+      const origin = 'http://localhost:8080/'
+      blockstack.redirectToSignIn()
+      // blockstack.redirectToSignIn(origin, origin + 'manifest.json', ['scope_write', 'publish_data'])
     }
   },
 }

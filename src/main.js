@@ -15,7 +15,7 @@ new Vue({
       bus: new Vue(),
       isDev: process.env.NODE_ENV === "development",
       huddles: [],
-      user: {}
+      user: false
     }
   }),
   router,
