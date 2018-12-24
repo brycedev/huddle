@@ -31,7 +31,7 @@
             </div>
           </div>
           <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer" @click="user == null ? signIn : false">
-            <span v-if="user == null">Login</span>
+            <span v-if="!user">Login</span>
             <span v-else>{{ user.name }}</span>
           </div>
         </div>
