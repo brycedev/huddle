@@ -24,7 +24,7 @@
                 </router-link>
               </div>
               <div class="flex -mb-px">
-                <router-link to="/random" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75" active-class="opacity-100">
+                <router-link :to="randomSlug" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75" active-class="opacity-100">
                   <span class="text-xs cursor-pointer">Random</span>
                 </router-link>
               </div>
@@ -44,13 +44,25 @@
 
 <script>
 export default {
-  store: ['huddles', 'user'],
+  store: ['user'],
   data() {
     return {
+      random: 0,
       scroll: 0
     }
   },
+  computed: {
+    huddles(){
+      return window.db.huddles.all
+    },
+    randomSlug(){
+      return this.huddles.length > 0
+        ? `/h/${this.huddles[this.random].slug}`
+        : '/'
+    }
+  },
   mounted(){
+    this.random = Math.floor(Math.random() * this.huddles.length)
     document.addEventListener('scroll', e => {
       this.scroll = window.scrollY
     })
@@ -80,18 +92,22 @@ export default {
       this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
       const users = window.db.users.all
       if(!users.find(u => u.id == this.user.id)){
-        console.log('setting users')
+        console.log('adding user to orbit: ', this.user.id)
         await window.db.users.instance.put({ id: this.user.id })
-      } 
+      }
       await updateIpfs()
     },
     signIn () {
       const origin = 'http://localhost:8080/'
       blockstack.redirectToSignIn()
       // blockstack.redirectToSignIn(origin, origin + 'manifest.json', ['scope_write', 'publish_data'])
-    },
-    
+    }
   },
+  watch: {
+    $route(){
+      this.random = Math.floor(Math.random() * this.huddles.length)
+    }
+  }
 }
 </script>
 
@@ -100,7 +116,7 @@ export default {
 @tailwind components;
 @tailwind utilities;
 
-body 
+body
   font-weight 300
   font-family 'Nunito', sans-serif
 
@@ -113,7 +129,7 @@ body
   animation-name spin
   animation-duration 5000ms
   animation-iteration-count infinite
-  animation-timing-function linear 
+  animation-timing-function linear
 
 @keyframes spin
   from

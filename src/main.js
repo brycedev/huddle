@@ -26,7 +26,7 @@ window.updateIpfs = () => {
 window.bootIpfs = () => {
   return new Promise(async (resolve, reject) => {
     const ipfs = new IPFS({
-      repo: 'ipfs/shared/',
+      repo: 'ipfs/shared/b',
       config: {
         "Bootstrap": []
       },
@@ -42,7 +42,7 @@ window.bootIpfs = () => {
         users: {}
       }
       window.db.huddles.instance = await orbitdb.docstore('hdl.huddles', { indexBy: 'id' })
-      window.db.users.instance = await orbitdb.docstore('hdl.users')
+      window.db.users.instance = await orbitdb.docstore('hdl.users', { indexBy: 'id' })
       await db.huddles.instance.load()
       await db.users.instance.load()
       await updateIpfs()

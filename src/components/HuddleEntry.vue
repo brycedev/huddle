@@ -53,6 +53,4 @@ export default {
 <style lang="stylus" scoped>
 .entry 
   background-position center center
-  p.break 
-    word-break break-all
 </style>
