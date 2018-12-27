@@ -1,10 +1,9 @@
 <template>
   <div class="w-full shadow rounded-lg overflow-hidden bg-cover relative cursor-pointer bg-blue-light entry" :style="`background-image: url('https://picsum.photos/700x400/?random=${huddle.id}')`">
-  <!-- <div class="w-full rounded-lg overflow-hidden bg-cover relative cursor-pointer"> -->
     <div class="overlay absolute pin z-auto" :style="bgColor"></div>
     <div class="px-6 py-4 flex justify-between items-center z-50">
       <div class="flex justify-between flex-grow z-50 items-center">
-        <div class="font-light text-xl text-white opacity-90">Huddle {{ huddle.id }}</div>
+        <div class="font-light text-xl text-white opacity-90">{{ huddle.name }}</div>
         <div class="flex items-center">
           <div class="flex items-center px-3 py-2 bg-smoke rounded-full">
             <img class="mr-1" src="../assets/people.svg" alt="" width="14">
@@ -18,7 +17,7 @@
     </div>
     <div class="px-6 py-4 w-full flex flex-col">
       <div class="w-full z-50 flex">
-        <p class="text-white text-md mb-4 z-50 opacity-90 leading-normal">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Adipisci velit maxime pariatur corporis illum...</p>
+        <p class="break text-white text-md mb-4 z-50 opacity-90 leading-normal h-20 overflow-hidden">{{ huddle.description.slice(0, 130) }}</p>
       </div>
       <div class="w-full flex">
         <div class="flex z-50 overflow-hidden">
@@ -39,13 +38,12 @@ export default {
   props: ['huddle'],
   data() {
     return {
-      memberCount: 279,
-      popularity: 93
+      memberCount: 0
     }
   },
   computed: {
     bgColor(){
-      return { backgroundColor: `hsla(${this.huddle.hue}, 35%, 27%, .64)`   }
+      return { backgroundColor: `hsla(${this.huddle.hue ? this.huddle.hue : Math.floor(Math.random() * 357)}, 35%, 27%, .64)`   }
     }
   }
 }
@@ -55,4 +53,6 @@ export default {
 <style lang="stylus" scoped>
 .entry 
   background-position center center
+  p.break 
+    word-break break-all
 </style>

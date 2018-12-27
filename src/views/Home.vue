@@ -5,7 +5,9 @@
         <div class="flex justify-center items-center flex-col py-20 my-20">
           <h1 class="text-4xl text-white font-light max-w-sm text-center mb-8">It's time to take back control of your group's data.</h1>
           <div class="flex justify-center items-center">
-            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer mr-4">Create a Huddle</div>
+            <router-link to="/huddles/new" class="block no-underline mr-4">
+              <div class="bg-white rounded-full text-black text-center py-2 px-4">Create a Huddle</div>
+            </router-link>
             <div class="bg-blue rounded-full text-white text-center py-2 px-4 cursor-pointer">Transfer from FB</div>
           </div>
         </div>
@@ -15,7 +17,9 @@
       <div class="w-full">
         <div class="flex flex-wrap">
           <div class="w-full md:w-1/2 lg:w-1/3 mb-4 px-2" v-for="huddle in huddles" :key="huddle.id">
-            <huddle-entry :huddle="huddle"></huddle-entry>
+            <router-link :to="'/h/' + huddle.slug" class="block w-full block no-underline">
+              <huddle-entry :huddle="huddle"></huddle-entry>
+            </router-link>
           </div>          
         </div>
       </div>
@@ -28,12 +32,19 @@ import HuddleEntry from '@/components/HuddleEntry.vue'
 
 export default {
   name: 'home',
-  store: ['huddles'],
+  store: ['user'],
   components: {
     HuddleEntry
   },
+  computed: {
+    huddles(){
+      return window.db.huddles.all
+        ? window.db.huddles.all
+        : []
+    }
+  },
   mounted(){
-
+    // if(!this.user) window.location.replace('/')
   }
 }
 </script>

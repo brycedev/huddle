@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="min-h-screen bg-khak-grey">
     <nav class="w-full fixed z-max subtle" style="height: 60px;" :class="{'bg-black' : scroll > 20}">
       <div class="container">
         <div class="flex justify-between items-center py-2">
@@ -9,30 +9,31 @@
           <div class="flex flex-grow">
             <div class="mx-auto flex justify-center">
               <div class="flex -mb-px mr-6">
-                  <router-link to="/#search" class="no-underline flex items-center py-4 text-white uppercase" active-class="active-link">
-                      <img src="../src/assets/search.svg" alt="" width="14">
-                  </router-link>
+                <router-link to="/#search" class="no-underline flex items-center text-white uppercase" active-class="active-link">
+                  <img src="../src/assets/search.svg" alt="" width="14">
+                </router-link>
               </div>
               <div class="flex -mb-px mr-6">
-                  <router-link to="/about" class="no-underline flex items-center py-4 text-white uppercase" active-class="active-link">
-                      <span class="text-xs hover:opacity-100 opacity-75 cursor-pointer">About</span>
-                  </router-link>
+                <router-link to="/about" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75" active-class="opacity-100">
+                  <span class="text-xs cursor-pointer">About</span>
+                </router-link>
               </div>
               <div class="flex -mb-px mr-6">
-                  <router-link to="/discover" class="no-underline flex items-center py-4 text-white uppercase" active-class="active-link">
-                      <span class="text-xs hover:opacity-100 opacity-75 cursor-pointer">Discover</span>
-                  </router-link>
+                <router-link to="/discover" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75" active-class="opacity-100">
+                  <span class="text-xs cursor-pointer">Discover</span>
+                </router-link>
               </div>
               <div class="flex -mb-px">
-                  <router-link to="/random" class="no-underline flex items-center py-4 text-white uppercase" active-class="active-link">
-                      <span class="text-xs hover:opacity-100 opacity-75 cursor-pointer">Random</span>
-                  </router-link>
+                <router-link to="/random" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75" active-class="opacity-100">
+                  <span class="text-xs cursor-pointer">Random</span>
+                </router-link>
               </div>
             </div>
           </div>
-          <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer" @click="!user ? signIn() : logout()">
+          <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center" @click="!user ? signIn() : logout()">
             <span v-if="!user">Login</span>
-            <span v-else>{{ user.name }}</span>
+            <img v-if="user" class="w-6 h-6 rounded-full mr-2" :src="user.avatar"/>
+            <span v-if="user">{{ user.name }}</span>
           </div>
         </div>
       </div>
@@ -42,7 +43,6 @@
 </template>
 
 <script>
-
 export default {
   store: ['huddles', 'user'],
   data() {
@@ -54,33 +54,43 @@ export default {
     document.addEventListener('scroll', e => {
       this.scroll = window.scrollY
     })
-    for (let i = 0; i < 23; i++) {
-      this.huddles.push({ id: i, hue: Math.floor(Math.random() * 357) + 0 })
-    }
-    if(blockstack.isUserSignedIn()) {
-      const userData = blockstack.loadUserData()
-      this.setUser(userData)
-    } else if (blockstack.isSignInPending()) {
-      blockstack.handlePendingSignIn().then(userData => {
-        this.setUser(userData)
-        this.$router.push('/')
-      })
-    }
+    setTimeout(async () => {
+      await this.checkUser()
+    })
   },
   methods: {
+    async checkUser(){
+      if(blockstack.isUserSignedIn()) {
+        const userData = blockstack.loadUserData()
+        await this.setUser(userData)
+      } else if (blockstack.isSignInPending()) {
+        blockstack.handlePendingSignIn().then(async (userData) => {
+          await this.setUser(userData)
+          this.$router.push('/')
+        })
+      }
+    },
     logout () {
       blockstack.signUserOut(window.location.origin)
     },
-    setUser(data){
+    async setUser(data){
       this.user = new blockstack.Person(data.profile)
+      this.user.id = data.identityAddress
       this.user.name = data.username
       this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
+      const users = window.db.users.all
+      if(!users.find(u => u.id == this.user.id)){
+        console.log('setting users')
+        await window.db.users.instance.put({ id: this.user.id })
+      } 
+      await updateIpfs()
     },
     signIn () {
       const origin = 'http://localhost:8080/'
       blockstack.redirectToSignIn()
       // blockstack.redirectToSignIn(origin, origin + 'manifest.json', ['scope_write', 'publish_data'])
-    }
+    },
+    
   },
 }
 </script>
@@ -96,4 +106,18 @@ body
 
 .subtle
   transition all .27s ease
+
+.centercenter
+  background-position center center
+.spin
+  animation-name spin
+  animation-duration 5000ms
+  animation-iteration-count infinite
+  animation-timing-function linear 
+
+@keyframes spin
+  from
+    transform:rotate(0deg)
+  to
+    transform:rotate(360deg)
 </style>
