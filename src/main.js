@@ -60,7 +60,7 @@ window.updateGun = () => {
     huddles.push(huddle)
   })
   store.huddles = Array.from(new Set(huddles))
-  if(store.huddles.length < 1 && isDev) seedDatabase()
+  if(store.huddles.length < 1) seedDatabase()
   console.log('huddles : ', store.huddles)
   gun.users.map().on(user => {
     users.push(user)
