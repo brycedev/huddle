@@ -1,6 +1,6 @@
 require('setimmediate')
 const isDev = process.env.NODE_ENV === "development"
-const dbPrefix = 'a[taueiopt'
+const dbPrefix = 'awunebpieotzvtduc'
 const huddleDb = `${dbPrefix}:huddles`
 const userDb = `${dbPrefix}:users`
 
@@ -32,7 +32,7 @@ const store = {
 }
 
 window.seedDatabase = () => {
-  let names = ['AMA', 'BillGuyScienceNye', 'Crypto', 'Vue.js', 'EarthPorn']
+  let names = ['AMA', 'BillGuyTheScienceNye', 'Crypto', 'Vue.js', 'EarthPorn', 'Indie Makers', 'Fortnite', 'Celebrities']
   names.forEach(n => {
     let huddle = {
       id: uuid('huddle'),

@@ -32,6 +32,10 @@ export default new Router({
       component: Huddle,
       children: [
         { 
+          path: 'new',
+          name: 'CreatePost'
+        },
+        { 
           path: 'post/:id',
           name: 'ExpandedHuddlePost'
         }

@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="min-h-screen bg-khak-grey">
-    <portal-target name="postModal">
+    <portal-target name="modal">
 
     </portal-target>
     <nav class="w-full fixed z-max subtle" :class="{'bg-black' : scroll > 32}">
@@ -92,22 +92,43 @@ export default {
     logout () {
       blockstack.signUserOut(window.location.origin)
     },
-    async setUser(data){
-      this.user = new blockstack.Person(data.profile)
-      this.user.id = data.identityAddress
-      this.user.name = data.username
-      this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
-      if(!this.users.find(u => u.id == this.user.id)){
-        console.log('adding user to gundb: ', this.user.id)
-        const identity = { id: this.user.id, name: this.user.name, avatar: this.user.avatar }
-        const newUser = shogun.get(`${gun.prefix}:users/${this.user.id}`).put(identity)
-        gun.users.set(newUser)
-      }
+    setUser(data){
+      return new Promise(async (resolve, reject) => {
+        this.user = new blockstack.Person(data.profile)
+        this.user.id = data.identityAddress
+        this.user.name = data.username
+        this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
+        // check to see if the user exists
+        if(!this.users.find(u => u.id == this.user.id)){
+          console.log('instantiating user : ', this.user.name)
+          // add user to the decentralized gundb instance
+          const identity = { id: this.user.id, name: this.user.name, avatar: this.user.avatar }
+          const newUser = shogun.get(`${gun.prefix}:users/${this.user.id}`).put(identity)
+          gun.users.set(newUser)
+          // configure the user's gaia storage
+          this.user.preferences = {
+            blockedUsers : [],
+            hideNSFW: true,
+            mutedWords : []
+          }
+          const newPrefs = JSON.stringify(this.user.preferences)
+          await blockstack.putFile('preferences.json', newPrefs, { encrypt : true })
+          resolve()
+        } else {
+          console.log('loading user : ', this.user.name)
+          // user exists, so load their gaia storage
+          blockstack.getFile('preferences.json', { decrypt: true })
+          .then(prefs => {
+            this.user.preferences = JSON.parse(prefs)
+            resolve()
+          }).catch(err => reject(err))
+        }
+      })
     },
     signIn () {
-      const origin = 'http://localhost:8080/'
+      const origin = window.location.origin
       blockstack.redirectToSignIn()
-      // blockstack.redirectToSignIn(origin, origin + 'manifest.json', ['scope_write', 'publish_data'])
+      // blockstack.redirectToSignIn(origin, origin + '/manifest.json', ['scope_write', 'publish_data'])
     }
   }
 }

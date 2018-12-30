@@ -29,10 +29,13 @@
           </div>
         </div>
         <div class="w-full flex-grow flex flex-col -mt-20 ml-4">
-          <div class=" self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center mb-4">
-            <img src="../assets/plus-dark.svg" alt="" class="w-4 h-4 mr-2">
-            <span>Create Post</span>
-          </div>
+          <router-link :to="`${$route.fullPath}/new`" class="block no-underline self-end">
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center mb-4">
+              <img src="../assets/plus-dark.svg" alt="" class="w-4 h-4 mr-2">
+              <span>Create Post</span>
+            </div>
+          </router-link>
+          
           <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in posts" class="block no-underline mr-2" :key="post.id">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
@@ -40,20 +43,22 @@
       </div>
     </div>
     <router-view></router-view>
-    <portal to="postModal">
-      <expanded-huddle-post :post="expandedPost" :visible="showExpandedPost" ref="ehp"></expanded-huddle-post>
+    <portal to="modal">
+      <expanded-huddle-post :post="expandedPost" :visible="showExpandedPost"></expanded-huddle-post>
+      <create-post :visible="showCreatePost"></create-post>
     </portal>
   </div>
 </template>
 
 <script>
+import CreatePost from '@/components/CreatePost.vue'
 import ExpandedHuddlePost from '@/components/ExpandedHuddlePost.vue'
 import HuddlePost from '@/components/HuddlePost.vue'
 
 export default {
   name: 'Huddle',
   store: ['huddles', 'user', 'users'],
-  components: { ExpandedHuddlePost, HuddlePost },
+  components: { CreatePost, ExpandedHuddlePost, HuddlePost },
   data() {
     return {
       huddle: null,
@@ -71,6 +76,10 @@ export default {
         vm.expandedPost = { id: to.params.id, content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: vm.user }
         document.getElementById('body').style.overflow = 'hidden'
         vm.expandedPost ? next() : next(false)
+      })
+    } else if(to.name == 'CreatePost'){
+      next(vm => {
+        document.getElementById('body').style.overflow = 'hidden'
       })
     } else {
       next()
@@ -103,11 +112,14 @@ export default {
     },
     posts(){
       return Array.from(Array(20), (x, index) => index).map(i => {
-        return { id: i, content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: this.user }
+        return { id: uuid(), content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: this.user }
       })
     },
     members(){
       return this.users
+    },
+    showCreatePost(){
+      return this.$route.name == 'CreatePost'
     },
     showExpandedPost(){
       return this.$route.name == 'ExpandedHuddlePost' && this.expandedPost
