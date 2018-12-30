@@ -37,7 +37,7 @@
 
 <script>
 export default {
-  name: 'create',
+  name: 'Propose',
   store: ['user'],
   data: () => {
     return {
@@ -49,15 +49,12 @@ export default {
       }
     }
   },  
-  mounted(){
-    
-  },
   computed: {
     canSubmit(){
       const description = this.huddle.description
       const name = this.huddle.name
       const type = this.huddle.type
-      return description !== '' && description.trim().length >= 80 && name !== '' && type !== ''
+      return description !== '' && description.trim().length >= 80 && name !== '' && type !== '' && this.user
     },
     slugged(){
       return slug(this.huddle.name, { lower: true, replacement: '' }).slice(0,30)
@@ -66,16 +63,23 @@ export default {
   methods: {
     async create(){
       if(this.canSubmit){
-        this.isCreating = true
-        let huddle = this.huddle
-        huddle.id = Date.now()
-        huddle.createdAt = Date.now()
-        huddle.updatedAt = Date.now()
-        huddle.slug = this.slugged
-        await db.huddles.instance.put(huddle)
-        await updateIpfs()
-        this.isCreating = false
-        this.$router.push(`/h/${this.slugged}`)
+        if(this.huddle.type == 'public'){
+          this.isCreating = true
+          let huddle = this.huddle
+          huddle.id = uuid('huddle')
+          huddle.hue = Math.floor(Math.random() * 357)
+          huddle.background = `https://picsum.photos/1920x1080/?random=${this.huddle.id}`
+          huddle.createdAt = Date.now()
+          huddle.updatedAt = Date.now()
+          huddle.slug = this.slugged
+          huddle.isProposed = true
+          huddle.isApproved = false
+          console.log('adding huddle to gundb: ', huddle.id)
+          const newHuddle = shogun.get(`${gun.prefix}:huddles/${huddle.id}`).put(huddle)
+          gun.huddles.set(newHuddle)
+          this.isCreating = false
+          this.$router.push(`/h/${this.slugged}`)
+        }
       } else {
 
       }

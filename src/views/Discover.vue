@@ -1,0 +1,62 @@
+<template>
+  <div class="home max-w-full relative overflow-hidden">
+    <div class="w-full bg-black relative canvas">
+      <div class="container flex justify-center items-center">
+        <div class="flex justify-center items-center flex-col py-20 my-12">
+          <h1 class="text-4xl text-white font-light max-w-sm text-center mb-4 flex z-50">
+            Discover
+          </h1>
+          <p class="text-white text-lg">{{ publicHuddles.length }} Public Communities</p>
+        </div>
+      </div>
+    </div>
+    <div class="container flex">
+      <div class="w-full justify-between flex">
+        <div class="w-full flex-grow flex-col -mt-20 mr-4">
+          <div class="w-full self-center bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex justify-center items-center mb-4 h-12">
+            
+          </div>
+          <div class="flex flex-wrap">
+            <div class="w-full md:w-1/2 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id">
+              <router-link :to="'/h/' + huddle.slug" class="block w-full no-underline">
+                <huddle-entry :huddle="huddle"></huddle-entry>
+              </router-link>
+            </div>          
+          </div>
+        </div>
+        <div class="w-120 mt-8">
+          <div class="rounded-lg shadow p-4 bg-white w-full mb-4">
+            <p class="text-center text-black font-light mb-4">Proposed Huddles</p>
+            <div class="flex flex-col">
+              <router-link :to="'/h/' + huddle.slug" v-for="huddle in proposedHuddles" :key="huddle.id"  class="block w-full block no-underline">
+                <proposed-entry class="mb-4" :huddle="huddle"></proposed-entry>
+              </router-link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import HuddleEntry from '@/components/HuddleEntry.vue'
+import ProposedEntry from '@/components/ProposedEntry.vue'
+
+export default {
+  name: 'Discover',
+  store: ['huddles', 'user'],
+  components: { HuddleEntry, ProposedEntry  },
+  computed: {
+    publicHuddles(){
+      return this.huddles.filter(h => h.isApproved && h.type == 'public')
+    },
+    proposedHuddles(){
+      return this.huddles.filter(h => h.isProposed).slice(0,3)
+    }
+  },
+  mounted(){
+    // if(!this.user) window.location.replace('/')
+  }
+}
+</script>

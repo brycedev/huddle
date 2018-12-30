@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Create from './views/Create.vue'
+import Discover from './views/Discover.vue'
 import Home from './views/Home.vue'
 import Huddle from './views/Huddle.vue'
 
@@ -16,6 +17,11 @@ export default new Router({
       component: Create
     },
     {
+      path: '/discover',
+      name: 'Discover',
+      component: Discover
+    },
+    {
       path: '/',
       name: 'Home',
       component: Home
@@ -23,7 +29,13 @@ export default new Router({
     {
       path: '/h/:slug',
       name: 'Huddle',
-      component: Huddle
+      component: Huddle,
+      children: [
+        { 
+          path: 'post/:id',
+          name: 'ExpandedHuddlePost'
+        }
+      ]
     },
   ]
 })

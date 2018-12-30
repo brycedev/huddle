@@ -16,7 +16,7 @@
     <div class="container flex -mt-20">
       <div class="w-full">
         <div class="flex flex-wrap">
-          <div class="w-full md:w-1/2 lg:w-1/3 mb-4 px-2" v-for="huddle in huddles" :key="huddle.id">
+          <div class="w-full md:w-1/2 lg:w-1/3 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id">
             <router-link :to="'/h/' + huddle.slug" class="block w-full block no-underline">
               <huddle-entry :huddle="huddle"></huddle-entry>
             </router-link>
@@ -32,15 +32,13 @@ import HuddleEntry from '@/components/HuddleEntry.vue'
 
 export default {
   name: 'home',
-  store: ['user'],
+  store: ['huddles', 'user'],
   components: {
     HuddleEntry
   },
   computed: {
-    huddles(){
-      return window.db.huddles.all
-        ? window.db.huddles.all
-        : []
+    publicHuddles(){
+      return this.huddles.filter(h => h.isApproved && h.type == 'public')
     }
   },
   mounted(){

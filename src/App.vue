@@ -1,6 +1,9 @@
 <template>
   <div id="app" class="min-h-screen bg-khak-grey">
-    <nav class="w-full fixed z-max subtle" style="height: 60px;" :class="{'bg-black' : scroll > 20}">
+    <portal-target name="postModal">
+
+    </portal-target>
+    <nav class="w-full fixed z-max subtle" :class="{'bg-black' : scroll > 32}">
       <div class="container">
         <div class="flex justify-between items-center py-2">
           <router-link class="block no-underline" to="/">
@@ -24,7 +27,7 @@
                 </router-link>
               </div>
               <div class="flex -mb-px">
-                <router-link :to="randomSlug" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75" active-class="opacity-100">
+                <router-link :to="randomSlug" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75">
                   <span class="text-xs cursor-pointer">Random</span>
                 </router-link>
               </div>
@@ -33,18 +36,19 @@
           <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center" @click="!user ? signIn() : logout()">
             <span v-if="!user">Login</span>
             <img v-if="user" class="w-6 h-6 rounded-full mr-2" :src="user.avatar"/>
-            <span v-if="user">{{ user.name }}</span>
+            <span v-if="user">{{ user.name.replace('.id.blockstack','') }}</span>
           </div>
         </div>
       </div>
     </nav>
     <router-view/>
+    
   </div>
 </template>
 
 <script>
 export default {
-  store: ['user'],
+  store: ['huddles', 'user', 'users'],
   data() {
     return {
       random: 0,
@@ -52,13 +56,16 @@ export default {
     }
   },
   computed: {
-    huddles(){
-      return window.db.huddles.all
-    },
     randomSlug(){
-      return this.huddles.length > 0
-        ? `/h/${this.huddles[this.random].slug}`
-        : '/'
+      return this.eligibleRandomSlugs.length > 0
+        ? `/h/${this.eligibleRandomSlugs[Math.floor(Math.random() * this.eligibleRandomSlugs.length)].slug}`
+        : '#'
+    },
+    eligibleRandomSlugs(){
+      if(this.$route.name == 'Huddle'){
+        return this.huddles.filter(h => h.slug !== this.$route.params.slug)
+      }
+      return this.huddles
     }
   },
   mounted(){
@@ -90,22 +97,17 @@ export default {
       this.user.id = data.identityAddress
       this.user.name = data.username
       this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
-      const users = window.db.users.all
-      if(!users.find(u => u.id == this.user.id)){
-        console.log('adding user to orbit: ', this.user.id)
-        await window.db.users.instance.put({ id: this.user.id })
+      if(!this.users.find(u => u.id == this.user.id)){
+        console.log('adding user to gundb: ', this.user.id)
+        const identity = { id: this.user.id, name: this.user.name, avatar: this.user.avatar }
+        const newUser = shogun.get(`${gun.prefix}:users/${this.user.id}`).put(identity)
+        gun.users.set(newUser)
       }
-      await updateIpfs()
     },
     signIn () {
       const origin = 'http://localhost:8080/'
       blockstack.redirectToSignIn()
       // blockstack.redirectToSignIn(origin, origin + 'manifest.json', ['scope_write', 'publish_data'])
-    }
-  },
-  watch: {
-    $route(){
-      this.random = Math.floor(Math.random() * this.huddles.length)
     }
   }
 }
@@ -120,9 +122,13 @@ body
   font-weight 300
   font-family 'Nunito', sans-serif
 
+.break
+  word-break break-word
 .subtle
   transition all .27s ease
-
+.scale
+  &:hover
+    transform scale(1.01)
 .centercenter
   background-position center center
 .spin
@@ -136,4 +142,7 @@ body
     transform:rotate(0deg)
   to
     transform:rotate(360deg)
+
+.canvas 
+  background-image: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 16c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zm33.414-6l5.95-5.95L45.95.636 40 6.586 34.05.636 32.636 2.05 38.586 8l-5.95 5.95 1.414 1.414L40 9.414l5.95 5.95 1.414-1.414L41.414 8zM40 48c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zM9.414 40l5.95-5.95-1.414-1.414L8 38.586l-5.95-5.95L.636 34.05 6.586 40l-5.95 5.95 1.414 1.414L8 41.414l5.95 5.95 1.414-1.414L9.414 40z' fill='%23ffffff' fill-opacity='0.047' fill-rule='evenodd'/%3E%3C/svg%3E");
 </style>

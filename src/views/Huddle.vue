@@ -10,65 +10,108 @@
         </div>
       </div>
     </div>
-    <div class="container flex -mt-20">
-      <div class="w-full flex justify-between z-50">
-        <div class="w-160 h-64">
-
-        </div>
-        <div class="w-full flex-grow flex flex-col">
-          <div class="rounded-lg p-8 bg-white w-full mb-4" v-for="post in posts" :key="post.id" :class="Math.floor(Math.random() * 2) ? 'h-48' : 'h-64' ">
-
+    <div class="container flex">
+      <div class="w-full flex justify-between z-50 mx-auto max-w-xl">
+        <div class="w-120 mt-8 mr-4 flex flex-col">
+          <div class="rounded-lg shadow p-6 bg-white w-full mb-4">
+            <p class="text-black font-medium mb-2">Description</p>
+            <p class="text-grey-darkest leading-normal font-light break">{{ huddle.description }}</p>
+          </div>
+          <div class="rounded-lg shadow p-4 bg-white w-full mb-4">
+            <p class="text-black font-normal mb-2">Members</p>
+            <div class="w-full flex">
+              <div class="flex flex-wrap z-50 overflow-hidden">
+                <router-link :to="'/i/' + member.name.replace('.id.blockstack', '')" v-for="member in members" :key="member.id"  class="block no-underline mr-2">
+                  <img class="w-8 h-8 rounded-full" :src="member.avatar"/>
+                </router-link>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="w-160 h-64">
-
+        <div class="w-full flex-grow flex flex-col -mt-20 ml-4">
+          <div class=" self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center mb-4">
+            <img src="../assets/plus-dark.svg" alt="" class="w-4 h-4 mr-2">
+            <span>Create Post</span>
+          </div>
+          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in posts" class="block no-underline mr-2" :key="post.id">
+            <huddle-post :loaded="true" :post="post"></huddle-post>
+          </router-link>
         </div>
       </div>
     </div>
+    <router-view></router-view>
+    <portal to="postModal">
+      <expanded-huddle-post :post="expandedPost" :visible="showExpandedPost" ref="ehp"></expanded-huddle-post>
+    </portal>
   </div>
 </template>
 
 <script>
-import HuddleEntry from '@/components/HuddleEntry.vue'
+import ExpandedHuddlePost from '@/components/ExpandedHuddlePost.vue'
+import HuddlePost from '@/components/HuddlePost.vue'
 
 export default {
-  name: 'home',
-  store: ['user'],
-  components: {
-    HuddleEntry
-  },
+  name: 'Huddle',
+  store: ['huddles', 'user', 'users'],
+  components: { ExpandedHuddlePost, HuddlePost },
   data() {
     return {
-      huddle: null
+      huddle: null,
+      expandedPost: null
     }
   },
   beforeMount(){
-    const huddle = window.db.huddles.all.find(h => h.slug == this.$route.params.slug)
+    const huddle = this.huddles.find(h => h.slug == this.$route.params.slug)
     if(!huddle) this.$router.push('/')
     else this.huddle = huddle
+  },
+  beforeRouteEnter (to, from, next) {
+    if(to.name == 'ExpandedHuddlePost'){
+      next(vm => {
+        vm.expandedPost = { id: to.params.id, content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: vm.user }
+        document.getElementById('body').style.overflow = 'hidden'
+        vm.expandedPost ? next() : next(false)
+      })
+    } else {
+      next()
+    }
+  },
+  beforeRouteUpdate (to, from, next) {
+    if(to.name == 'ExpandedHuddlePost'){
+      this.expandedPost = this.posts.find(p => p.id == to.params.id)
+      this.expandedPost ? next() : next(false)
+    } else if(to.name == 'Huddle' && from.name !== 'ExpandedHuddlePost'){
+      this.huddle = this.huddles.find(h => h.slug == to.params.slug)
+      this.huddle ? next() : next(false)
+    } else if(to.name == 'Huddle' && from.name == 'ExpandedHuddlePost'){
+      this.expandedPost = null
+      next()
+    } else {
+      next()
+    }
   },
   computed: {
     bgColor(){
       return { 
-        backgroundColor: `hsla(${this.huddle.hue ? this.huddle.hue : Math.floor(Math.random() * 357)}, 35%, 27%, .64)`
+        backgroundColor: `hsla(${ this.huddle.hue }, 35%, 27%, .64)`
       }
     },
     bgImage(){
       return { 
-        backgroundImage: `url('https://picsum.photos/1920x1080/?random=${this.huddle.id}')` 
+        backgroundImage: `url('${this.huddle.background}')` 
       }
-    },
-    huddles(){
-      return window.db.huddles.all
     },
     posts(){
       return Array.from(Array(20), (x, index) => index).map(i => {
-        return { id: i }
+        return { id: i, content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: this.user }
       })
+    },
+    members(){
+      return this.users
+    },
+    showExpandedPost(){
+      return this.$route.name == 'ExpandedHuddlePost' && this.expandedPost
     }
-  },
-  mounted(){
-    // if(!this.user) window.location.replace('/')
   }
 }
 </script>
