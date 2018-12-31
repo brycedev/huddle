@@ -39,13 +39,14 @@
             <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
             <span>Request Invite</span>
           </div>
-          <div class="self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center mb-4" v-if="!isHybrid && !isMember">
+          <div class="self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center mb-4" v-if="!isHybrid && !isMember" @click="joinGroup">
             <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
             <span>Join Group</span>
           </div>
-          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in posts" class="block md:ml-0 ml-2 no-underline mr-2" :key="post.id">
+          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in posts" class="block md:ml-0 ml-2 no-underline mr-2" :key="post.id" v-if="isMember">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
+          <huddle-post :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num" v-if="!isMember"></huddle-post>
         </div>
       </div>
     </div>
@@ -70,6 +71,7 @@ export default {
     return {
       huddle: null,
       expandedPost: null,
+      memberIds: []
     }
   },
   beforeMount(){
@@ -114,7 +116,13 @@ export default {
       this.expandedPost ? next() : next(false)
     } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && !from.name.includes('ExpandedHuddlePost')){
       this.huddle = this.huddles.find(h => h.slug == to.params.slug)
-      this.huddle ? next() : next(false)
+      if(this.huddle){
+        next(vm => {
+          vm.fetchMembers()
+        })
+      } else {
+        next(false)
+      }
     } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && from.name.includes('ExpandedHuddlePost')){
       this.expandedPost = null
       next()
@@ -136,8 +144,11 @@ export default {
     isHybrid(){
       return this.huddle && this.huddle.type == 'hybrid'
     },
+    isPublic(){
+      return this.huddle && this.huddle.type == 'public'
+    },
     isMember(){
-      return false
+      return this.memberIds.includes(this.user.id)
     },
     posts(){
       return Array.from(Array(20), (x, index) => index).map(i => {
@@ -145,7 +156,7 @@ export default {
       })
     },
     members(){
-      return this.users
+      return this.users.filter(u => this.memberIds.includes(u.id))
     },
     showCreatePost(){
       return this.$route.name.includes('CreatePost')
@@ -153,6 +164,24 @@ export default {
     showExpandedPost(){
       return this.$route.name.includes('ExpandedHuddlePost') && this.expandedPost
     }
+  },
+  methods: {
+    joinGroup(){
+      if(this.isPublic){
+        const newMember = shogun.get(`${gun.prefix}:huddles/${this.huddle.id}`).get('members').put({ id: this.user.id })
+        console.log(newMember)
+      }
+    },
+    fetchMembers(){
+      let members = []
+      shogun.get(`${gun.prefix}:huddles/${this.huddle.id}`).get('members').map().on(user => {
+        members.push(user)
+      })
+      this.memberIds = Array.from(new Set(members))
+    }
+  },
+  mounted(){
+    this.fetchMembers()
   }
 }
 </script>
