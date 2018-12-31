@@ -12,7 +12,7 @@
     </div>
     <div class="container flex">
       <div class="w-full flex justify-between z-50 mx-auto max-w-xl">
-        <div class="w-120 mt-8 mr-4 flex flex-col">
+        <div class="w-120 mt-8 mr-4 md:flex md:flex-col hidden">
           <div class="rounded-lg shadow p-6 bg-white w-full mb-4">
             <p class="text-black font-medium mb-2">Description</p>
             <p class="text-grey-darkest leading-normal font-light break">{{ huddle.description }}</p>
@@ -28,15 +28,22 @@
             </div>
           </div>
         </div>
-        <div class="w-full flex-grow flex flex-col -mt-20 ml-4">
-          <router-link :to="`${$route.fullPath}/new`" class="block no-underline self-end">
+        <div class="w-full flex-grow flex flex-col -mt-20 md:ml-4">
+          <router-link :to="`${$route.fullPath}/new`" class="block no-underline self-end" v-if="isMember">
             <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center mb-4">
               <img src="../assets/plus-dark.svg" alt="" class="w-4 h-4 mr-2">
               <span>Create Post</span>
             </div>
           </router-link>
-          
-          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in posts" class="block no-underline mr-2" :key="post.id">
+          <div class="self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center mb-4" v-if="isHybrid && !isMember">
+            <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
+            <span>Request Invite</span>
+          </div>
+          <div class="self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center mb-4" v-if="!isHybrid && !isMember">
+            <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
+            <span>Join Group</span>
+          </div>
+          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in posts" class="block md:ml-0 ml-2 no-underline mr-2" :key="post.id">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
         </div>
@@ -62,22 +69,38 @@ export default {
   data() {
     return {
       huddle: null,
-      expandedPost: null
+      expandedPost: null,
     }
   },
   beforeMount(){
-    const huddle = this.huddles.find(h => h.slug == this.$route.params.slug)
-    if(!huddle) this.$router.push('/')
-    else this.huddle = huddle
+    const isPrivate = this.$route.fullPath.includes('/p/')
+    if(isPrivate){
+      const huddle = this.huddles.find(h => h.id == this.$route.params.id)
+      if(!huddle){
+        const superHiddenHuddle = this.user.privateGroups.find(h => h == this.$route.params.id)
+        if(!superHiddenHuddle){
+          this.$router.push('/')
+        } else {
+          this.huddle = huddle
+        }
+      } else {
+        this.huddle = huddle
+      }
+    } else {
+      const huddle = this.huddles.find(h => h.slug == this.$route.params.slug)
+      if(!huddle) this.$router.push('/')
+      else this.huddle = huddle
+    }
+    
   },
   beforeRouteEnter (to, from, next) {
-    if(to.name == 'ExpandedHuddlePost'){
+    if(to.name.includes('ExpandedHuddlePost')){
       next(vm => {
-        vm.expandedPost = { id: to.params.id, content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: vm.user }
+        vm.expandedPost = { id: to.params.postId, content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: vm.user }
         document.getElementById('body').style.overflow = 'hidden'
         vm.expandedPost ? next() : next(false)
       })
-    } else if(to.name == 'CreatePost'){
+    } else if(to.name.includes('CreatePost')){
       next(vm => {
         document.getElementById('body').style.overflow = 'hidden'
       })
@@ -86,13 +109,13 @@ export default {
     }
   },
   beforeRouteUpdate (to, from, next) {
-    if(to.name == 'ExpandedHuddlePost'){
-      this.expandedPost = this.posts.find(p => p.id == to.params.id)
+    if(to.name.includes('ExpandedHuddlePost')){
+      this.expandedPost = this.posts.find(p => p.id == to.params.postId)
       this.expandedPost ? next() : next(false)
-    } else if(to.name == 'Huddle' && from.name !== 'ExpandedHuddlePost'){
+    } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && !from.name.includes('ExpandedHuddlePost')){
       this.huddle = this.huddles.find(h => h.slug == to.params.slug)
       this.huddle ? next() : next(false)
-    } else if(to.name == 'Huddle' && from.name == 'ExpandedHuddlePost'){
+    } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && from.name.includes('ExpandedHuddlePost')){
       this.expandedPost = null
       next()
     } else {
@@ -110,6 +133,12 @@ export default {
         backgroundImage: `url('${this.huddle.background}')` 
       }
     },
+    isHybrid(){
+      return this.huddle && this.huddle.type == 'hybrid'
+    },
+    isMember(){
+      return false
+    },
     posts(){
       return Array.from(Array(20), (x, index) => index).map(i => {
         return { id: uuid(), content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: this.user }
@@ -119,10 +148,10 @@ export default {
       return this.users
     },
     showCreatePost(){
-      return this.$route.name == 'CreatePost'
+      return this.$route.name.includes('CreatePost')
     },
     showExpandedPost(){
-      return this.$route.name == 'ExpandedHuddlePost' && this.expandedPost
+      return this.$route.name.includes('ExpandedHuddlePost') && this.expandedPost
     }
   }
 }

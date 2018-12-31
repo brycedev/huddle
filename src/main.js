@@ -1,6 +1,6 @@
 require('setimmediate')
 const isDev = process.env.NODE_ENV === "development"
-const dbPrefix = 'awunebpieotzvtduc'
+const dbPrefix = 'jwoae'
 const huddleDb = `${dbPrefix}:huddles`
 const userDb = `${dbPrefix}:users`
 

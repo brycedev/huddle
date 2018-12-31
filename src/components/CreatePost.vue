@@ -1,14 +1,14 @@
 <template>
   <div class="z-max fixed pin bg-smoke justify-center subtle" :class="open" @click.self="close">
     <div class="flex justify-center mt-20">
-      <div class="rounded-lg shadow-lg p-6 bg-white w-full mb-4 max-w-md relative">
+      <div class="rounded-lg shadow-lg p-6 bg-white w-full mb-4 max-w-smd relative">
         <div class="w-full flex flex-col">
           <div class="flex items-center mb-2" v-if="post.user">
             <img class="w-8 h-8 rounded-full mr-2" :src="post.user.avatar"/>
             <h4 class="font-normal text-black">{{ post.user.name.replace('.id.blockstack','') }}</h4>
           </div>
           <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex">
-            <textarea v-model="post" type="text" class="bg-transparent flex-grow w-full mr-4 h-24 block appearance-none text-grey-darker font-light leading-loose outline-none text-normal h-24 resize-none" placeholder="Some post text"></textarea>
+            <textarea v-model="post" type="text" class="bg-transparent flex-grow w-full mr-4 h-64 block appearance-none text-grey-darker font-light leading-loose outline-none text-normal h-24 resize-none" placeholder="Some post text"></textarea>
             <div class="bg-blue rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer self-end">
               <span v-show="!isGivingThought">Post</span>
               <img src="../assets/spinner.svg" class="spin" alt="" width="16" v-show="isGivingThought">

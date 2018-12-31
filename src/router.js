@@ -10,6 +10,14 @@ Vue.use(Router)
 export default new Router({
   mode: 'history',
   base: process.env.BASE_URL,
+  scrollBehavior(to, from, savedPosition) {
+    const stickers = ['CreatePostPublic', 'CreatePostPrivate', 'ExpandedHuddlePostPublic', 'ExpandedHuddlePostPrivate']
+    if (savedPosition || stickers.includes(to.name) || stickers.includes(from.name)) {
+      return savedPosition
+    } else {
+      return { x: 0, y: 0 }
+    }
+  },
   routes: [
     {
       path: '/huddles/new',
@@ -28,16 +36,30 @@ export default new Router({
     },
     {
       path: '/h/:slug',
-      name: 'Huddle',
+      name: 'HuddlePublic',
       component: Huddle,
       children: [
         { 
           path: 'new',
-          name: 'CreatePost'
+          name: 'CreatePostPublic'
         },
         { 
-          path: 'post/:id',
-          name: 'ExpandedHuddlePost'
+          path: 'post/:postId',
+          name: 'ExpandedHuddlePostPublic'
+        }
+      ]
+    },
+    {
+      path: '/p/:id',
+      name: 'HuddlePrivate',
+      component: Huddle,
+      children: [{
+          path: 'new',
+          name: 'CreatePostPrive'
+        },
+        {
+          path: 'post/:postId',
+          name: 'ExpandedHuddlePostPrivate'
         }
       ]
     },

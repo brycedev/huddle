@@ -4,12 +4,15 @@
 
     </portal-target>
     <nav class="w-full fixed z-max subtle" :class="{'bg-black' : scroll > 32}">
-      <div class="container">
+      <div class="container px-6 sm:px-0">
         <div class="flex justify-between items-center py-2">
-          <router-link class="block no-underline" to="/">
+          <router-link class="sm:block no-underline hidden" to="/">
             <img src="../src/assets/logo.svg" alt="Huddle logo" width="120">
           </router-link>
-          <div class="flex flex-grow">
+          <router-link class="sm:hidden block no-underline" to="/">
+            <img src="../src/assets/logomark-white.png" alt="Huddle logo" width="35">
+          </router-link>
+          <div class="sm:flex-grow hidden sm:flex">
             <div class="mx-auto flex justify-center">
               <div class="flex -mb-px mr-6">
                 <router-link to="/#search" class="no-underline flex items-center text-white uppercase" active-class="active-link">
@@ -51,7 +54,6 @@ export default {
   store: ['huddles', 'user', 'users'],
   data() {
     return {
-      random: 0,
       scroll: 0
     }
   },
@@ -62,14 +64,13 @@ export default {
         : '#'
     },
     eligibleRandomSlugs(){
-      if(this.$route.name == 'Huddle'){
-        return this.huddles.filter(h => h.slug !== this.$route.params.slug)
+      if(['HuddlePublic', 'HuddlePrivate'].includes(this.$route.name)){
+        return this.huddles.filter(h => h.slug !== this.$route.params.slug && h.type == 'public')
       }
-      return this.huddles
+      return this.huddles.filter(h => h.type == 'public')
     }
   },
   mounted(){
-    this.random = Math.floor(Math.random() * this.huddles.length)
     document.addEventListener('scroll', e => {
       this.scroll = window.scrollY
     })
@@ -111,17 +112,18 @@ export default {
             hideNSFW: true,
             mutedWords : []
           }
+          this.user.privateGroups = []
           const newPrefs = JSON.stringify(this.user.preferences)
+          const newPrivateGroups = JSON.stringify(this.user.privateGroups)
           await blockstack.putFile('preferences.json', newPrefs, { encrypt : true })
+          await blockstack.putFile('privateGroups.json', newPrivateGroups, { encrypt : true })
           resolve()
         } else {
           console.log('loading user : ', this.user.name)
           // user exists, so load their gaia storage
-          blockstack.getFile('preferences.json', { decrypt: true })
-          .then(prefs => {
-            this.user.preferences = JSON.parse(prefs)
-            resolve()
-          }).catch(err => reject(err))
+          this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
+          this.user.privateGroups = JSON.parse(await blockstack.getFile('privateGroups.json', { decrypt: true }))
+          resolve()
         }
       })
     },

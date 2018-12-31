@@ -63,25 +63,33 @@ export default {
   methods: {
     async create(){
       if(this.canSubmit){
+        this.isCreating = true
+        let huddle = this.huddle
+        huddle.id = uuid('huddle')
+        huddle.hue = Math.floor(Math.random() * 357)
+        huddle.background = `https://picsum.photos/1920x1080/?random=${this.huddle.id}`
+        huddle.createdAt = Date.now()
+        huddle.updatedAt = Date.now()
         if(this.huddle.type == 'public'){
-          this.isCreating = true
-          let huddle = this.huddle
-          huddle.id = uuid('huddle')
-          huddle.hue = Math.floor(Math.random() * 357)
-          huddle.background = `https://picsum.photos/1920x1080/?random=${this.huddle.id}`
-          huddle.createdAt = Date.now()
-          huddle.updatedAt = Date.now()
           huddle.slug = this.slugged
           huddle.isProposed = true
           huddle.isApproved = false
+        } else {
+          this.user.privateGroups.push(huddle.id)
+          const newPrivateGroup = JSON.stringify(huddle)
+          const newPrivateGroups = JSON.stringify(this.user.privateGroups)
+          await blockstack.putFile(`privateGroups/${huddle.id}.json`, newPrivateGroup, { encrypt : true })
+          await blockstack.putFile('privateGroups.json', newPrivateGroups, { encrypt : true })
+        }
+        if(this.huddle.type !== 'private'){
           console.log('adding huddle to gundb: ', huddle.id)
           const newHuddle = shogun.get(`${gun.prefix}:huddles/${huddle.id}`).put(huddle)
           gun.huddles.set(newHuddle)
-          this.isCreating = false
-          this.$router.push(`/h/${this.slugged}`)
         }
+        if(this.huddle.type == 'public') this.$router.push(`/h/${this.slugged}`)
+        else this.$router.push(`/p/${huddle.id}`)
       } else {
-
+        // can't submit
       }
     },
     styleForType(type){
