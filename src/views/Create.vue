@@ -83,8 +83,8 @@ export default {
         }
         if(this.huddle.type !== 'private'){
           console.log('adding huddle to gundb: ', huddle.id)
-          const newHuddle = shogun.get(`${gun.prefix}:huddles/${huddle.id}`).put(huddle)
-          gun.huddles.set(newHuddle)
+          const newHuddle = this.$gun.get(`${gunPrefix}:huddles/${huddle.id}`).put(huddle)
+          this.$gun.get(`${gunPrefix}:huddles`).set(newHuddle)
         }
         if(this.huddle.type == 'public') this.$router.push(`/h/${this.slugged}`)
         else this.$router.push(`/p/${huddle.id}`)

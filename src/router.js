@@ -55,7 +55,7 @@ export default new Router({
       component: Huddle,
       children: [{
           path: 'new',
-          name: 'CreatePostPrive'
+          name: 'CreatePostPrivate'
         },
         {
           path: 'post/:postId',

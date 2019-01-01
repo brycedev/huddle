@@ -1,8 +1,6 @@
 <template>
   <div id="app" class="min-h-screen bg-khak-grey">
-    <portal-target name="modal">
-
-    </portal-target>
+    <portal-target name="modal"></portal-target>
     <nav class="w-full fixed z-max subtle" :class="{'bg-black' : scroll > 32}">
       <div class="container px-6 sm:px-0">
         <div class="flex justify-between items-center py-2">
@@ -77,6 +75,17 @@ export default {
     setTimeout(async () => {
       await this.checkUser()
     })
+    this.$gun.get(`${gunPrefix}:huddles`).once(v => {
+      if(typeof(v) == 'undefined') this.seedData()
+    })
+    this.$gun.get(`${gunPrefix}:huddles`).map().on((node, key) => {
+      this.huddles.push(node)
+      this.huddles = Array.from(new Set(this.huddles))
+    })
+    this.$gun.get(`${gunPrefix}:users`).map().on((node, key) => {
+      this.users.push(node)
+      this.users = Array.from(new Set(this.users))
+    })
   },
   methods: {
     async checkUser(){
@@ -90,6 +99,12 @@ export default {
         })
       }
     },
+    seedData(){
+      seedDatabase().forEach(h => {
+        const newHuddle = this.$gun.get(`${gunPrefix}:huddles/${h.id}`).put(h)
+        this.$gun.get(`${gunPrefix}:huddles`).set(newHuddle)
+      })
+    },
     logout () {
       blockstack.signUserOut(window.location.origin)
     },
@@ -102,27 +117,42 @@ export default {
         // check to see if the user exists
         if(!this.users.find(u => u.id == this.user.id)){
           console.log('instantiating user : ', this.user.name)
-          // add user to the decentralized gundb instance
+          // add user to the gundb instance
           const identity = { id: this.user.id, name: this.user.name, avatar: this.user.avatar }
-          const newUser = shogun.get(`${gun.prefix}:users/${this.user.id}`).put(identity)
-          gun.users.set(newUser)
+          const newUser = this.$gun.get(`${gunPrefix}:users/${this.user.id}`).put(identity)
+          this.$gun.get(`${gunPrefix}:users`).set(newUser)
           // configure the user's gaia storage
           this.user.preferences = {
             blockedUsers : [],
+            hideNonVerifiedUsers: true,
             hideNSFW: true,
             mutedWords : []
           }
+          const cleanArray = JSON.stringify([])
           this.user.privateGroups = []
-          const newPrefs = JSON.stringify(this.user.preferences)
-          const newPrivateGroups = JSON.stringify(this.user.privateGroups)
-          await blockstack.putFile('preferences.json', newPrefs, { encrypt : true })
-          await blockstack.putFile('privateGroups.json', newPrivateGroups, { encrypt : true })
+          this.user.publicGroups = []
+          this.user.publicPosts = []
+          this.user.privatePosts = []
+          this.user.publicComments = []
+          this.user.privateComments = []
+          await blockstack.putFile('preferences.json', JSON.stringify(this.user.preferences), { encrypt : true })
+          await blockstack.putFile('privateGroups.json', cleanArray, { encrypt : true })
+          await blockstack.putFile('publicGroups.json', cleanArray, { encrypt : false })
+          await blockstack.putFile('publicPosts.json', cleanArray, { encrypt : false })
+          await blockstack.putFile('privatePosts.json', cleanArray, { encrypt : true })
+          await blockstack.putFile('publicComments.json', cleanArray, { encrypt : false })
+          await blockstack.putFile('privateComments.json', cleanArray, { encrypt : true })
           resolve()
         } else {
           console.log('loading user : ', this.user.name)
           // user exists, so load their gaia storage
           this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
           this.user.privateGroups = JSON.parse(await blockstack.getFile('privateGroups.json', { decrypt: true }))
+          this.user.publicGroups = JSON.parse(await blockstack.getFile('publicGroups.json', { decrypt: false }))
+          this.user.publicPosts = JSON.parse(await blockstack.getFile('publicPosts.json', { decrypt: false }))
+          this.user.privatePosts = JSON.parse(await blockstack.getFile('privatePosts.json', { decrypt: true }))
+          this.user.publicComments = JSON.parse(await blockstack.getFile('publicComments.json', { decrypt: false }))
+          this.user.privateComments = JSON.parse(await blockstack.getFile('privateComments.json', { decrypt: true }))
           resolve()
         }
       })

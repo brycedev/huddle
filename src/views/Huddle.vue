@@ -17,7 +17,7 @@
             <p class="text-black font-medium mb-2">Description</p>
             <p class="text-grey-darkest leading-normal font-light break">{{ huddle.description }}</p>
           </div>
-          <div class="rounded-lg shadow p-4 bg-white w-full mb-4">
+          <div class="rounded-lg shadow p-4 bg-white w-full mb-4" v-if="isMember">
             <p class="text-black font-normal mb-2">Members</p>
             <div class="w-full flex">
               <div class="flex flex-wrap z-50 overflow-hidden">
@@ -43,17 +43,22 @@
             <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
             <span>Join Group</span>
           </div>
-          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in posts" class="block md:ml-0 ml-2 no-underline mr-2" :key="post.id" v-if="isMember">
+          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in tempPosts" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="isMember">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
-          <huddle-post :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num" v-if="!isMember"></huddle-post>
+          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in tempPosts.slice(0,2)" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="!isMember">
+            <huddle-post :loaded="true" :post="post"></huddle-post>
+          </router-link>
+          <huddle-post class="md:mx-0 mx-2" :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num" v-if="!isMember">
+            
+          </huddle-post>
         </div>
       </div>
     </div>
     <router-view></router-view>
     <portal to="modal">
       <expanded-huddle-post :post="expandedPost" :visible="showExpandedPost"></expanded-huddle-post>
-      <create-post :visible="showCreatePost"></create-post>
+      <create-post :huddle="huddle" :visible="showCreatePost"></create-post>
     </portal>
   </div>
 </template>
@@ -71,7 +76,8 @@ export default {
     return {
       huddle: null,
       expandedPost: null,
-      memberIds: []
+      memberIds: [],
+      posts: []
     }
   },
   beforeMount(){
@@ -98,7 +104,7 @@ export default {
   beforeRouteEnter (to, from, next) {
     if(to.name.includes('ExpandedHuddlePost')){
       next(vm => {
-        vm.expandedPost = { id: to.params.postId, content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: vm.user }
+        vm.expandedPost = { id: to.params.postId, content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: {} }
         document.getElementById('body').style.overflow = 'hidden'
         vm.expandedPost ? next() : next(false)
       })
@@ -112,19 +118,14 @@ export default {
   },
   beforeRouteUpdate (to, from, next) {
     if(to.name.includes('ExpandedHuddlePost')){
-      this.expandedPost = this.posts.find(p => p.id == to.params.postId)
+      this.expandedPost = this.tempPosts.find(p => p.id == to.params.postId)
       this.expandedPost ? next() : next(false)
     } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && !from.name.includes('ExpandedHuddlePost')){
       this.huddle = this.huddles.find(h => h.slug == to.params.slug)
-      if(this.huddle){
-        next(vm => {
-          vm.fetchMembers()
-        })
-      } else {
-        next(false)
-      }
+      this.huddle ? next() : next(false)
     } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && from.name.includes('ExpandedHuddlePost')){
       this.expandedPost = null
+      this.fetchPosts()
       next()
     } else {
       next()
@@ -148,9 +149,9 @@ export default {
       return this.huddle && this.huddle.type == 'public'
     },
     isMember(){
-      return this.memberIds.includes(this.user.id)
+      return this.huddle && this.memberIds.includes(this.user.id)
     },
-    posts(){
+    tempPosts(){
       return Array.from(Array(20), (x, index) => index).map(i => {
         return { id: uuid(), content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: this.user }
       })
@@ -166,23 +167,49 @@ export default {
     }
   },
   methods: {
-    joinGroup(){
+    async joinGroup(){
       if(this.isPublic){
-        const newMember = shogun.get(`${gun.prefix}:huddles/${this.huddle.id}`).get('members').put({ id: this.user.id })
-        console.log(newMember)
+        const newMember = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').put({ id: this.user.id })
+        this.user.publicGroups.push(this.huddle.id)
+        const newPublicGroups = JSON.stringify(this.user.publicGroups)
+        await blockstack.putFile('publicGroups.json', newPublicGroups, { encrypt : false })
+        this.fetchMembers()
+        this.fetchPosts()
       }
     },
     fetchMembers(){
-      let members = []
-      shogun.get(`${gun.prefix}:huddles/${this.huddle.id}`).get('members').map().on(user => {
-        members.push(user)
-      })
-      this.memberIds = Array.from(new Set(members))
+      if(this.isPublic){
+        let members = []
+        this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').map().on(user => {
+          members.push(user)
+        })
+        this.memberIds = Array.from(new Set(members))
+      } else {
+        this.memberIds = []
+      }
+    },
+    fetchPosts(){
+      if(this.isPublic){
+        let postIds = []
+        this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('posts').map().on(post => {
+          console.log(post)
+          // postIds.push(post.id)
+        })
+        this.postIds = Array.from(new Set(postIds))
+      } else {
+        this.posts = []
+      }
     }
   },
   mounted(){
     this.fetchMembers()
-  }
+    this.fetchPosts()
+  },
+  watch: {
+    huddle(newValue, oldValue) {
+      this.fetchMembers()
+    }
+  },
 }
 </script>
 

@@ -17,6 +17,7 @@
     "slug": "^0.9.3",
     "tailwindcss": "^0.7.3",
     "vue": "^2.5.17",
+    "vue-gun": "0.0.3",
     "vue-router": "^3.0.1",
     "vue-stash": "^2.0.1-beta"
   },
