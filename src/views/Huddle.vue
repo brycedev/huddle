@@ -168,7 +168,7 @@ export default {
   },
   methods: {
     async joinGroup(){
-      if(this.isPublic){
+      if(this.isPublic && this.user){
         const newMember = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').put({ id: this.user.id })
         this.user.publicGroups.push(this.huddle.id)
         const newPublicGroups = JSON.stringify(this.user.publicGroups)
@@ -178,7 +178,7 @@ export default {
       }
     },
     fetchMembers(){
-      if(this.isPublic){
+      if(this.isPublic && this.user){
         let members = []
         this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').map().on(user => {
           members.push(user)

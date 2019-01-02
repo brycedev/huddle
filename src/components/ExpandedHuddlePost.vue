@@ -10,7 +10,7 @@
           <div class="mb-8">
             <p class="text-grey-darkest leading-loose">{{ post.content }}</p>
           </div>
-          <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex">
+          <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex" v-if="user">
             <textarea v-model="comment" type="text" class="bg-transparent flex-grow w-full mr-4 h-24 block appearance-none text-grey-darker font-light leading-loose outline-none text-normal h-24 resize-none" placeholder="Some comment"></textarea>
             <div class="bg-blue rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer self-end">
               <span v-show="!isGivingThought">Post</span>
@@ -31,6 +31,7 @@
 <script>
   export default {
     props: ['post', 'visible'],
+    store: ['user'],
     name: 'ExpandedHuddlePost',
     data() {
       return {

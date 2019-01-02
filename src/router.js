@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import About from './views/About.vue'
 import Create from './views/Create.vue'
 import Discover from './views/Discover.vue'
 import Home from './views/Home.vue'
@@ -19,6 +20,11 @@ export default new Router({
     }
   },
   routes: [
+    {
+      path: '/about',
+      name: 'About',
+      component: About
+    },
     {
       path: '/huddles/new',
       name: 'Create',
