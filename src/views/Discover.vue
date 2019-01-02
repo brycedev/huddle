@@ -17,14 +17,14 @@
             
           </div>
           <div class="flex flex-wrap">
-            <div class="w-full md:w-1/2 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id">
+            <div class="w-full md:w-1/2 xl:w-1/3 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id">
               <router-link :to="'/h/' + huddle.slug" class="block w-full no-underline">
                 <huddle-entry :huddle="huddle"></huddle-entry>
               </router-link>
             </div>          
           </div>
         </div>
-        <div class="w-120 mt-8">
+        <div class="w-120 mt-8" v-if="user">
           <div class="rounded-lg shadow p-4 bg-white w-full mb-4">
             <p class="text-center text-black font-light mb-4">Proposed Huddles</p>
             <div class="flex flex-col">

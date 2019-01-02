@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-lg shadow p-6 bg-white w-full mb-4 cursor-pointer">
+  <div class="rounded-lg shadow p-6 bg-white md:w-full mb-4 cursor-pointer">
     <shimmer v-if="!loaded"></shimmer>
     <div class="w-full flex flex-col relative" v-else>
       <div class="overlay absolute pin"></div>

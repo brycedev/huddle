@@ -105,12 +105,12 @@ export default {
     if(to.name.includes('ExpandedHuddlePost')){
       next(vm => {
         vm.expandedPost = { id: to.params.postId, content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: {} }
-        document.getElementById('body').style.overflow = 'hidden'
+        document.getElementById('body').style.overflowY = 'hidden'
         vm.expandedPost ? next() : next(false)
       })
     } else if(to.name.includes('CreatePost')){
       next(vm => {
-        document.getElementById('body').style.overflow = 'hidden'
+        document.getElementById('body').style.overflowY = 'hidden'
       })
     } else {
       next()

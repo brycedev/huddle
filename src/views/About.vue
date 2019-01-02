@@ -2,37 +2,128 @@
   <div class="home max-w-full relative overflow-hidden">
     <div class="w-full bg-black relative canvas">
       <div class="container flex">
-        <div class="flex flex-col py-20 my-12 mt-20 mx-4">
-          <h1 class="text-4xl text-white font-light max-w-sm text-left mb-4 flex z-50">
-            Social media made for you.
+        <div class="flex flex-col py-24 my-16 mt-16 mx-4 w-full">
+          <h1 class="text-4xl text-white font-light flex-wrap md:w-full md:max-w-lg max-w-sm justify-center md:justify-start md:self-start self-center md:text-left mb-4 flex z-50 leading-normal">
+            Social media made for <span class="block md:hidden ml-3">you</span><span class="hidden md:block typi ml-3">you</span>
           </h1>
-          <h2 class="text-2xl leading-normal text-white font-thin max-w-sm text-left flex z-50">
+          <h2 class="text-2xl leading-normal text-white font-thin md:max-w-sm text-center md:text-left flex z-50">
             Escape prying eyes and constant noise with communities you value most.
           </h2>
         </div>
       </div>
     </div>
     <div class="container flex">
-      <div class="w-full -mt-12 flex justify-between z-50">
-        <div class="rounded-lg w-1/3 shadow p-6 bg-white w-full mx-4 h-64 flex flex-col items-center justify-center">
+      <div class="w-full -mt-12 flex flex-col md:flex-row z-50">
+        <div class="rounded-lg h-full md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white w-full mx-4 flex flex-col items-center justify-center">
           <h2 class="text-grey-darkest font-normal mb-4">Privacy</h2>
-          <p class="text-grey-darkest leading-normal font-light break">
+          <p class="text-grey-darkest opacity-85 leading-normal font-normal break">
             Hey, you know how I'm, like, always trying to save the planet? Here's my chance. Hey, you know how I'm, like, always trying to save the planet? Here's my chance.
           </p>
         </div>
-       <div class="rounded-lg w-1/3 shadow p-6 bg-white w-full mx-4 h-64 flex flex-col items-center justify-center">
+       <div class="rounded-lg h-full md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white w-full mx-4 h-64 flex flex-col items-center justify-center">
           <h2 class="text-grey-darkest font-normal mb-4">Quality</h2>
-          <p class="text-grey-darkest leading-normal font-light break">
+          <p class="text-grey-darkest opacity-85 leading-normal font-normal break">
             Hey, you know how I'm, like, always trying to save the planet? Here's my chance. Hey, you know how I'm, like, always trying to save the planet? Here's my chance.
           </p>
         </div>
-        <div class="rounded-lg w-1/3 shadow p-6 bg-white w-full mx-4 h-64 flex flex-col items-center justify-center">
+        <div class="rounded-lg h-full md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white w-full mx-4 h-64 flex flex-col items-center justify-center">
           <h2 class="text-grey-darkest font-normal mb-4">Knowledge</h2>
-          <p class="text-grey-darkest leading-normal font-light break">
+          <p class="text-grey-darkest opacity-85 leading-normal font-normal break">
             Hey, you know how I'm, like, always trying to save the planet? Here's my chance. Hey, you know how I'm, like, always trying to save the planet? Here's my chance.
           </p>
         </div>
-        <!-- <div class="rounded-lg w-1/4 shadow p-4 bg-white w-full mx-4 h-64"></div> -->
+      </div>
+    </div>
+    <div class="w-full bg-white mt-8">
+      <div class="container flex justify-center">
+        <div class="flex flex-col justify-center items-center py-12">
+          <h1 class="text-3xl text-grey-darkest font-normal max-w-sm mb-6">
+            How does it work?
+          </h1>
+          <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal max-w-md text-center">
+            Huddle is a decentralized social network for public and private groups. It is built
+            on Blockstack, a solid technical foundation that gives you control over your digital data.
+          </p>
+          <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal max-w-md text-center my-6">
+            No central entity, like Facebook, can control or sell your data.
+          </p>
+          <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal text-center">
+            Let's take a closer look
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="w-full bg-transparent my-8">
+      <div class="container flex flex-col">
+        <div class="flex items-center justify-between w-full mb-8">
+          <div class="w-1/2 p-6">
+            <h1 class="text-3xl text-grey-darkest font-normal mb-4">
+            Create your identity
+            </h1>
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
+            In order to join Huddle, Mark has to create a profile.
+            </p>
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal">
+            He quickly creates a Blockstack identity and now has access to Huddle and the rest of the Blockstack ecosystem.
+            </p>
+          </div>
+          <div class="w-1/2 flex justify-center">
+            
+          </div>
+        </div>
+        <div class="flex items-center justify-between w-full mb-8">
+          <div class="w-1/2 flex justify-center">
+            
+          </div>
+          <div class="w-1/2 p-6">
+            <h1 class="text-3xl text-grey-darkest font-normal mb-4">
+            Find or create communities
+            </h1>
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
+            Mark joins a public group about photography and creates a private one for local photographers in his area.
+            </p>
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal">
+            He doesn't see a public group for new fathers, so he proposes a new one, and the community approves it via vote.
+            </p>
+          </div>
+          
+        </div>
+        <div class="flex items-center justify-between w-full mb-8">
+          <div class="w-1/2 p-6">
+            <h1 class="text-3xl text-grey-darkest font-normal mb-4">
+            Recognize and save quality
+            </h1>
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
+            Mark sends a few claps and comments on a post about new baby lullaby tricks.
+            </p>
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal">
+            He saves the post to easily find and review it in the future.
+            </p>
+          </div>
+          <div class="w-1/2 flex justify-center">
+            
+          </div>
+        </div>
+        <div class="flex items-center justify-between w-full mb-8">
+          <div class="w-1/2 flex justify-center">
+            
+          </div>
+          <div class="w-1/2 p-6">
+            <h1 class="text-3xl text-grey-darkest font-normal mb-4">
+            Curate your community, your way
+            </h1>
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
+            Mark can't relate with the posts made by a particular person in a group.
+            </p>
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
+            He uses the mute button to prevent seeing more of their content.
+            </p>
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal">
+            A central-censor-free filter.
+            </p>
+          </div>
+          
+        </div>
       </div>
     </div>
     <div class="w-full bg-white mt-8">
@@ -53,27 +144,30 @@
         </div>
       </div>
     </div>
+    
   </div>
 </template>
 
 <script>
-import HuddleEntry from '@/components/HuddleEntry.vue'
-import ProposedEntry from '@/components/ProposedEntry.vue'
-
+const Typed = require('typed.js')
 export default {
-  name: 'Discover',
-  store: ['huddles', 'user'],
-  components: { HuddleEntry, ProposedEntry  },
-  computed: {
-    publicHuddles(){
-      return this.huddles.filter(h => h.isApproved && h.type == 'public')
-    },
-    proposedHuddles(){
-      return this.huddles.filter(h => h.isProposed).slice(0,3)
+  name: 'About',
+  data() {
+    return {
+      person: null
     }
   },
   mounted(){
-    // if(!this.user) window.location.replace('/')
+    const people = [
+      { name: 'Hadiya', pro: 'She'}
+    ]
+    var typed = new Typed('.typi', {
+      strings: ["you", "your group", "your mindshare", "your family"],
+      typeSpeed: 200,
+      loop: true,
+      showCursor: false,
+      shuffle: false,
+    })
   }
 }
 </script>

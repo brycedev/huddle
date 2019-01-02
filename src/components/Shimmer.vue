@@ -1,5 +1,5 @@
 <template>
-  <section class="h-full w-full">
+  <section class="h-full">
     <article class="background">
       <div class="a"></div>
       <div class="b"></div>

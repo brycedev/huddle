@@ -52,9 +52,9 @@
     watch: {
       visible(value) {
         if(value){
-          document.getElementById('body').style.overflow = 'hidden'
+          document.getElementById('body').style.overflowY = 'hidden'
         } else {
-          document.getElementById('body').style.overflow = 'auto'
+          document.getElementById('body').style.overflowY = 'auto'
         }
       }
     },
