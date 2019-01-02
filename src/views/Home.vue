@@ -3,24 +3,18 @@
     <div class="w-full bg-black relative canvas">
       <div class="container flex justify-center items-center sm:px-0 px-6">
         <div class="flex flex-col py-24 my-16 mt-16 mx-4 w-full">
-          <h1 class="text-4xl text-white font-light flex-wrap md:w-full md:max-w-lg max-w-sm justify-center md:justify-start md:self-start self-center md:text-left mb-4 flex z-50 leading-normal">
+          <h1 class="text-4xl text-white font-light flex-wrap md:w-full md:max-w-lg max-w-sm justify-center self-center mb-4 flex z-50 leading-normal text-center mb-8">
             Communicate freely knowing you can’t be monitored or censored.
           </h1>
-          <router-link to="/about" class="no-underline flex self-start z-50">
-            <div class="bg-huddle-blue rounded-full text-white text-center py-3 px-4 text-lg cursor-pointer">Learn More</div>
-          </router-link>
-          
-        </div>
-        <!-- <div class="flex justify-center items-center flex-col py-20 my-20">
-          <h1 class="text-4xl text-white font-light max-w-sm text-center mb-8">It's time to take back control of your group's data.</h1>
           <div class="flex flex-col sm:flex-row justify-center items-center">
-            <router-link to="/huddles/new" class="block no-underline sm:mr-4 sm:mb-0 mb-4">
-              <div class="bg-white rounded-full text-black text-center py-2 px-4">Create a Huddle</div>
+            <router-link to="/about" class="no-underline flex self-start z-50 mr-4">
+              <div class="bg-huddle-blue rounded-full text-white text-center py-3 px-4 text-lg cursor-pointer">Learn More</div>
             </router-link>
-            <div class="bg-huddle-blue rounded-full text-white text-center py-2 px-4 cursor-pointer">Transfer from FB</div>
-            <div class="bg-huddle-blue rounded-full text-white text-center py-2 px-4 cursor-pointer">Learn More</div>
+            <router-link to="/about" class="no-underline flex self-start z-50">
+              <div class="bg-white rounded-full text-black text-center py-3 px-4 text-lg cursor-pointer">Login w/ Blockstack</div>
+            </router-link>
           </div>
-        </div> -->
+        </div>
       </div>
     </div>
     <div class="container flex -mt-20 sm:px-0 px-6">
@@ -52,7 +46,7 @@ export default {
     }
   },
   mounted(){
-    // if(!this.user) window.location.replace('/')
+  
   }
 }
 </script>
