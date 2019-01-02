@@ -1,6 +1,6 @@
 require('setimmediate')
 const isDev = window.location.host !== "huddle.group"
-const dbPrefix = 'egaweewrgt'
+const dbPrefix = 'aewhwhauwua'
 
 import Vue from 'vue'
 import App from './App.vue'
@@ -52,8 +52,9 @@ const store = {
 
 window.seedDatabase = () => {
   localStorage.clear()
-  const names = ['AMA', 'BillGuyTheScienceNye', 'Crypto', 'Vue.js', 'EarthPorn', 'Indie Makers', 'Fortnite', 'Celebrities', 'Music Production', 'Study Buddies']
+  const names = ['AMA', 'BillGuyTheScienceNye', 'Crypto', 'Vue.js', 'EarthPorn', 'Indie Makers', 'Fortnite', 'Celebrities', 'HuddleHQ', 'Music Production', 'Study Buddies']
   const proposed = ['Music Production', 'Study Buddies']
+  const hybrid = ['HuddleHQ']
   let huddles = []
   names.forEach(n => {
     let huddle = {
@@ -61,10 +62,10 @@ window.seedDatabase = () => {
       hue: Math.floor(Math.random() * 357),
       name: n,
       description: `You're a very talented young man, with your own clever thoughts and ideas. Do you need a manager? Do you have any idea how long it takes those cups to decompose. You're a very talented young man, with your own clever thoughts and ideas. Do you need a manager?`,
-      type: 'public',
+      type: hybrid.includes(n) ? 'hybrid' : 'public',
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      background: `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}`,
+      background: n == 'HuddleHQ' ? 'https://huddle.group/cover.jpg' : `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}`,
       isProposed: proposed.includes(n),
       isApproved: !proposed.includes(n),
       slug: slug(n, { lower: true, replacement: '' })

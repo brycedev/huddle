@@ -45,8 +45,8 @@ export default {
       return this.huddles.filter(h => h.isApproved && h.type == 'public')
     }
   },
-  mounted(){
-  
+  beforeMount(){
+    document.getElementById('body').style.overflow = 'auto'
   }
 }
 </script>

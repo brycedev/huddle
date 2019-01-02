@@ -29,7 +29,7 @@
             </div>          
           </div>
         </div>
-        <div class="w-120 mt-8 md:block hidden" v-if="user">
+        <div class="w-120 mt-8 md:block hidden">
           <div class="rounded-lg shadow p-4 bg-white w-full mb-4">
             <p class="text-center text-black font-light mb-4">Proposed Huddles</p>
             <div class="flex flex-col">

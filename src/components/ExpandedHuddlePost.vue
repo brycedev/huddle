@@ -1,12 +1,22 @@
 <template>
-  <div class="z-max fixed pin bg-smoke justify-center subtle" :class="open" @click.self="close">
+  <div class="z-max fixed pin bg-smoke justify-center subtle overflow-y-scroll" :class="open" @click.self="close">
     <div class="flex justify-center mt-20" v-if="post !== null">
-      <div class="rounded-lg shadow-lg p-6 bg-white w-full mb-4 max-w-md relative">
+      <div class="rounded-lg shadow-lg p-6 px-8 bg-white w-full mb-4 max-w-md relative">
         <div class="w-full flex flex-col">
-          <div class="flex items-center mb-2" v-if="postUser">
-            <img class="w-8 h-8 rounded-full mr-2" :src="postUser.avatar"/>
-            <h4 class="font-normal text-black">{{ postUser.name.replace('.id.blockstack','') }}</h4>
+          <div class="flex w-full justify-between mb-6">
+            <div class="flex flex-col flex-grow w-full">
+              <div class="flex items-center mb-2 w-full" v-if="postUser">
+                <img class="w-8 h-8 rounded-full mr-2" :src="postUser.avatar"/>
+                <h3 class="font-normal text-black text-xl tracking-wide">{{ postUser.name.replace('.id.blockstack','') }}</h3>
+              </div>
+              <p class="text-grey-darkest font-light text-xs pt-1 tracking-wide">Post Creation : {{ postDate }}</p>
+            </div>
+            <div class="flex ml-2">
+              <img src="../assets/save.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle">
+              <img src="../assets/share.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle">
+            </div>
           </div>
+          
           <div class="mb-8">
             <p class="text-grey-darkest leading-loose">{{ post.content }}</p>
           </div>
@@ -60,6 +70,11 @@
           ? this.users.find(u => u.id == this.post.u)
           : false
       },
+      postDate(){
+        return this.post 
+          ? (new Date()).toLocaleDateString() 
+          : new Date(Date.UTC(this.post.createdAt)).toLocaleDateString()
+      }
     },
     methods: {
       close(){
@@ -106,7 +121,7 @@
         await blockstack.putFile('publicComments.json', JSON.stringify(this.user.publicComments), { encrypt : false })
         await blockstack.putFile(`publicComments/${comment.id}.json`, gaiaComment, { encrypt : false })
         this.comment = ''
-        this.$parent.fetchComments()
+        // this.$parent.fetchComments()
       }
     },
     mounted(){
