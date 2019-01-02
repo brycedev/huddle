@@ -6,7 +6,10 @@
           <h1 class="text-4xl text-white font-light flex-wrap md:w-full md:max-w-lg max-w-sm justify-center md:justify-start md:self-start self-center md:text-left mb-4 flex z-50 leading-normal">
             Communicate freely knowing you can’t be monitored or censored.
           </h1>
-          <div class="bg-blue rounded-full text-white text-center py-3 px-4 text-lg cursor-pointer flex self-start z-50">Learn More</div>
+          <router-link to="/about" class="no-underline flex self-start z-50">
+            <div class="bg-blue rounded-full text-white text-center py-3 px-4 text-lg cursor-pointer">Learn More</div>
+          </router-link>
+          
         </div>
         <!-- <div class="flex justify-center items-center flex-col py-20 my-20">
           <h1 class="text-4xl text-white font-light max-w-sm text-center mb-8">It's time to take back control of your group's data.</h1>

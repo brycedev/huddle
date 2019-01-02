@@ -44,10 +44,10 @@
     </nav>
     <router-view/>
     <footer class="bg-black py-8 w-full mt-8">
-      <div class="container mx-auto px-8">
-        <div class="flex w-full justify-center">
-          <img src="../src/assets/logomark-white.png" class="self-start mr-12" alt="Huddle logo" width="35">
-          <div class="block sm:table-cell mr-12">
+      <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row w-full justify-center">
+          <img src="../src/assets/logomark-white.png" class="self-start mr-12 mb-8 md:mb-0" alt="Huddle logo" width="35">
+          <div class="block sm:table-cell mr-12 mb-8 md:mb-0">
             <p class="no-underline flex items-center text-white uppercase opacity-75 text-xs mb-4">Links</p>
             <ul class="list-reset text-xs mb-6">
               <li class="mt-2 inline-block mr-2 sm:block sm:mr-0">
@@ -61,21 +61,18 @@
               </li>
             </ul>
           </div>
-          <div class="block sm:table-cell mr-12">
+          <div class="block sm:table-cell mr-12 mb-8 md:mb-0">
             <p class="no-underline flex items-center text-white uppercase opacity-75 text-xs mb-4">Community</p>
             <ul class="list-reset text-xs mb-6">
               <li class="mt-2 inline-block mr-2 sm:block sm:mr-0">
-                <a href="#" class="text-white opacity-75 hover:opacity-100 no-underline">Facebook</a>
-              </li>
-              <li class="mt-2 inline-block mr-2 sm:block sm:mr-0">
-                <a href="#" class="text-white opacity-75 hover:opacity-100 no-underline">Linkedin</a>
+                <a href="#" class="text-white opacity-75 hover:opacity-100 no-underline">Huddle</a>
               </li>
               <li class="mt-2 inline-block mr-2 sm:block sm:mr-0">
                 <a href="#" class="text-white opacity-75 hover:opacity-100 no-underline">Twitter</a>
               </li>
             </ul>
           </div>        
-          <div class="block sm:table-cell mr-12">
+          <div class="block sm:table-cell mr-12 mb-8 md:mb-0">
             <p class="no-underline flex items-center text-white uppercase opacity-75 text-xs mb-4">Legal</p>
             <ul class="list-reset text-xs mb-6">
               <li class="mt-2 inline-block mr-2 sm:block sm:mr-0">

@@ -1,5 +1,5 @@
 <template>
-  <div class="home max-w-full relative overflow-hidden">
+  <div class="home max-w-full relative overflow-hidden -mb-8">
     <div class="w-full bg-black relative canvas">
       <div class="container flex">
         <div class="flex flex-col py-24 my-16 mt-16 mx-4 w-full">
@@ -14,19 +14,19 @@
     </div>
     <div class="container flex">
       <div class="w-full -mt-12 flex flex-col md:flex-row z-50">
-        <div class="rounded-lg h-full md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white w-full mx-4 flex flex-col items-center justify-center">
+        <div class="rounded-lg h-full  md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white md:w-full mx-4 flex flex-col items-center justify-center">
           <h2 class="text-grey-darkest font-normal mb-4">Privacy</h2>
           <p class="text-grey-darkest opacity-85 leading-normal font-normal break">
             Hey, you know how I'm, like, always trying to save the planet? Here's my chance. Hey, you know how I'm, like, always trying to save the planet? Here's my chance.
           </p>
         </div>
-       <div class="rounded-lg h-full md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white w-full mx-4 h-64 flex flex-col items-center justify-center">
+       <div class="rounded-lg h-full  md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white md:w-full mx-4 h-64 flex flex-col items-center justify-center">
           <h2 class="text-grey-darkest font-normal mb-4">Quality</h2>
           <p class="text-grey-darkest opacity-85 leading-normal font-normal break">
             Hey, you know how I'm, like, always trying to save the planet? Here's my chance. Hey, you know how I'm, like, always trying to save the planet? Here's my chance.
           </p>
         </div>
-        <div class="rounded-lg h-full md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white w-full mx-4 h-64 flex flex-col items-center justify-center">
+        <div class="rounded-lg h-full  md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white md:w-full mx-4 h-64 flex flex-col items-center justify-center">
           <h2 class="text-grey-darkest font-normal mb-4">Knowledge</h2>
           <p class="text-grey-darkest opacity-85 leading-normal font-normal break">
             Hey, you know how I'm, like, always trying to save the planet? Here's my chance. Hey, you know how I'm, like, always trying to save the planet? Here's my chance.
@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="w-full bg-white mt-8">
-      <div class="container flex justify-center">
+      <div class="container flex justify-center px-6">
         <div class="flex flex-col justify-center items-center py-12">
           <h1 class="text-3xl text-grey-darkest font-normal max-w-sm mb-6">
             How does it work?
@@ -56,8 +56,8 @@
     <div class="w-full bg-transparent my-8">
       <div class="container flex flex-col">
         <div class="flex items-center justify-between w-full mb-8">
-          <div class="w-1/2 p-6">
-            <h1 class="text-3xl text-grey-darkest font-normal mb-4">
+          <div class="w-full md:w-1/2 px-8">
+            <h1 class="text-3xl text-grey-darkest font-normal mb-4 leading-normal">
             Create your identity
             </h1>
             <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
@@ -67,16 +67,16 @@
             He quickly creates a Blockstack identity and now has access to Huddle and the rest of the Blockstack ecosystem.
             </p>
           </div>
-          <div class="w-1/2 flex justify-center">
+          <div class="md:w-1/2 md:block hidden">
             
           </div>
         </div>
         <div class="flex items-center justify-between w-full mb-8">
-          <div class="w-1/2 flex justify-center">
+          <div class="md:w-1/2 md:block hidden">
             
           </div>
-          <div class="w-1/2 p-6">
-            <h1 class="text-3xl text-grey-darkest font-normal mb-4">
+          <div class="w-full md:w-1/2 px-8">
+            <h1 class="text-3xl text-grey-darkest font-normal mb-4 leading-normal">
             Find or create communities
             </h1>
             <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
@@ -89,8 +89,8 @@
           
         </div>
         <div class="flex items-center justify-between w-full mb-8">
-          <div class="w-1/2 p-6">
-            <h1 class="text-3xl text-grey-darkest font-normal mb-4">
+          <div class="w-full md:w-1/2 px-8">
+            <h1 class="text-3xl text-grey-darkest font-normal mb-4 leading-normal">
             Recognize and save quality
             </h1>
             <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
@@ -100,16 +100,16 @@
             He saves the post to easily find and review it in the future.
             </p>
           </div>
-          <div class="w-1/2 flex justify-center">
+          <div class="md:w-1/2 md:block hidden">
             
           </div>
         </div>
         <div class="flex items-center justify-between w-full mb-8">
-          <div class="w-1/2 flex justify-center">
+          <div class="md:w-1/2 md:block hidden">
             
           </div>
-          <div class="w-1/2 p-6">
-            <h1 class="text-3xl text-grey-darkest font-normal mb-4">
+          <div class="w-full md:w-1/2 px-8">
+            <h1 class="text-3xl text-grey-darkest font-normal mb-4 leading-normal">
             Curate your community, your way
             </h1>
             <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
@@ -127,7 +127,7 @@
       </div>
     </div>
     <div class="w-full bg-white mt-8">
-      <div class="container flex justify-center">
+      <div class="container flex justify-center px-4">
         <div class="flex flex-col justify-center items-center py-12">
           <h1 class="text-3xl font-light max-w-sm">
             We're here to listen.
@@ -144,7 +144,6 @@
         </div>
       </div>
     </div>
-    
   </div>
 </template>
 
