@@ -25,6 +25,16 @@
               <huddle-entry :huddle="huddle"></huddle-entry>
             </router-link>
           </div>          
+          <div class="w-full md:w-1/2 xl:w-1/3 mb-4 px-2">
+            <router-link to="/discover" class="block h-full w-full block no-underline">
+              <div class="w-full shadow-md rounded-lg overflow-hidden canvas relative cursor-pointer bg-black h-full">
+                <!-- <div class="overlay absolute pin z-auto" :style="bgColor"></div> -->
+                <div class="px-6 py-4 flex justify-center h-full items-center z-50 overflow-hidden">
+                  <h1 class="font-light text-xl text-white opacity-90">Discover {{ more }} More</h1>
+                </div>
+              </div>
+            </router-link>
+          </div>          
         </div>
       </div>
     </div>
@@ -43,6 +53,12 @@ export default {
   computed: {
     publicHuddles(){
       return this.huddles.filter(h => h.isApproved && h.type == 'public')
+    },
+    bgColor(){
+      return { backgroundColor: `hsla(4, 35%, 27%, .64)` }
+    },
+    more(){
+      return this.publicHuddles.length - 8
     }
   },
   beforeMount(){

@@ -16,13 +16,8 @@
           <div class="w-full self-center bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex justify-center items-center mb-4 h-12">
             
           </div>
-          <div class="flex flex-wrap">
-            <div class="w-full md:w-1/2 xl:w-1/3 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id" v-if="!user">
-              <router-link :to="'/h/' + huddle.slug" class="block w-full no-underline">
-                <huddle-entry :huddle="huddle"></huddle-entry>
-              </router-link>
-            </div>          
-            <div class="w-full lg:w-1/2 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id" v-if="user">
+          <div class="flex flex-wrap">        
+            <div class="w-full lg:w-1/2 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id">
               <router-link :to="'/h/' + huddle.slug" class="block w-full no-underline">
                 <huddle-entry :huddle="huddle"></huddle-entry>
               </router-link>

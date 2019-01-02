@@ -1,6 +1,6 @@
 require('setimmediate')
 const isDev = window.location.host !== "huddle.group"
-const dbPrefix = 'aewhwhauwua'
+const dbPrefix = 'aewphauwua'
 
 import Vue from 'vue'
 import App from './App.vue'
@@ -52,7 +52,7 @@ const store = {
 
 window.seedDatabase = () => {
   localStorage.clear()
-  const names = ['AMA', 'BillGuyTheScienceNye', 'Crypto', 'Vue.js', 'EarthPorn', 'Indie Makers', 'Fortnite', 'Celebrities', 'HuddleHQ', 'Music Production', 'Study Buddies']
+  const names = ['AMA', 'BillGuyTheScienceNye', 'Crypto', 'Vue.js', 'EarthPorn', 'Indie Makers', 'Fortnite', 'Celebrities', 'HuddleHQ', 'Music Production', 'Study Buddies', 'Chess Club', 'Futurology', 'New Year Resolutions']
   const proposed = ['Music Production', 'Study Buddies']
   const hybrid = ['HuddleHQ']
   let huddles = []
