@@ -43,10 +43,10 @@
             <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
             <span>Join Group</span>
           </div>
-          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in tempPosts" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="isMember">
+          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in posts" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="isMember">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
-          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in tempPosts.slice(0,2)" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="!isMember">
+          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in posts.slice(0,2)" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="!isMember">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
           <huddle-post class="md:mx-0 mx-2" :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num" v-if="!isMember">
@@ -77,7 +77,8 @@ export default {
       huddle: null,
       expandedPost: null,
       memberIds: [],
-      posts: []
+      posts: [],
+      postFragments: []
     }
   },
   beforeMount(){
@@ -104,7 +105,7 @@ export default {
   beforeRouteEnter (to, from, next) {
     if(to.name.includes('ExpandedHuddlePost')){
       next(vm => {
-        vm.expandedPost = { id: to.params.postId, content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: {} }
+        vm.expandedPost = { id: uuid(), content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: vm.user, huddle: to.params.id }
         document.getElementById('body').style.overflowY = 'hidden'
         vm.expandedPost ? next() : next(false)
       })
@@ -113,12 +114,13 @@ export default {
         document.getElementById('body').style.overflowY = 'hidden'
       })
     } else {
+      document.getElementById('body').style.overflowY = 'auto'
       next()
     }
   },
   beforeRouteUpdate (to, from, next) {
     if(to.name.includes('ExpandedHuddlePost')){
-      this.expandedPost = this.tempPosts.find(p => p.id == to.params.postId)
+      this.expandedPost = this.posts.find(p => p.id == to.params.postId)
       this.expandedPost ? next() : next(false)
     } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && !from.name.includes('ExpandedHuddlePost')){
       this.huddle = this.huddles.find(h => h.slug == to.params.slug)
@@ -153,7 +155,7 @@ export default {
     },
     tempPosts(){
       return Array.from(Array(20), (x, index) => index).map(i => {
-        return { id: uuid(), content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: this.user }
+        return { id: uuid(), content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: this.user, huddle: this.huddle.id }
       })
     },
     members(){
@@ -163,7 +165,7 @@ export default {
       return this.$route.name.includes('CreatePost')
     },
     showExpandedPost(){
-      return this.$route.name.includes('ExpandedHuddlePost') && this.expandedPost
+      return this.$route.name.includes('ExpandedHuddlePost') && this.expandedPost !== null
     }
   },
   methods: {
@@ -189,15 +191,14 @@ export default {
       }
     },
     fetchPosts(){
-      if(this.isPublic){
-        let postIds = []
+      if(this.isPublic && this.users){
+        this.postFragments = []
         this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('posts').map().on(post => {
-          console.log(post)
-          // postIds.push(post.id)
+          this.postFragments.push(post)
+          this.postFragments = Array.from(new Set(this.postFragments))
         })
-        this.postIds = Array.from(new Set(postIds))
       } else {
-        this.posts = []
+        
       }
     }
   },
@@ -208,6 +209,26 @@ export default {
   watch: {
     huddle(newValue, oldValue) {
       this.fetchMembers()
+      this.fetchPosts()
+    },
+    postFragments(value){
+      let posts = []
+      value.forEach(async f => {
+        if(f.u == this.user.id){
+          posts.push(this.user.publicPosts.find(p => p.id == f.id))
+        } else {
+          blockstack.getFile(`/publicPosts/${f.id}.json`, {
+            decrypt: false,
+            app: window.location.origin,
+            username: this.users.find(u => u.id == f.u).name
+          }).then(file => {
+            console.log(file)
+          }).catch(err => {
+            console.log(err)
+          })
+        }
+      })
+      this.posts = posts
     }
   },
 }

@@ -12,23 +12,28 @@
     </div>
     <div class="container flex">
       <div class="w-full justify-between flex">
-        <div class="w-full flex-grow flex-col -mt-20 mr-4">
+        <div class="w-full flex-grow flex-col -mt-20 md:mr-4">
           <div class="w-full self-center bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex justify-center items-center mb-4 h-12">
             
           </div>
           <div class="flex flex-wrap">
-            <div class="w-full md:w-1/2 xl:w-1/3 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id">
+            <div class="w-full md:w-1/2 xl:w-1/3 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id" v-if="!user">
+              <router-link :to="'/h/' + huddle.slug" class="block w-full no-underline">
+                <huddle-entry :huddle="huddle"></huddle-entry>
+              </router-link>
+            </div>          
+            <div class="w-full lg:w-1/2 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id" v-if="user">
               <router-link :to="'/h/' + huddle.slug" class="block w-full no-underline">
                 <huddle-entry :huddle="huddle"></huddle-entry>
               </router-link>
             </div>          
           </div>
         </div>
-        <div class="w-120 mt-8" v-if="user">
+        <div class="w-120 mt-8 md:block hidden" v-if="user">
           <div class="rounded-lg shadow p-4 bg-white w-full mb-4">
             <p class="text-center text-black font-light mb-4">Proposed Huddles</p>
             <div class="flex flex-col">
-              <router-link :to="'/h/' + huddle.slug" v-for="huddle in proposedHuddles" :key="huddle.id"  class="block w-full block no-underline">
+              <router-link :to="'/discover/vote/' + huddle.id" v-for="huddle in proposedHuddles" :key="huddle.id"  class="block w-full block no-underline">
                 <proposed-entry class="mb-4" :huddle="huddle"></proposed-entry>
               </router-link>
             </div>
@@ -36,27 +41,62 @@
         </div>
       </div>
     </div>
+    <portal to="modal">
+      <proposed-vote :huddle="expanded" :visible="showProposedVote"></proposed-vote>
+    </portal>
   </div>
 </template>
 
 <script>
 import HuddleEntry from '@/components/HuddleEntry.vue'
 import ProposedEntry from '@/components/ProposedEntry.vue'
+import ProposedVote from '@/components/ProposedVote.vue'
 
 export default {
   name: 'Discover',
   store: ['huddles', 'user'],
-  components: { HuddleEntry, ProposedEntry  },
+  data() {
+    return {
+      expanded: null
+    }
+  },
+  components: { HuddleEntry, ProposedEntry, ProposedVote  },
   computed: {
     publicHuddles(){
       return this.huddles.filter(h => h.isApproved && h.type == 'public')
     },
     proposedHuddles(){
       return this.huddles.filter(h => h.isProposed).slice(0,3)
+    },
+    showProposedVote(){
+      return this.$route.name == ('ProposedVote') && this.expandedPost !== null
+    }
+  },
+  beforeRouteEnter (to, from, next) {
+    if(to.name == 'ProposedVote'){
+      next(vm => {
+        vm.expanded = vm.proposedHuddles.find(h => h.id == to.params.id)
+        document.getElementById('body').style.overflowY = 'hidden'
+        vm.expanded ? next() : next(false)
+      })
+    } else {
+      document.getElementById('body').style.overflowY = 'auto'
+      next()
+    }
+  },
+  beforeRouteUpdate (to, from, next) {
+    if(to.name.includes('ProposedVote')){
+      this.expanded = this.proposedHuddles.find(h => h.id == to.params.id)
+      this.expanded ? next() : next(false)
+    } else if(to.name == 'Discover' && from.name == 'ExpandedHuddlePost'){
+      this.expanded = null
+      next()
+    } else {
+      next()
     }
   },
   mounted(){
-    // if(!this.user) window.location.replace('/')
+
   }
 }
 </script>

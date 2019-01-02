@@ -33,7 +33,12 @@ export default new Router({
     {
       path: '/discover',
       name: 'Discover',
-      component: Discover
+      component: Discover,
+      children: [{
+          path: 'vote/:id',
+          name: 'ProposedVote'
+        }
+      ]
     },
     {
       path: '/',

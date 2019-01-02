@@ -9,11 +9,13 @@
           </div>
           <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex">
             <textarea v-model="post" type="text" class="bg-transparent flex-grow w-full mr-4 h-64 block appearance-none text-grey-darker font-light leading-loose outline-none text-normal h-24 resize-none" placeholder="Some post text"></textarea>
-            <div class="bg-blue rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer self-end" v-show="isGivingThought">
-              <img src="../assets/spinner.svg" class="spin" alt="" width="16" v-show="isGivingThought">
-              <span class="ml-2">Cancel</span>
+            <div class="bg-red-light rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer table self-end" v-show="isGivingThought" @click="cancelPost">
+              <div class="ul m-0 p-0 inline-block">
+                <img src="../assets/spinner.svg" class="align-middle spin" alt="" width="16">
+                <span class="align-middle ml-2 mb-4">{{ timer }}</span>
+              </div>
             </div>
-            <div class="bg-blue rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer self-end" v-show="!isGivingThought">
+            <div class="bg-huddle-blue rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer self-end" v-show="!isGivingThought" @click="clickPost">
               <span>Post</span>
             </div>
           </div>
@@ -28,22 +30,50 @@
 <script>
   export default {
     props: ['huddle', 'visible'],
+    store: ['user'],
     name: 'CreatePost',
     data() {
       return {
         post: '',
         isGivingThought: false,
-        isPosting: '',
+        thoughtPromise: null,
+        timerInterval: null,
+        timer: 7
       }
     },
     computed: {
       open(){
         return this.visible ? 'opacity-100 visible' : 'opacity-0 invisible'
-      }
+      },
+      isMember(){
+        return this.huddle && this.user && this.user.publicGroups.includes(this.huddle.id)
+      },
     },
     methods: {
       cancelPost(){
-        this.$emit('cancel-post')
+        this.thoughtPromise.cancel()
+      },
+      clickPost(){
+        if(!this.isGivingThought && this.isMember){
+          this.isGivingThought = true
+          this.thoughtPromise = later(7000, "posting comment")
+          this.timerInterval = setInterval(() => {
+            this.timer--
+          }, 1000)
+          this.thoughtPromise.promise.then(async msg => { 
+            await this.submitPost()
+            clearInterval(this.timerInterval)
+            this.timer = 7
+            this.isGivingThought = false
+          }).catch(() => { 
+            console.log("cancelled comment")
+            clearInterval(this.timerInterval)
+            this.timer = 7
+            this.isGivingThought = false 
+          })
+        } else {
+          // error message
+        }
       },
       close(){
         if(this.huddle.type == 'public') this.$router.push(`/h/${this.$route.params.slug}`)
@@ -51,36 +81,23 @@
         else this.$router.push(`/p/${this.$route.params.slug}`)
       },
       async submitPost(){
-        if(!isGivingThought && !isPosting){
-          this.isGivingThought = true
-          Promise((resolve, reject) => {
-            this.$on('cancel-post', reject('cancelled'))
-            setTimeout(() => {
-              resolve()
-            }, 7000)
-          }).then(async () => {
-            this.isGivingThought = false
-            this.isPosting = true
-            const post = {
-              id: uuid(),
-              huddle: this.huddle.id,
-              type: 'text',
-              content: this.post
-            }
-            const gunData = { id: uuid(), u: this.user.id }
-            const gunPost = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('posts').put(gunData)
-            const gaiaPost = JSON.stringify(post)
-            this.user.posts.push(post)
-            await blockstack.putFile('publicPosts.json', JSON.stringify(this.user.posts), { encrypt : false })
-            await blockstack.putFile(`publicPosts/${post.id}.json`, gaiaPost, { encrypt : false })
-            this.isPosting = false
-            this.close()
-          }).catch(err => {
-            this.isGivingThought = false
-            console.log(err)
-          })
+        const post = {
+          id: uuid(),
+          u: this.user.id,
+          huddle: this.huddle.id,
+          type: 'text',
+          content: this.post
         }
-      }
+        const gunData = { id: post.id, u: this.user.id }
+        const newPost = this.$gun.get(`${gunPrefix}:posts/${post.id}`).put(gunData)
+        const gunPost = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('posts').set(newPost)
+        const gaiaPost = JSON.stringify(post)
+        this.user.publicPosts.push(post)
+        await blockstack.putFile('publicPosts.json', JSON.stringify(this.user.publicPosts), { encrypt : false })
+        await blockstack.putFile(`publicPosts/${post.id}.json`, gaiaPost, { encrypt : false })
+        this.post = ''
+        this.close()
+      },
     },
     watch: {
       visible(value) {

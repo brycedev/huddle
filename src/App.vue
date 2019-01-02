@@ -167,9 +167,14 @@ export default {
           // configure the user's gaia storage
           this.user.preferences = {
             blockedUsers : [],
-            hideNonVerifiedUsers: true,
+            hideUnlikelyHuddleProposals: false,
+            hideNonVerifiedUsers: false,
             hideNSFW: true,
-            mutedWords : []
+            filters : [
+              // example filters
+              // { type: 'wordBeginsWith', match: 'poli' },
+              // { type: 'wordIs', match: 'jeffblum' }
+            ]
           }
           const cleanArray = JSON.stringify([])
           this.user.privateGroups = []

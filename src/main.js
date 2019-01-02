@@ -1,6 +1,6 @@
 require('setimmediate')
 const isDev = window.location.host !== "huddle.group"
-const dbPrefix = 'gayktykrtylrtylt'
+const dbPrefix = 'egaweewrgt'
 
 import Vue from 'vue'
 import App from './App.vue'
@@ -22,6 +22,25 @@ window.uuid = ((a, b) => {
   for (b = a = ''; a++ < 36; b += a * 51 & 52 ? (a ^ 15 ? 8 ^ Math.random() * (a ^ 20 ? 16 : 4) : 4).toString(16) : '-');
   return b.replace(/-/g, "")
 })
+window.later = (delay, value) => {
+  let timer = 0;
+  let reject = null;
+  const promise = new Promise((resolve, _reject) => {
+      reject = _reject;
+      timer = setTimeout(resolve, delay, value);
+  });
+  return {
+    get promise() { return promise },
+    cancel() {
+      if (timer) {
+        clearTimeout(timer);
+        timer = 0;
+        reject();
+        reject = null;
+      }
+    }
+  };
+};
 
 const store = {
   bus: new Vue(),
@@ -33,7 +52,8 @@ const store = {
 
 window.seedDatabase = () => {
   localStorage.clear()
-  const names = ['AMA', 'BillGuyTheScienceNye', 'Crypto', 'Vue.js', 'EarthPorn', 'Indie Makers', 'Fortnite', 'Celebrities']
+  const names = ['AMA', 'BillGuyTheScienceNye', 'Crypto', 'Vue.js', 'EarthPorn', 'Indie Makers', 'Fortnite', 'Celebrities', 'Music Production', 'Study Buddies']
+  const proposed = ['Music Production', 'Study Buddies']
   let huddles = []
   names.forEach(n => {
     let huddle = {
@@ -45,8 +65,8 @@ window.seedDatabase = () => {
       createdAt: Date.now(),
       updatedAt: Date.now(),
       background: `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}`,
-      isProposed: false,
-      isApproved: true,
+      isProposed: proposed.includes(n),
+      isApproved: !proposed.includes(n),
       slug: slug(n, { lower: true, replacement: '' })
     }
     huddles.push(huddle)

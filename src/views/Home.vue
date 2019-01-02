@@ -7,7 +7,7 @@
             Communicate freely knowing you can’t be monitored or censored.
           </h1>
           <router-link to="/about" class="no-underline flex self-start z-50">
-            <div class="bg-blue rounded-full text-white text-center py-3 px-4 text-lg cursor-pointer">Learn More</div>
+            <div class="bg-huddle-blue rounded-full text-white text-center py-3 px-4 text-lg cursor-pointer">Learn More</div>
           </router-link>
           
         </div>
@@ -17,8 +17,8 @@
             <router-link to="/huddles/new" class="block no-underline sm:mr-4 sm:mb-0 mb-4">
               <div class="bg-white rounded-full text-black text-center py-2 px-4">Create a Huddle</div>
             </router-link>
-            <div class="bg-blue rounded-full text-white text-center py-2 px-4 cursor-pointer">Transfer from FB</div>
-            <div class="bg-blue rounded-full text-white text-center py-2 px-4 cursor-pointer">Learn More</div>
+            <div class="bg-huddle-blue rounded-full text-white text-center py-2 px-4 cursor-pointer">Transfer from FB</div>
+            <div class="bg-huddle-blue rounded-full text-white text-center py-2 px-4 cursor-pointer">Learn More</div>
           </div>
         </div> -->
       </div>
