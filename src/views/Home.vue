@@ -20,7 +20,7 @@
     <div class="container flex -mt-20 sm:px-0 px-6">
       <div class="w-full">
         <div class="flex flex-wrap">
-          <div class="w-full md:w-1/2 xl:w-1/3 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id">
+          <div class="w-full md:w-1/2 xl:w-1/3 mb-4 px-2" v-for="huddle in displayedHuddles" :key="huddle.id">
             <router-link :to="'/h/' + huddle.slug" class="block w-full block no-underline">
               <huddle-entry :huddle="huddle"></huddle-entry>
             </router-link>
@@ -50,6 +50,9 @@ export default {
     HuddleEntry
   },
   computed: {
+    displayedHuddles(){
+      return this.publicHuddles.slice(0,8)
+    },
     publicHuddles(){
       return this.huddles.filter(h => h.isApproved && h.type == 'public')
     },
