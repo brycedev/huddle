@@ -15,6 +15,7 @@
     <div class="container flex">
       <div class="w-full -mt-12 flex flex-col md:flex-row z-50">
         <div class="rounded-lg h-full  md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white md:w-full mx-4 flex flex-col items-center justify-center">
+          <img class="px-8" src="../assets/security.svg" alt="Huddle offers privacy" width="100%">
           <h2 class="text-grey-darkest font-normal mb-4">Privacy</h2>
           <p class="text-grey-darkest opacity-85 leading-normal font-normal break">
             Hey, you know how I'm, like, always trying to save the planet? Here's my chance. Hey, you know how I'm, like, always trying to save the planet? Here's my chance.
@@ -27,6 +28,7 @@
           </p>
         </div>
         <div class="rounded-lg h-full  md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white md:w-full mx-4 h-64 flex flex-col items-center justify-center">
+          <img class="px-8" src="../assets/knowledge.svg" alt="Huddle offers access to knowledge" width="100%">
           <h2 class="text-grey-darkest font-normal mb-4">Knowledge</h2>
           <p class="text-grey-darkest opacity-85 leading-normal font-normal break">
             Hey, you know how I'm, like, always trying to save the planet? Here's my chance. Hey, you know how I'm, like, always trying to save the planet? Here's my chance.
@@ -53,7 +55,7 @@
         </div>
       </div>
     </div>
-    <div class="w-full bg-transparent my-8">
+    <div class="w-full bg-transparent my-8 py-8">
       <div class="container flex flex-col">
         <div class="flex items-center justify-between w-full mb-8">
           <div class="w-full md:w-1/2 px-8">
@@ -67,13 +69,13 @@
             He quickly creates a Blockstack identity and now has access to Huddle and the rest of the Blockstack ecosystem.
             </p>
           </div>
-          <div class="md:w-1/2 md:block hidden">
-            
+          <div class="md:w-1/2 md:flex items-center justify-center hidden">
+            <img class="px-8" src="../assets/identity.svg" alt="Create an identity" width="100%">
           </div>
         </div>
-        <div class="flex items-center justify-between w-full mb-8">
-          <div class="md:w-1/2 md:block hidden">
-            
+        <div class="flex items-center justify-between w-full mb-8 py-8">
+          <div class="md:w-1/2 md:flex items-center justify-center hidden">
+            <img class="px-8" src="../assets/mindshare.svg" alt="Find communities and mindshares" width="100%">
           </div>
           <div class="w-full md:w-1/2 px-8">
             <h1 class="text-3xl text-grey-darkest font-normal mb-4 leading-normal">
@@ -86,9 +88,8 @@
             He doesn't see a public group for new fathers, so he proposes a new one, and the community approves it via vote.
             </p>
           </div>
-          
         </div>
-        <div class="flex items-center justify-between w-full mb-8">
+        <div class="flex items-center justify-between w-full mb-8 py-8">
           <div class="w-full md:w-1/2 px-8">
             <h1 class="text-3xl text-grey-darkest font-normal mb-4 leading-normal">
             Recognize and save quality
@@ -100,13 +101,13 @@
             He saves the post to easily find and review it in the future.
             </p>
           </div>
-          <div class="md:w-1/2 md:block hidden">
-            
+          <div class="md:w-1/2 md:flex items-center justify-center hidden">
+            <img class="px-8" src="../assets/girl-laptop.svg" alt="Huddle logo" width="100%">
           </div>
         </div>
-        <div class="flex items-center justify-between w-full mb-8">
-          <div class="md:w-1/2 md:block hidden">
-            
+        <div class="flex items-center justify-between w-full mb-8 pt-8">
+          <div class="md:w-1/2 md:flex items-center justify-center hidden">
+            <img class="px-8" src="../assets/group-hangout.svg" alt="Huddle logo" width="100%">
           </div>
           <div class="w-full md:w-1/2 px-8">
             <h1 class="text-3xl text-grey-darkest font-normal mb-4 leading-normal">

@@ -207,8 +207,8 @@ export default {
     },
     signIn () {
       const origin = window.location.origin
-      // blockstack.redirectToSignIn()
-      blockstack.redirectToSignIn(origin, origin + '/manifest.json', ['scope_write', 'publish_data'])
+      blockstack.redirectToSignIn()
+      // blockstack.redirectToSignIn(origin, origin + '/manifest.json', ['scope_write', 'publish_data'])
     }
   }
 }
