@@ -6,11 +6,11 @@
           <h1 class="text-4xl text-white font-light flex-wrap md:w-full md:max-w-lg max-w-sm justify-center self-center mb-4 flex z-50 leading-normal text-center mb-8">
             Communicate freely knowing you can’t be monitored or censored.
           </h1>
-          <div class="flex flex-col sm:flex-row justify-center items-center">
-            <router-link to="/about" class="no-underline flex self-start z-50 mr-4">
+          <div class="flex flex-col md:flex-row justify-center items-center">
+            <router-link to="/about" class="no-underline flex z-50 md:mr-4 mb-4 md:mb-0">
               <div class="bg-huddle-blue rounded-full text-white text-center py-3 px-4 text-lg cursor-pointer">Learn More</div>
             </router-link>
-            <router-link to="/about" class="no-underline flex self-start z-50">
+            <router-link to="/about" class="no-underline flex z-50">
               <div class="bg-white rounded-full text-black text-center py-3 px-4 text-lg cursor-pointer">Login w/ Blockstack</div>
             </router-link>
           </div>
@@ -28,7 +28,6 @@
           <div class="w-full md:w-1/2 xl:w-1/3 mb-4 px-2">
             <router-link to="/discover" class="block h-full w-full block no-underline">
               <div class="w-full shadow-md rounded-lg overflow-hidden canvas relative cursor-pointer bg-black h-full">
-                <!-- <div class="overlay absolute pin z-auto" :style="bgColor"></div> -->
                 <div class="px-6 py-4 flex justify-center h-full items-center z-50 overflow-hidden">
                   <h1 class="font-light text-xl text-white opacity-90">Discover {{ more }} More</h1>
                 </div>
