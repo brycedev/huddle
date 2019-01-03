@@ -17,22 +17,22 @@
         <div class="rounded-lg h-full  md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white md:w-full mx-4 flex flex-col items-center justify-center">
           <img class="px-8 h-32 mb-8" src="../assets/security.svg" alt="Huddle offers privacy" width="100%">
           <h2 class="text-grey-darkest font-normal mb-4">Privacy</h2>
-          <p class="text-grey-darkest opacity-85 leading-normal font-normal break">
-            Hey, you know how I'm, like, always trying to save the planet? Here's my chance. Hey, you know how I'm, like, always trying to save the planet? Here's my chance.
+          <p class="text-center text-grey-darkest opacity-85 leading-normal font-normal break">
+            You deserve full control over your priavte life. Communicate freely knowing your data can't be sold.
           </p>
         </div>
        <div class="rounded-lg h-full  md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white md:w-full mx-4 h-64 flex flex-col items-center justify-center">
           <img class="px-8 h-32 mb-8" src="../assets/quality.svg" alt="Huddle offers quality" width="100%">
           <h2 class="text-grey-darkest font-normal mb-4">Quality</h2>
-          <p class="text-grey-darkest opacity-85 leading-normal font-normal break">
-            Hey, you know how I'm, like, always trying to save the planet? Here's my chance. Hey, you know how I'm, like, always trying to save the planet? Here's my chance.
+          <p class=" text-center text-grey-darkest opacity-85 leading-normal font-normal break">
+            Too much noise distracts you from what matters most. Curate your social experience with niche communities.
           </p>
         </div>
         <div class="rounded-lg h-full  md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white md:w-full mx-4 h-64 flex flex-col items-center justify-center">
           <img class="px-8 h-32 mb-8" src="../assets/knowledge.svg" alt="Huddle offers access to knowledge" width="100%">
           <h2 class="text-grey-darkest font-normal mb-4">Knowledge</h2>
-          <p class="text-grey-darkest opacity-85 leading-normal font-normal break">
-            Hey, you know how I'm, like, always trying to save the planet? Here's my chance. Hey, you know how I'm, like, always trying to save the planet? Here's my chance.
+          <p class="text-center text-grey-darkest opacity-85 leading-normal font-normal break">
+            Learning new things shouldn't require endless scrolling. Grow your community while limiting your confusion.
           </p>
         </div>
       </div>
@@ -51,7 +51,7 @@
             No central entity, like Facebook, can control or sell your data.
           </p>
           <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal text-center">
-            Let's take a closer look
+            Let's take a closer look.
           </p>
         </div>
       </div>

@@ -29,7 +29,7 @@
             <router-link to="/discover" class="block h-full w-full block no-underline">
               <div class="w-full shadow-md rounded-lg overflow-hidden canvas relative cursor-pointer bg-black h-full">
                 <div class="px-6 py-4 flex justify-center h-full items-center z-50 overflow-hidden">
-                  <h1 class="font-light text-xl text-white opacity-90">Discover {{ more }} More</h1>
+                  <h1 class="font-light text-xl text-white opacity-90">Discover {{ more }} More<span class="ml-4"><img src="../assets/arrow-r.svg" alt="" width="16"></span></h1>
                 </div>
               </div>
             </router-link>
