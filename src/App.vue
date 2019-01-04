@@ -51,10 +51,10 @@
             <p class="no-underline flex items-center text-white uppercase opacity-75 text-xs mb-4">Community</p>
             <ul class="list-reset text-xs mb-6">
               <li class="mt-3 inline-block mr-2 sm:block sm:mr-0">
-                <a href="#" class="text-white opacity-75 hover:opacity-100 no-underline">Huddle</a>
+                <router-link to="/h/huddlehq" class="text-white opacity-75 hover:opacity-100 no-underline">Support</router-link>
               </li>
               <li class="mt-3 inline-block mr-2 sm:block sm:mr-0">
-                <a href="#" class="text-white opacity-75 hover:opacity-100 no-underline">Twitter</a>
+                <a href="https://twitter.com/itshuddletime" target="_blank" class="text-white opacity-75 hover:opacity-100 no-underline">Twitter</a>
               </li>
             </ul>
           </div>        
@@ -98,6 +98,12 @@ export default {
     }
   },
   mounted(){
+    if (blockstack.isUserSignedIn()) {
+      (async () => {
+        await this.putUser(blockstack.loadUserData())
+        await loadGaia()
+      })
+    }
     document.addEventListener('scroll', e => {
       this.scroll = window.scrollY
     })
@@ -136,26 +142,18 @@ export default {
       console.log('loading user gaia storage: ', this.user.name)
       // user exists, load their gaia storage
       this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
+      this.user.name = this.user.preferences.username
       this.user.privateGroups = JSON.parse(await blockstack.getFile('privateGroups.json', { decrypt: true }))
       this.user.publicGroups = JSON.parse(await blockstack.getFile('publicGroups.json', { decrypt: false }))
       this.user.publicPosts = JSON.parse(await blockstack.getFile('publicPosts.json', { decrypt: false }))
       this.user.privatePosts = JSON.parse(await blockstack.getFile('privatePosts.json', { decrypt: true }))
       this.user.publicComments = JSON.parse(await blockstack.getFile('publicComments.json', { decrypt: false }))
       this.user.privateComments = JSON.parse(await blockstack.getFile('privateComments.json', { decrypt: true }))
-      this.user.name = this.user.preferences.name
     },
-    signIn () {
+    signIn() {
       const origin = window.location.origin
       // blockstack.redirectToSignIn()
       blockstack.redirectToSignIn(`${origin}/welcome`, `${origin}/manifest.json`)
-      // const transitPrivateKey = blockstack.generateAndStoreTransitKey()
-      // const redirectURI = `${origin}/welcome`
-      // const manifestURI = `${origin}/manifest.json`
-      // const scopes = []
-
-      // const authRequest = blockstack.makeAuthRequest(transitPrivateKey, redirectURI, manifestURI, scopes, origin)
-
-      // blockstack.redirectToSignInWithAuthRequest(authRequest)
     }
   }
 }

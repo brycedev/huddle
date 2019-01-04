@@ -1,6 +1,6 @@
 require('setimmediate')
 const isDev = window.location.host !== "huddle.group"
-const dbPrefix = 'aegaeeraegawegawegh'
+const dbPrefix = 'aegaeeraegawegawex'
 
 import Vue from 'vue'
 import App from './App.vue'

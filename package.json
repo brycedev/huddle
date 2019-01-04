@@ -10,6 +10,7 @@
     "autoprefixer": "^9.4.3",
     "axios": "^0.18.0",
     "blockstack": "^18.2.0",
+    "giphy-api": "^2.0.1",
     "gun": "^0.9.999995",
     "portal-vue": "^1.5.1",
     "register-service-worker": "^1.5.2",

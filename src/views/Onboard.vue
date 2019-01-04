@@ -27,11 +27,21 @@
                 <p class="text-normal text-center">No</p>
               </div>
             </div>
-            <div class="bg-huddle-blue rounded-full px-6 text-white text-center py-3 cursor-pointer" @click="createProfile">
-              <span v-show="!isCreating">Create</span>
-              
-              <img src="../assets/spinner.svg" class="spin" alt="" width="16" v-show="isCreating">
+          </div>
+          <div class="w-full">
+            <p class="text-black font-medium mb-6">Should we hide NSFW posts and groups?</p>
+            <div class="flex w-full bg-khak-grey rounded-full mb-6">
+              <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForHideNSFW(true)" @click="hideNSFW = true">
+                <p class="text-normal text-center">Yes</p>
+              </div>
+              <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForHideNSFW(false)" @click="hideNSFW = false">
+                <p class="text-normal text-center">No</p>
+              </div>
             </div>
+          </div>
+          <div class="bg-huddle-blue rounded-full px-6 text-white text-center py-3 cursor-pointer" @click="createProfile">
+            <span v-show="!isCreating">Create</span>
+            <img src="../assets/spinner.svg" class="spin" alt="" width="16" v-show="isCreating">
           </div>
         </div>
       </div>
@@ -48,6 +58,7 @@ export default {
     return {
       isCreating: false,
       participate: true,
+      hideNSFW: true,
       username: ''
     }
   },
@@ -55,7 +66,7 @@ export default {
     
   },
   methods: {
-    setUser(data, isPublic){
+    async setUser(data, isPublic){
       return new Promise(async (resolve, reject) => {
         this.user = new blockstack.Person(data.profile)
         this.user.id = data.identityAddress
@@ -72,7 +83,8 @@ export default {
         this.$gun.get(`${gunPrefix}:users`).set(newUser)
         // configure the user's gaia storage
         this.user.preferences = {
-          registered: true,
+          isOnboarded: true,
+          username: data.username,
           isPublic: isPublic,
           blockedUsers : [],
           hideUnlikelyHuddleProposals: false,
@@ -102,30 +114,28 @@ export default {
       })
     },
     async checkUser(){
-      if(blockstack.isUserSignedIn()) {
-        await this.$parent.putUser(blockstack.loadUserData())
-        // this.$router.push('/')
-      } else if (blockstack.isSignInPending()) {
+      if(!this.$route.query.authResponse) this.$router.push('/')
+      if (blockstack.isSignInPending()) {
         blockstack.handlePendingSignIn().then(async userData => {
           this.userData = userData
-          this.username = userData.username
-          this.$parent.putUser(userData)
-          this.$router.push('/welcome')
-          try {
-            await this.pingConfig()
-          } catch(err) {
-            console.log(err)
-            userData.username = this.username
-            
+          const file = await blockstack.getFile('preferences.json', { decrypt: true })
+          if(file && file.isOnboarded){
+            userData.username = file.username
+            this.$parent.putUser(userData)
+            this.$router.push('/')
+          } else {
+            await this.$parent.putUser(userData)
+            this.$router.push('/welcome')
           }
         })
       }
     },
-    async pingConfig(){
-      await blockstack.getFile('preferences.json', { decrypt: true })
-    },
     styleForParticipate(type){
       if(this.participate == type) return 'bg-black text-white'
+      else return 'bg-transparent text-grey-darker'
+    },
+    styleForHideNSFW(type){
+      if(this.hideNSFW == type) return 'bg-black text-white'
       else return 'bg-transparent text-grey-darker'
     },
     async createProfile(){
@@ -133,13 +143,16 @@ export default {
       setTimeout(async() => {
         this.userData.username = this.username
         await this.setUser(this.userData, this.participate)
-      })
+        await this.$parent.loadGaia()
+        await this.$parent.putUser(this.userData)
+        this.$router.push('/')
+        this.isCreating = false
+      }, 2000)
       
     }
   },
   mounted(){
     this.checkUser()
-    // this.pingConfig()
   }
 }
 </script>
