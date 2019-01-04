@@ -3,7 +3,7 @@
     <portal-target name="modal"></portal-target>
     <nav class="w-full fixed z-max subtle" :class="{'bg-black' : scroll > 32}">
       <div class="container px-6 sm:px-0">
-        <div class="flex justify-between items-center py-2">
+        <div class="flex justify-between items-center py-3 px-2">
           <router-link class="sm:block no-underline hidden" to="/">
             <img src="../src/assets/logo.svg" alt="Huddle logo" width="120">
           </router-link>
@@ -11,7 +11,7 @@
             <img src="../src/assets/logomark-white.png" alt="Huddle logo" width="35">
           </router-link>
           <div class="sm:flex-grow hidden sm:flex">
-            <div class="mx-auto flex justify-center">
+            <div class="w-full flex justify-center">
               <div class="flex -mb-px mr-6">
                 <router-link to="/#search" class="no-underline flex items-center text-white uppercase" active-class="active-link">
                   <img src="../src/assets/search.svg" alt="" width="14">
@@ -37,7 +37,7 @@
           <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center" @click="!user ? signIn() : logout()">
             <span v-if="!user">Login</span>
             <img v-if="user" class="w-6 h-6 rounded-full mr-2" :src="user.avatar"/>
-            <span v-if="user">{{ user.name.replace('.id.blockstack','') }}</span>
+            <span v-if="user">{{ user.name }}</span>
           </div>
         </div>
       </div>
@@ -101,9 +101,6 @@ export default {
     document.addEventListener('scroll', e => {
       this.scroll = window.scrollY
     })
-    setTimeout(async () => {
-      await this.checkUser()
-    })
     this.$gun.get(`${gunPrefix}:huddles`).once(v => {
       if(typeof(v) == 'undefined') this.seedData()
     })
@@ -117,17 +114,6 @@ export default {
     })
   },
   methods: {
-    async checkUser(){
-      if(blockstack.isUserSignedIn()) {
-        const userData = blockstack.loadUserData()
-        await this.setUser(userData)
-      } else if (blockstack.isSignInPending()) {
-        blockstack.handlePendingSignIn().then(async (userData) => {
-          await this.setUser(userData)
-          this.$router.push('/')
-        })
-      }
-    },
     seedData(){
       seedDatabase().forEach(h => {
         const newHuddle = this.$gun.get(`${gunPrefix}:huddles/${h.id}`).put(h)
@@ -137,64 +123,39 @@ export default {
     logout () {
       blockstack.signUserOut(window.location.origin)
     },
-    setUser(data){
+    putUser(data){
       return new Promise(async (resolve, reject) => {
         this.user = new blockstack.Person(data.profile)
         this.user.id = data.identityAddress
-        this.user.name = data.username
         this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
-        // check to see if the user exists
-        if(!this.users.find(u => u.id == this.user.id)){
-          console.log('instantiating user : ', this.user.name)
-          // add user to the gundb instance
-          const identity = { id: this.user.id, name: this.user.name, avatar: this.user.avatar }
-          const newUser = this.$gun.get(`${gunPrefix}:users/${this.user.id}`).put(identity)
-          this.$gun.get(`${gunPrefix}:users`).set(newUser)
-          // configure the user's gaia storage
-          this.user.preferences = {
-            blockedUsers : [],
-            hideUnlikelyHuddleProposals: false,
-            hideNonVerifiedUsers: false,
-            hideNSFW: true,
-            filters : [
-              // example filters
-              // { type: 'wordBeginsWith', match: 'poli' },
-              // { type: 'wordIs', match: 'jeffblum' }
-            ]
-          }
-          const cleanArray = JSON.stringify([])
-          this.user.privateGroups = []
-          this.user.publicGroups = []
-          this.user.publicPosts = []
-          this.user.privatePosts = []
-          this.user.publicComments = []
-          this.user.privateComments = []
-          await blockstack.putFile('preferences.json', JSON.stringify(this.user.preferences), { encrypt : true })
-          await blockstack.putFile('privateGroups.json', cleanArray, { encrypt : true })
-          await blockstack.putFile('publicGroups.json', cleanArray, { encrypt : false })
-          await blockstack.putFile('publicPosts.json', cleanArray, { encrypt : false })
-          await blockstack.putFile('privatePosts.json', cleanArray, { encrypt : true })
-          await blockstack.putFile('publicComments.json', cleanArray, { encrypt : false })
-          await blockstack.putFile('privateComments.json', cleanArray, { encrypt : true })
-          resolve()
-        } else {
-          console.log('loading user : ', this.user.name)
-          // user exists, so load their gaia storage
-          this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
-          this.user.privateGroups = JSON.parse(await blockstack.getFile('privateGroups.json', { decrypt: true }))
-          this.user.publicGroups = JSON.parse(await blockstack.getFile('publicGroups.json', { decrypt: false }))
-          this.user.publicPosts = JSON.parse(await blockstack.getFile('publicPosts.json', { decrypt: false }))
-          this.user.privatePosts = JSON.parse(await blockstack.getFile('privatePosts.json', { decrypt: true }))
-          this.user.publicComments = JSON.parse(await blockstack.getFile('publicComments.json', { decrypt: false }))
-          this.user.privateComments = JSON.parse(await blockstack.getFile('privateComments.json', { decrypt: true }))
-          resolve()
-        }
+        this.user.name = data.username
+        resolve()
       })
+    },
+    async loadGaia(){
+      console.log('loading user gaia storage: ', this.user.name)
+      // user exists, load their gaia storage
+      this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
+      this.user.privateGroups = JSON.parse(await blockstack.getFile('privateGroups.json', { decrypt: true }))
+      this.user.publicGroups = JSON.parse(await blockstack.getFile('publicGroups.json', { decrypt: false }))
+      this.user.publicPosts = JSON.parse(await blockstack.getFile('publicPosts.json', { decrypt: false }))
+      this.user.privatePosts = JSON.parse(await blockstack.getFile('privatePosts.json', { decrypt: true }))
+      this.user.publicComments = JSON.parse(await blockstack.getFile('publicComments.json', { decrypt: false }))
+      this.user.privateComments = JSON.parse(await blockstack.getFile('privateComments.json', { decrypt: true }))
+      this.user.name = this.user.preferences.name
     },
     signIn () {
       const origin = window.location.origin
-      blockstack.redirectToSignIn()
-      // blockstack.redirectToSignIn(origin, `${origin}/manifest.json`, ['scope_write', 'publish_data'])
+      // blockstack.redirectToSignIn()
+      blockstack.redirectToSignIn(`${origin}/welcome`, `${origin}/manifest.json`)
+      // const transitPrivateKey = blockstack.generateAndStoreTransitKey()
+      // const redirectURI = `${origin}/welcome`
+      // const manifestURI = `${origin}/manifest.json`
+      // const scopes = []
+
+      // const authRequest = blockstack.makeAuthRequest(transitPrivateKey, redirectURI, manifestURI, scopes, origin)
+
+      // blockstack.redirectToSignInWithAuthRequest(authRequest)
     }
   }
 }

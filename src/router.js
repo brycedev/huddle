@@ -5,6 +5,7 @@ import Create from './views/Create.vue'
 import Discover from './views/Discover.vue'
 import Home from './views/Home.vue'
 import Huddle from './views/Huddle.vue'
+import Onboard from './views/Onboard.vue'
 
 Vue.use(Router)
 
@@ -73,6 +74,11 @@ export default new Router({
           name: 'ExpandedHuddlePostPrivate'
         }
       ]
+    },
+    {
+      path: '/welcome',
+      name: 'Onboard',
+      component: Onboard
     },
   ]
 })

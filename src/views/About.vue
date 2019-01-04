@@ -124,7 +124,6 @@
             A central-censor-free filter.
             </p>
           </div>
-          
         </div>
       </div>
     </div>
