@@ -10,9 +10,7 @@
             <router-link to="/about" class="no-underline flex z-50 md:mr-4 mb-4 md:mb-0">
               <div class="bg-huddle-blue rounded-full text-white text-center py-2 px-4 text-md cursor-pointer">Learn More</div>
             </router-link>
-            <router-link to="/about" class="no-underline flex z-50">
-              <div class="bg-white rounded-full text-black text-center py-2 px-4 text-md cursor-pointer">Join w/ Blockstack</div>
-            </router-link>
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 text-md cursor-pointer z-50" @click="$parent.signIn">Create Profile</div>
           </div>
         </div>
       </div>

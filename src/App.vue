@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="min-h-screen bg-khak-grey">
+  <div id="app" class="min-h-screen bg-khak-grey flex flex-col">
     <portal-target name="modal"></portal-target>
     <nav class="w-full fixed z-max subtle" :class="{'bg-black' : scroll > 32}">
       <div class="container px-6 sm:px-0">
@@ -45,9 +45,9 @@
     <router-view/>
     <footer class="bg-black py-8 w-full mt-8">
       <div class="container mx-auto px-6">
-        <div class="flex flex-col md:flex-row w-full justify-center">
-          <img src="../src/assets/logomark-white.png" class="self-start mr-12 mb-8 md:mb-0" alt="Huddle logo" width="35">
-          <div class="block sm:table-cell mr-12 mb-8 md:mb-0">
+        <div class="flex flex-col sm:items-start sm:flex-row w-full justify-center">
+          <img src="../src/assets/logomark-white.png" class="self-start mr-4 md:mr-12 mb-8 md:mb-0" alt="Huddle logo" width="35">
+          <div class="block sm:table-cell mr-4 md:mr-12 mb-8 md:mb-0">
             <p class="no-underline flex items-center text-white uppercase opacity-75 text-xs mb-4">Community</p>
             <ul class="list-reset text-xs mb-6">
               <li class="mt-3 inline-block mr-2 sm:block sm:mr-0">
@@ -58,7 +58,7 @@
               </li>
             </ul>
           </div>        
-          <div class="block sm:table-cell mr-12 mb-8 md:mb-0">
+          <div class="block sm:table-cell mr-4 md:mr-12 mb-8 md:mb-0">
             <p class="no-underline flex items-center text-white uppercase opacity-75 text-xs mb-4">Legal</p>
             <ul class="list-reset text-xs mb-6">
               <li class="mt-3 inline-block mr-2 sm:block sm:mr-0">
@@ -92,9 +92,9 @@ export default {
     },
     eligibleRandomSlugs(){
       if(['HuddlePublic', 'HuddlePrivate'].includes(this.$route.name)){
-        return this.huddles.filter(h => h.slug !== this.$route.params.slug && h.type == 'public')
+        return this.huddles.filter(h => h.slug !== this.$route.params.slug && h.type == 'public' && h.isApproved)
       }
-      return this.huddles.filter(h => h.type == 'public')
+      return this.huddles.filter(h => h.type == 'public' && h.isApproved)
     }
   },
   mounted(){
@@ -194,7 +194,7 @@ export default {
     signIn () {
       const origin = window.location.origin
       blockstack.redirectToSignIn()
-      // blockstack.redirectToSignIn(origin, origin + '/manifest.json', ['scope_write', 'publish_data'])
+      // blockstack.redirectToSignIn(origin, `${origin}/manifest.json`, ['scope_write', 'publish_data'])
     }
   }
 }
@@ -231,5 +231,109 @@ body
     transform:rotate(360deg)
 
 .canvas 
-  background-image: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 16c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zm33.414-6l5.95-5.95L45.95.636 40 6.586 34.05.636 32.636 2.05 38.586 8l-5.95 5.95 1.414 1.414L40 9.414l5.95 5.95 1.414-1.414L41.414 8zM40 48c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zM9.414 40l5.95-5.95-1.414-1.414L8 38.586l-5.95-5.95L.636 34.05 6.586 40l-5.95 5.95 1.414 1.414L8 41.414l5.95 5.95 1.414-1.414L9.414 40z' fill='%23ffffff' fill-opacity='0.047' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-image url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 16c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zm33.414-6l5.95-5.95L45.95.636 40 6.586 34.05.636 32.636 2.05 38.586 8l-5.95 5.95 1.414 1.414L40 9.414l5.95 5.95 1.414-1.414L41.414 8zM40 48c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zM9.414 40l5.95-5.95-1.414-1.414L8 38.586l-5.95-5.95L.636 34.05 6.586 40l-5.95 5.95 1.414 1.414L8 41.414l5.95 5.95 1.414-1.414L9.414 40z' fill='%23ffffff' fill-opacity='0.047' fill-rule='evenodd'/%3E%3C/svg%3E");
+</style>
+
+<style>
+
+.tooltip {
+  display: block !important;
+  z-index: 9999999999999999;
+}
+
+.tooltip .tooltip-inner {
+  background: #5F91D6;
+  color: rgba(255, 255, 255, .85);
+  font-size: 13px;
+  border-radius: 16px;
+  padding: 7px 11px;
+}
+
+.tooltip .tooltip-arrow {
+  display: none;
+}
+
+.tooltip[x-placement^="top"] {
+  margin-bottom: 5px;
+}
+
+.tooltip[x-placement^="top"] .tooltip-arrow {
+  border-width: 5px 5px 0 5px;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  border-bottom-color: transparent !important;
+  bottom: -5px;
+  left: calc(50% - 5px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.tooltip[x-placement^="bottom"] {
+  margin-top: 5px;
+}
+
+.tooltip[x-placement^="bottom"] .tooltip-arrow {
+  border-width: 0 5px 5px 5px;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  border-top-color: transparent !important;
+  top: -5px;
+  left: calc(50% - 5px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.tooltip[x-placement^="right"] {
+  margin-left: 5px;
+}
+
+.tooltip[x-placement^="right"] .tooltip-arrow {
+  border-width: 5px 5px 5px 0;
+  border-left-color: transparent !important;
+  border-top-color: transparent !important;
+  border-bottom-color: transparent !important;
+  left: -5px;
+  top: calc(50% - 5px);
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.tooltip[x-placement^="left"] {
+  margin-right: 5px;
+}
+
+.tooltip[x-placement^="left"] .tooltip-arrow {
+  border-width: 5px 0 5px 5px;
+  border-top-color: transparent !important;
+  border-right-color: transparent !important;
+  border-bottom-color: transparent !important;
+  right: -5px;
+  top: calc(50% - 5px);
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.tooltip.popover .popover-inner {
+  background: #f9f9f9;
+  color: black;
+  padding: 24px;
+  border-radius: 5px;
+  box-shadow: 0 5px 30px rgba(black, .1);
+}
+
+.tooltip.popover .popover-arrow {
+  border-color: #f9f9f9;
+}
+
+.tooltip[aria-hidden='true'] {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .15s, visibility .15s;
+}
+
+.tooltip[aria-hidden='false'] {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity .15s;
+}
 </style>

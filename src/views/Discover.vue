@@ -64,7 +64,7 @@ export default {
       return this.huddles.filter(h => h.isProposed).slice(0,3)
     },
     showProposedVote(){
-      return this.$route.name == ('ProposedVote') && this.expandedPost !== null
+      return this.$route.name == ('ProposedVote') && this.expanded !== null
     }
   },
   beforeRouteEnter (to, from, next) {

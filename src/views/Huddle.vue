@@ -1,5 +1,5 @@
 <template>
-  <div class="home w-full relative" v-if="huddle">
+  <div class="home w-full relative flex-grow" v-if="huddle">
     <div class="w-full bg-black relative centercenter" :style="bgImage">
       <div class="overlay absolute pin z-auto" :style="bgColor"></div>
       <div class="container flex justify-center items-center">
@@ -30,7 +30,7 @@
         </div>
         <div class="w-full flex-grow flex flex-col -mt-20 md:ml-4">
           <router-link :to="`${$route.fullPath}/new`" class="block no-underline self-end" v-if="isMember">
-            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center mb-4">
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center mb-4">
               <img src="../assets/plus-dark.svg" alt="" class="w-4 h-4 mr-2">
               <span>Create Post</span>
             </div>
@@ -49,9 +49,11 @@
           <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in posts.slice(0,2)" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="!isMember">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
-          <huddle-post class="md:mx-0 mx-2" :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num" v-if="!isMember">
-            
-          </huddle-post>
+          <huddle-post class="md:mx-0 mx-2" :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num" v-if="!isMember"></huddle-post>
+          <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="isMember && !posts.length">
+            <img class="px-8 w-96 mb-4" src="../assets/empty-post.svg" alt="Create an identity" width="100%">
+            <p class="text-grey-dark text-center md:font-thin md:text-xl font break" >No posts, yet. Start the conversation.</p>
+          </div>
         </div>
       </div>
     </div>

@@ -7,25 +7,17 @@
         <div class="flex items-center">
           <div class="flex items-center px-3 py-2 bg-smoke rounded-full">
             <img class="mr-1" src="../assets/people.svg" alt="" width="14">
-            <p class="text-grey-light text-xs opacity-85">{{ memberCount }}</p>
+            <p class="text-grey-light text-xs opacity-85">{{ members.length }}</p>
           </div>
-          <div class="flex items-center px-3 py-2 bg-smoke rounded-full ml-1" v-if="Math.floor(Math.random() * 2)">
+          <!-- <div class="flex items-center px-3 py-2 bg-smoke rounded-full ml-1" v-if="Math.floor(Math.random() * 2)">
             <img src="../assets/fire.svg" alt="" width="14">
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
     <div class="px-6 py-4 w-full flex flex-col">
       <div class="w-full z-50 flex">
         <p class="break text-white text-md mb-4 z-50 opacity-90 leading-normal h-18 overflow-hidden">{{ huddle.description.slice(0, 140) }}</p>
-      </div>
-      <div class="w-full flex">
-        <div class="flex z-50 overflow-hidden">
-          <template v-for="(item, index) in members">
-            <img class="w-6 h-6 rounded-full" :src="item.avatar" v-if="index == 0" :key="index"/>
-            <img class="w-6 h-6 -ml-2 rounded-full" :src="item.avatar" :key="index" v-else/>
-          </template>
-        </div>
       </div>
     </div>
   </div>
@@ -37,12 +29,12 @@ export default {
   props: ['huddle'],
   data() {
     return {
-      memberCount: Math.floor(Math.random() * 357)
+      memberIds: []
     }
   },
   computed: {
     bgColor(){
-      return { backgroundColor: `hsla(${ this.huddle.hue }, 35%, 27%, .64)` }
+      return { backgroundColor: `hsla(${ this.huddle.hue }, 35%, 27%, .72)` }
     },
     bgImage(){
       return { 
@@ -50,8 +42,20 @@ export default {
       }
     },
     members(){
-      return this.users.slice(0,10)
+      return this.users.filter(u => this.memberIds.includes(u.id)).slice(0,10)
     }
+  },
+  methods: {
+    fetchMembers(){
+      let members = []
+      this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').map().on(user => {
+        members.push(user)
+      })
+      this.memberIds = Array.from(new Set(members))
+    },
+  },
+  mounted(){
+    this.fetchMembers()
   }
 }
 </script>

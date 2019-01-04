@@ -22,8 +22,8 @@
             </div>
           </div>
           <div class="flex justify-between items-center w-full">
-            <div class="w-1/2 mr-1 bg-huddle-blue rounded-full text-white text-center py-2 px-4 cursor-pointer">Yes</div>
-            <div class="w-1/2 ml-2 bg-red-light rounded-full text-white text-center py-2 px-4 cursor-pointer">No</div>
+            <div class="w-1/2 mr-1 bg-huddle-blue rounded-full text-white text-center py-2 px-4 cursor-pointer" @click="vote(1)">Yes</div>
+            <div class="w-1/2 ml-2 bg-red-light rounded-full text-white text-center py-2 px-4 cursor-pointer" @click="vote(0)">No</div>
           </div>
         </div>
       </div>
@@ -49,14 +49,16 @@
         return this.visible ? 'opacity-100 visible' : 'opacity-0 invisible'
       },
       approved(){
-        return 7
-        // return (this.votes.filter(v => v.d).length)
+        return (this.votes.filter(v => v.d).length)
       },
       approval(){
         return (this.approved / this.quorum) * 100
       },
       approvalPercent(){
         return { 'width' : `${this.approval}%`}
+      },
+      canVote(){
+        return !this.votes.map(v => v.u).includes(this.user.id) && this.user
       }
     },
     methods: {
@@ -64,19 +66,28 @@
         this.$router.push(`/discover`)  
       },
       vote(d){
-        const vote = { id: uuid('vote'), u: this.user.id, h: this.huddle.id, d: d }
-        const newVote = this.$gun.get(`${gunPrefix}:votes/${vote.id}`).put(vote)
-        const addToThisPost = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('votes').set(newVote)
-        const gaiaComment = JSON.stringify(comment)
-      },
-      
-    },
-    mounted(){
+        if(this.canVote){
+          const vote = { id: uuid('vote'), u: this.user.id, h: this.huddle.id, d: d }
+          const newVote = this.$gun.get(`${gunPrefix}:votes/${vote.id}`).put(vote)
+          this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('votes').set(newVote)
 
+        } else {
+          // user has already voted
+        }
+      },
+      fetchVotes(){
+        if(this.huddle){
+          this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('votes').map().on(vote => {
+            this.votes.push(vote)
+            this.votes = Array.from(new Set(this.votes))
+          })
+        }
+      }
     },
     watch: {
       visible(value) {
         if(value){
+          this.fetchVotes()
           document.getElementById('body').style.overflowY = 'hidden'
         } else {
           document.getElementById('body').style.overflowY = 'auto'

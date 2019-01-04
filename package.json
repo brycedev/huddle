@@ -17,6 +17,7 @@
     "slug": "^0.9.3",
     "tailwindcss": "^0.7.3",
     "typed.js": "^2.0.9",
+    "v-tooltip": "^2.0.0-rc.33",
     "vue": "^2.5.17",
     "vue-gun": "0.0.3",
     "vue-router": "^3.0.1",
