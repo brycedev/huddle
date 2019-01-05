@@ -1,21 +1,21 @@
 <template>
-  <div class="home w-full relative">
+  <div class="home w-full relative flex-grow">
     <div class="w-full bg-black relative canvas">
       <div class="container flex justify-center items-center sm:px-0 px-6">
         <div class="flex flex-col py-24 my-16 mt-16 mx-4 w-full">
           <h1 class="text-4xl text-white font-light flex-wrap md:w-full md:max-w-lg max-w-sm justify-center self-center mb-4 flex z-50 leading-normal text-center mb-8">
-            Communicate freely knowing you can’t be monitored or censored.
+            Welcome back, {{ user.username }}
           </h1>
           <div class="flex flex-col md:flex-row justify-center items-center">
-            <router-link to="/about" class="no-underline flex z-50 md:mr-4 mb-4 md:mb-0">
-              <div class="bg-huddle-blue rounded-full text-white text-center py-2 px-4 text-md cursor-pointer">Learn More</div>
+            <router-link to="/huddles/new" class="no-underline flex z-50 md:mr-4 mb-4 md:mb-0">
+              <div class="bg-huddle-blue rounded-full text-white text-center py-2 px-4 text-md cursor-pointer">Create A Huddle</div>
             </router-link>
-            <div class="bg-white rounded-full text-black text-center py-2 px-4 text-md cursor-pointer z-50" @click="$parent.signIn">Create Profile</div>
+            <!-- <div class="bg-white rounded-full text-black text-center py-2 px-4 text-md cursor-pointer z-50">Invite A Friend</div> -->
           </div>
         </div>
       </div>
     </div>
-    <div class="container flex -mt-20 sm:px-0 px-6">
+    <div class="container flex -mt-20 sm:px-0 px-6" v-if="!user">
       <div class="w-full">
         <div class="flex flex-wrap">
           <div class="w-full md:w-1/2 xl:w-1/3 mb-4 px-2" v-for="huddle in displayedHuddles" :key="huddle.id">
@@ -35,6 +35,27 @@
         </div>
       </div>
     </div>
+    <div class="container flex" v-if="user">
+      <div class="w-full justify-between flex">
+        <div class="w-full flex-grow flex-col -mt-12 md:mr-4 z-50">
+          <div class="flex flex-wrap">        
+            <div class="w-full lg:w-1/2 mb-4 px-2" v-for="huddle in myHuddles" :key="huddle.id">
+              <router-link :to="'/h/' + huddle.slug" class="block w-full no-underline">
+                <huddle-entry :huddle="huddle"></huddle-entry>
+              </router-link>
+            </div>          
+          </div>
+        </div>
+        <div class="w-120 mt-8 md:block hidden">
+          <div class="rounded-lg shadow p-4 bg-white w-full mb-4">
+            <p class="text-center text-black font-light mb-4">Your Library</p>
+            <div class="flex flex-col">
+             
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -48,8 +69,8 @@ export default {
     HuddleEntry
   },
   computed: {
-    displayedHuddles(){
-      return this.publicHuddles.slice(0,8)
+    myHuddles(){
+      return this.publicHuddles.filter(h => this.user.publicGroups.includes(h.id))
     },
     publicHuddles(){
       return this.huddles.filter(h => h.isApproved && h.type == 'public')
@@ -57,9 +78,6 @@ export default {
     bgColor(){
       return { backgroundColor: `hsla(4, 35%, 27%, .64)` }
     },
-    more(){
-      return this.publicHuddles.length - 8
-    }
   },
   beforeMount(){
     document.getElementById('body').style.overflow = 'auto'

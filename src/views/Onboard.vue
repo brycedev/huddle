@@ -46,7 +46,7 @@
         </div>
       </div>
     </div>
-    <img src="../assets/astronaut.svg" class="-mb-12 -mt-32 table max-w-md mx-auto" alt="Huddle onboarding" width="100%">
+    <img src="../assets/astronaut.svg" class="-mb-12 -mt-20 table max-w-md mx-auto" alt="Huddle onboarding" width="100%">
   </div>
 </template>
 
@@ -79,6 +79,7 @@ export default {
         this.user.privatePosts = []
         this.user.publicComments = []
         this.user.privateComments = []
+        this.user.library = []
         console.log('instantiating user : ', this.user.username)
         // add user to the gundb instance
         let identity = {}
@@ -112,6 +113,7 @@ export default {
           await blockstack.putFile('publicGroups.json', cleanArray, { encrypt : false })
           await blockstack.putFile('publicPosts.json', cleanArray, { encrypt : false })
           await blockstack.putFile('publicComments.json', cleanArray, { encrypt : false })
+          await blockstack.putFile('library.json', cleanArray, { encrypt : false })
         }
         resolve()
       })
@@ -146,6 +148,7 @@ export default {
               await blockstack.putFile('publicGroups.json', cleanArray, { encrypt : false })
               await blockstack.putFile('publicPosts.json', cleanArray, { encrypt : false })
               await blockstack.putFile('publicComments.json', cleanArray, { encrypt : false })
+              await blockstack.putFile('library.json', cleanArray, { encrypt : false })
               await this.$parent.putUser(this.userData)
               this.$router.push('/welcome')
             }

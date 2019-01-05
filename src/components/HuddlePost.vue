@@ -17,11 +17,11 @@
         </div>
         <div class="flex ml-2">
           <img src="../assets/save.svg" alt="" class="cursor-pointer w-5 h-5 ml-2 opacity-75 hover:opacity-90 subtle">
-          <span class="pl-1 text-grey-darkest">15</span>
+          <span class="pl-1 text-grey-darkest">{{ saves.length }}</span>
         </div>
       </div>
       <div>
-        <p class="text-grey-darkest leading-loose break">{{ post.content }}</p>
+        <p class="text-grey-darkest leading-loose break">{{ post.content.slice(0,360) }}</p>
       </div>
     </div>
   </div>
@@ -35,6 +35,11 @@ export default {
   props: ['loaded', 'post'],
   store: ['user', 'users'],
   components: { Shimmer },
+  data() {
+    return {
+      saves: []
+    }
+  },
   computed: {
     postUser(){
       return this.post && this.user
@@ -45,9 +50,14 @@ export default {
       return this.post 
         ? new Date(this.post.createdAt).toLocaleTimeString()
         : (new Date()).toLocaleTimeString() 
-        
     }
   },
+  mounted(){
+    this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').map().on(save => {
+      this.saves.push(save)
+      this.saves = Array.from(new Set(this.saves))
+    })
+  }
 }
 </script>
 

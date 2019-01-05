@@ -12,7 +12,7 @@
               <p class="text-grey-darkest font-light text-xs pt-1 tracking-wide">Post Creation : {{ postDate }}</p>
             </div>
             <div class="flex ml-2">
-              <img src="../assets/save.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Save to Library'">
+              <img src="../assets/save.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Save to Library'" @click="saveToLibrary">
               <img src="../assets/share.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Share'">
             </div>
           </div>
@@ -31,8 +31,20 @@
               <span>Post</span>
             </div>
           </div>
-          <div v-if="!post.comments">
+          <div v-if="!comments.length">
             <p class="text-grey-dark text-center pt-8 pb-2" >No comments. Be the first.</p>
+          </div>
+          <div class="flex flex-col w-full mt-8" v-if="comments.length">
+            <div class="w-full flex flex-col mb-6 opacity-90" v-for="comment in sortedComments">
+              <div class="flex items-center mb-2">
+                <img class="w-5 h-5 rounded-full mr-2" :src="comment.avatar"/>
+                <div class="flex flex-col">
+                  <h3 class="font-normal text-grey-darkest text-sm tracking-wide mb-1">{{ comment.username.replace('.id.blockstack','') }}</h3>
+                  <p class="text-grey-darkest font-light text-xs tracking-wide">{{ new Date(comment.createdAt).toLocaleTimeString() }}</p>
+                </div>
+              </div>
+              <p class="text-grey-darkest leading-loose break " >{{ comment.content }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -50,6 +62,7 @@
     data() {
       return {
         comment: '',
+        commentFragments: [],
         thoughtPromise: null,
         isGivingThought: false,
         comments: [],
@@ -64,6 +77,9 @@
       isMember(){
         return this.post && this.user && this.user.publicGroups.includes(this.post.huddle)
       },
+      isSaved(){
+        return this.post && this.user && this.user.library.includes(this.post.id)
+      },
       postUser(){
         return this.post && this.user
           ? this.users.find(u => u.id == this.post.u)
@@ -73,6 +89,9 @@
         return this.post 
           ? new Date(this.post.createdAt).toLocaleTimeString()
           : (new Date()).toLocaleTimeString() 
+      },
+      sortedComments(){
+        return this.comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       }
     },
     methods: {
@@ -81,6 +100,17 @@
       },
       cancelPost(){
         this.thoughtPromise.cancel()
+      },
+      async saveToLibrary(){
+        if(!this.isSaved){
+          const save = { id: uuid('library'), u: this.user.id, p: this.post.id, h: this.post.huddle }
+          const newSave = this.$gun.get(`${gunPrefix}:saves/${save.id}`).put(save)
+          this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').set(newSave)
+          this.user.library.push(this.post.id)
+          await blockstack.putFile('library.json', JSON.stringify(this.user.library), { encrypt : false })
+        } else {
+          // user has already saved to library
+        }
       },
       clickPost(){
         if(!this.isGivingThought && this.isMember){
@@ -106,13 +136,15 @@
       },
       async submitComment(){
         const comment = {
-          id: uuid(),
+          id: uuid('comment'),
           huddle: this.post.huddle,
           post: this.post.id,
           type: 'text',
-          content: this.comment
+          content: this.comment,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
         }
-        const gunData = { id: uuid(), u: this.user.id }
+        const gunData = { id: comment.id, u: this.user.id }
         const newComment = this.$gun.get(`${gunPrefix}:comments/${comment.id}`).put(gunData)
         const addToThisPost = this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('comments').set(newComment)
         const gaiaComment = JSON.stringify(comment)
@@ -120,7 +152,15 @@
         await blockstack.putFile('publicComments.json', JSON.stringify(this.user.publicComments), { encrypt : false })
         await blockstack.putFile(`publicComments/${comment.id}.json`, gaiaComment, { encrypt : false })
         this.comment = ''
-        // this.$parent.fetchComments()
+      },
+      fetchComments(){
+        if(this.post){
+          this.commentFragments = []
+          this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('comments').map().on(comment => {
+            this.commentFragments.push(comment)
+            this.commentFragments = Array.from(new Set(this.commentFragments))
+          })
+        }
       }
     },
     mounted(){
@@ -129,13 +169,39 @@
     watch: {
       visible(value) {
         if(value){
+          this.fetchComments()
           document.getElementById('body').style.overflowY = 'hidden'
         } else {
           document.getElementById('body').style.overflowY = 'auto'
+          setTimeout(() => {
+            this.comments = []
+          }, 400)
         }
       },
       post(value) {
         this.comment = ''
+      },
+      commentFragments(value){
+        let comments = []
+        value.forEach(async f => {
+          if(f.u == this.user.id){
+            let comment = this.user.publicComments.find(p => p.id == f.id)
+            comment.username = this.user.username
+            comment.avatar = this.user.avatar
+            comments.push(comment)
+          } else {
+            blockstack.getFile(`/publicComments/${f.id}.json`, {
+              decrypt: false,
+              app: window.location.origin,
+              username: this.users.find(u => u.id == f.u).bi
+            }).then(file => {
+              console.log(file)
+            }).catch(err => {
+              console.log(err)
+            })
+          }
+        })
+        this.comments = comments
       }
     },
   }

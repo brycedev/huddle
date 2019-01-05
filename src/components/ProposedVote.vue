@@ -61,7 +61,7 @@
         return { 'width' : `${this.approval}%`}
       },
       hasVoted(){
-        return this.votes.map(v => v.u).includes(this.user.id) && this.user
+        return this.votes.map(v => v.u).includes(this.user.id)
       }
     },
     methods: {
@@ -94,6 +94,9 @@
           document.getElementById('body').style.overflowY = 'hidden'
         } else {
           document.getElementById('body').style.overflowY = 'auto'
+          setTimeout(() => {
+            this.votes = []
+          }, 400)
         }
       }
     },

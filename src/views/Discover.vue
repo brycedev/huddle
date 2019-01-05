@@ -12,10 +12,10 @@
     </div>
     <div class="container flex">
       <div class="w-full justify-between flex">
-        <div class="w-full flex-grow flex-col -mt-20 md:mr-4 z-50">
-          <div class="w-full self-center text-black text-center py-2 px-4 cursor-pointer flex justify-center items-center mb-4 h-12">
+        <div class="w-full flex-grow flex-col -mt-12 md:mr-4 z-50">
+          <!-- <div class="w-full self-center text-black text-center py-2 px-4 cursor-pointer flex justify-center items-center mb-4 h-12">
             <div class="sm:flex-grow hidden sm:flex">
-              <!-- <div class="flex">
+              <div class="flex">
                 <div class="flex -mb-px mr-6">
                   <router-link to="/discover" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75" active-class="opacity-100">
                    <img src="../assets/hourglass.svg" alt="" width="12"><span class="ml-2 text-sm cursor-pointer">Newest</span>
@@ -26,9 +26,9 @@
                     <img src="../assets/fire.svg" alt="" width="12"><span class="ml-2 text-sm cursor-pointer">Active</span>
                   </router-link>
                 </div>
-              </div> -->
+              </div>
             </div>
-          </div>
+          </div> -->
           <div class="flex flex-wrap">        
             <div class="w-full lg:w-1/2 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id">
               <router-link :to="'/h/' + huddle.slug" class="block w-full no-underline">

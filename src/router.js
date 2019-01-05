@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import About from './views/About.vue'
-import Create from './views/Create.vue'
+import CreateHuddle from './views/CreateHuddle.vue'
 import Discover from './views/Discover.vue'
 import Home from './views/Home.vue'
 import Huddle from './views/Huddle.vue'
@@ -28,8 +28,8 @@ export default new Router({
     },
     {
       path: '/huddles/new',
-      name: 'Create',
-      component: Create
+      name: 'CreateHuddle',
+      component: CreateHuddle
     },
     {
       path: '/discover',

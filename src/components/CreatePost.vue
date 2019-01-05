@@ -5,7 +5,7 @@
         <div class="w-full flex flex-col">
           <div class="flex w-full justify-between mb-6">
             <div class="flex flex-col flex-grow w-full">
-              <div class="flex items-center mb-2 w-full">
+              <div class="flex items-center mb-2 w-full" v-if="this.user">
                 <img class="w-8 h-8 rounded-full mr-2" :src="this.user.avatar"/>
                 <h3 class="font-normal text-black text-xl tracking-wide">{{ this.user.username.replace('.id.blockstack','') }}</h3>
               </div>

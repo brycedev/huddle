@@ -10,13 +10,13 @@
           <router-link class="sm:hidden block no-underline" to="/">
             <img src="../src/assets/logomark-white.png" alt="Huddle logo" width="35">
           </router-link>
-          <div class="sm:flex-grow hidden sm:flex">
+          <div class="hidden sm:block">
             <div class="flex mx-auto self-center">
-              <div class="flex -mb-px mr-6">
+              <!-- <div class="flex -mb-px mr-6">
                 <router-link to="/#search" class="no-underline flex items-center text-white uppercase" active-class="active-link">
                   <img src="../src/assets/search.svg" alt="" width="14">
                 </router-link>
-              </div>
+              </div> -->
               <div class="flex -mb-px mr-6">
                 <router-link to="/about" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75" active-class="opacity-100">
                   <span class="text-xs cursor-pointer">About</span>
@@ -145,13 +145,17 @@ export default {
       console.log('loading user gaia storage: ', this.user.username)
       // user exists, load their gaia storage
       this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
-      this.user.username = this.user.preferences.username
+      if(this.user.preferences && this.user.preferences.isPublic){
+        this.user.username = this.user.preferences.username
+        this.user.publicGroups = JSON.parse(await blockstack.getFile('publicGroups.json', { decrypt: false }))
+        this.user.publicPosts = JSON.parse(await blockstack.getFile('publicPosts.json', { decrypt: false }))
+        this.user.publicComments = JSON.parse(await blockstack.getFile('publicComments.json', { decrypt: false }))
+        this.user.library = JSON.parse(await blockstack.getFile('library.json', { decrypt: false }))
+      }
       this.user.privateGroups = JSON.parse(await blockstack.getFile('privateGroups.json', { decrypt: true }))
-      this.user.publicGroups = JSON.parse(await blockstack.getFile('publicGroups.json', { decrypt: false }))
-      this.user.publicPosts = JSON.parse(await blockstack.getFile('publicPosts.json', { decrypt: false }))
       this.user.privatePosts = JSON.parse(await blockstack.getFile('privatePosts.json', { decrypt: true }))
-      this.user.publicComments = JSON.parse(await blockstack.getFile('publicComments.json', { decrypt: false }))
       this.user.privateComments = JSON.parse(await blockstack.getFile('privateComments.json', { decrypt: true }))
+      
     },
     signIn() {
       const origin = window.location.origin
