@@ -53,7 +53,7 @@
 <script>
 export default {
   name: 'Onboard',
-  store: ['user'],
+  store: ['user', 'users'],
   data() {
     return {
       isCreating: false,
@@ -70,21 +70,28 @@ export default {
       return new Promise(async (resolve, reject) => {
         this.user = new blockstack.Person(data.profile)
         this.user.id = data.identityAddress
-        this.user.name = data.username
+        this.user.bi = data.bi
+        this.user.username = data.username
         this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
-        console.log('instantiating user : ', this.user.name)
+        this.user.privateGroups = []
+        this.user.publicGroups = []
+        this.user.publicPosts = []
+        this.user.privatePosts = []
+        this.user.publicComments = []
+        this.user.privateComments = []
+        console.log('instantiating user : ', this.user.username)
         // add user to the gundb instance
         let identity = {}
         if(isPublic)
-          identity = { id: this.user.id, name: this.user.name, avatar: this.user.avatar, public: true }
+          identity = { id: this.user.id, bi: data.bi, username: this.user.username, avatar: this.user.avatar, public: true }
         else
-          identity = { id: this.user.id, public: false }
+          identity = { id: this.user.id, bi: data.bi, public: false }
         const newUser = this.$gun.get(`${gunPrefix}:users/${this.user.id}`).put(identity)
         this.$gun.get(`${gunPrefix}:users`).set(newUser)
         // configure the user's gaia storage
         this.user.preferences = {
           isOnboarded: true,
-          username: data.username,
+          username: this.user.username,
           isPublic: isPublic,
           blockedUsers : [],
           hideUnlikelyHuddleProposals: false,
@@ -97,19 +104,15 @@ export default {
           ]
         }
         const cleanArray = JSON.stringify([])
-        this.user.privateGroups = []
-        this.user.publicGroups = []
-        this.user.publicPosts = []
-        this.user.privatePosts = []
-        this.user.publicComments = []
-        this.user.privateComments = []
         await blockstack.putFile('preferences.json', JSON.stringify(this.user.preferences), { encrypt : true })
         await blockstack.putFile('privateGroups.json', cleanArray, { encrypt : true })
-        await blockstack.putFile('publicGroups.json', cleanArray, { encrypt : false })
-        await blockstack.putFile('publicPosts.json', cleanArray, { encrypt : false })
         await blockstack.putFile('privatePosts.json', cleanArray, { encrypt : true })
-        await blockstack.putFile('publicComments.json', cleanArray, { encrypt : false })
         await blockstack.putFile('privateComments.json', cleanArray, { encrypt : true })
+        if(isPublic){
+          await blockstack.putFile('publicGroups.json', cleanArray, { encrypt : false })
+          await blockstack.putFile('publicPosts.json', cleanArray, { encrypt : false })
+          await blockstack.putFile('publicComments.json', cleanArray, { encrypt : false })
+        }
         resolve()
       })
     },
@@ -118,15 +121,32 @@ export default {
       if (blockstack.isSignInPending()) {
         blockstack.handlePendingSignIn().then(async userData => {
           this.userData = userData
-          const file = await blockstack.getFile('preferences.json', { decrypt: true })
+          this.userData.bi = userData.username
+          const file = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
           if(file && file.isOnboarded){
-            userData.username = file.username
-            this.$parent.putUser(userData)
-            this.$router.push('/')
+            if(this.users.find(u => u.id == userData.identityAddress)){ 
+              this.userData.huddleUsername = file.username
+              this.$parent.putUser(userData)
+              this.$router.push('/')
+            } else {
+              // seeding/testing - restore state
+              this.userData.huddleUsername = this.userData.bi
+              const cleanArray = JSON.stringify([])
+              await blockstack.putFile('preferences.json', JSON.stringify({}), { encrypt : true })
+              await blockstack.putFile('privateGroups.json', cleanArray, { encrypt : true })
+              await blockstack.putFile('privatePosts.json', cleanArray, { encrypt : true })
+              await blockstack.putFile('privateComments.json', cleanArray, { encrypt : true })
+              await blockstack.putFile('publicGroups.json', cleanArray, { encrypt : false })
+              await blockstack.putFile('publicPosts.json', cleanArray, { encrypt : false })
+              await blockstack.putFile('publicComments.json', cleanArray, { encrypt : false })
+              await this.$parent.putUser(this.userData)
+              this.$router.push('/welcome')
+            }
           } else {
-            await this.$parent.putUser(userData)
+            this.userData.huddleUsername = this.userData.bi
+            await this.$parent.putUser(this.userData)
             this.$router.push('/welcome')
-          }
+          } 
         })
       }
     },
@@ -148,7 +168,6 @@ export default {
         this.$router.push('/')
         this.isCreating = false
       }, 2000)
-      
     }
   },
   mounted(){

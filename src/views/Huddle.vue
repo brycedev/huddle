@@ -21,7 +21,7 @@
             <p class="text-black font-normal mb-2">Members</p>
             <div class="w-full flex">
               <div class="flex flex-wrap z-50 overflow-hidden">
-                <router-link :to="'/i/' + member.name.replace('.id.blockstack', '')" v-for="member in members" :key="member.id"  class="block no-underline mr-2">
+                <router-link :to="'/i/' + member.username.replace('.id.blockstack', '')" v-for="member in members" :key="member.id"  class="block no-underline mr-2">
                   <img class="w-8 h-8 rounded-full" :src="member.avatar"/>
                 </router-link>
               </div>
@@ -219,10 +219,11 @@ export default {
         if(f.u == this.user.id){
           posts.push(this.user.publicPosts.find(p => p.id == f.id))
         } else {
+          console.log(this.users.find(u => u.id == f.u).bi)
           blockstack.getFile(`/publicPosts/${f.id}.json`, {
             decrypt: false,
             app: window.location.origin,
-            username: this.users.find(u => u.id == f.u).name
+            username: this.users.find(u => u.id == f.u).bi
           }).then(file => {
             console.log(file)
           }).catch(err => {

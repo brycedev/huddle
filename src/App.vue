@@ -37,7 +37,7 @@
           <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center" @click="!user ? signIn() : logout()">
             <span v-if="!user">Login</span>
             <img v-if="user" class="w-6 h-6 rounded-full mr-2" :src="user.avatar"/>
-            <span v-if="user">{{ user.name }}</span>
+            <span v-if="user">{{ user.username ? user.username : user.bi }}</span>
           </div>
         </div>
       </div>
@@ -98,17 +98,18 @@ export default {
     }
   },
   mounted(){
-    if (blockstack.isUserSignedIn()) {
-      (async () => {
-        await this.putUser(blockstack.loadUserData())
-        await loadGaia()
-      })
+    if(blockstack.isUserSignedIn()) {
+      setTimeout(async () => {
+        const data = blockstack.loadUserData()
+        data.huddleUsername = data.username
+        await this.putUser(data)
+      }, 100)
     }
     document.addEventListener('scroll', e => {
       this.scroll = window.scrollY
     })
-    this.$gun.get(`${gunPrefix}:huddles`).once(v => {
-      if(typeof(v) == 'undefined') this.seedData()
+    this.$gun.get(`${gunPrefix}:huddles`).once(async v => {
+      if(typeof(v) == 'undefined') await this.seedData()
     })
     this.$gun.get(`${gunPrefix}:huddles`).map().on((node, key) => {
       this.huddles.push(node)
@@ -120,7 +121,7 @@ export default {
     })
   },
   methods: {
-    seedData(){
+    async seedData(){
       seedDatabase().forEach(h => {
         const newHuddle = this.$gun.get(`${gunPrefix}:huddles/${h.id}`).put(h)
         this.$gun.get(`${gunPrefix}:huddles`).set(newHuddle)
@@ -132,17 +133,19 @@ export default {
     putUser(data){
       return new Promise(async (resolve, reject) => {
         this.user = new blockstack.Person(data.profile)
+        this.user.bi = data.username
         this.user.id = data.identityAddress
         this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
-        this.user.name = data.username
+        this.user.username = data.huddleUsername
+        await this.loadGaia()
         resolve()
       })
     },
     async loadGaia(){
-      console.log('loading user gaia storage: ', this.user.name)
+      console.log('loading user gaia storage: ', this.user.username)
       // user exists, load their gaia storage
       this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
-      this.user.name = this.user.preferences.username
+      this.user.username = this.user.preferences.username
       this.user.privateGroups = JSON.parse(await blockstack.getFile('privateGroups.json', { decrypt: true }))
       this.user.publicGroups = JSON.parse(await blockstack.getFile('publicGroups.json', { decrypt: false }))
       this.user.publicPosts = JSON.parse(await blockstack.getFile('publicPosts.json', { decrypt: false }))

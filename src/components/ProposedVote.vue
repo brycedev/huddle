@@ -21,9 +21,12 @@
               <div class="bg-smoke pin-t pin-l h-full absolute rounded-full subtle w-0" :style="approvalPercent"></div>
             </div>
           </div>
-          <div class="flex justify-between items-center w-full">
+          <div class="flex justify-between items-center w-full" v-if="!hasVoted">
             <div class="w-1/2 mr-1 bg-huddle-blue rounded-full text-white text-center py-2 px-4 cursor-pointer" @click="vote(1)">Yes</div>
             <div class="w-1/2 ml-2 bg-red-light rounded-full text-white text-center py-2 px-4 cursor-pointer" @click="vote(0)">No</div>
+          </div>
+          <div class="flex justify-between items-center w-full" v-if="hasVoted">
+            <p class="text-grey-dark text-center pt-8 w-full" >Thank you for your vote!</p>
           </div>
         </div>
       </div>
@@ -57,8 +60,8 @@
       approvalPercent(){
         return { 'width' : `${this.approval}%`}
       },
-      canVote(){
-        return !this.votes.map(v => v.u).includes(this.user.id) && this.user
+      hasVoted(){
+        return this.votes.map(v => v.u).includes(this.user.id) && this.user
       }
     },
     methods: {

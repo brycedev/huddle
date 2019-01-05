@@ -2,11 +2,11 @@
   <div class="home max-w-full relative overflow-hidden -mb-8">
     <div class="w-full bg-black relative canvas">
       <div class="container flex">
-        <div class="flex flex-col py-24 my-16 mt-16 mx-4 w-full">
-          <h1 class="text-4xl text-white font-light flex-wrap md:w-full md:max-w-lg max-w-sm justify-center md:justify-start md:self-start self-center md:text-left mb-4 flex z-50 leading-normal">
+        <div class="flex items-center flex-col py-24 my-16 mt-16 mx-4 w-full">
+          <h1 class="text-4xl text-white font-light flex-wrap md:w-full md:max-w-lg max-w-sm justify-center self-center mb-4 flex z-50 leading-normal">
             Social media made for <span class="block md:hidden ml-3">you</span><span class="hidden md:block typi ml-3">you</span>
           </h1>
-          <h2 class="text-2xl leading-normal text-white font-thin md:max-w-sm text-center md:text-left flex z-50">
+          <h2 class="text-2xl leading-normal text-white font-thin text-center max-w-sm flex z-50">
             Escape prying eyes and constant noise with communities you value most.
           </h2>
         </div>
@@ -18,7 +18,7 @@
           <img class="px-8 h-32 mb-8" src="../assets/security.svg" alt="Huddle offers privacy" width="100%">
           <h2 class="text-grey-darkest font-normal mb-4">Privacy</h2>
           <p class="text-center text-grey-darkest opacity-85 leading-normal font-normal break">
-            You deserve full control over your priavte life. Communicate freely knowing your data can't be sold.
+            You deserve full control over your private life. Communicate freely knowing your data can't be sold.
           </p>
         </div>
        <div class="rounded-lg h-full  md:w-1/3 md:mb-0 mb-4 shadow p-8 bg-white md:w-full mx-4 h-64 flex flex-col items-center justify-center">
@@ -66,8 +66,11 @@
             <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
             In order to join Huddle, Mark has to create a profile.
             </p>
-            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal">
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
             He quickly creates a Blockstack identity and now has access to Huddle and the rest of the Blockstack ecosystem.
+            </p>
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
+            He has peace of mind knowing nobody can steal his personal information.
             </p>
           </div>
           <div class="md:w-1/2 md:flex items-center justify-center hidden">
@@ -83,10 +86,13 @@
             Find or create communities
             </h1>
             <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
+            Focused discussion and like-minded people await.
+            </p>
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
             Mark joins a public group about photography and creates a private one for local photographers in his area.
             </p>
             <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal">
-            He doesn't see a public group for new fathers, so he proposes a new one, and the community approves it via vote.
+            He doesn't see a public group for new fathers, so he proposes a new one, and the Huddle community approves it via vote.
             </p>
           </div>
         </div>
@@ -96,10 +102,13 @@
             Recognize and save quality
             </h1>
             <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
-            Mark sends a few claps and comments on a post about new baby lullaby tricks.
+            Hadiya joined Huddle because she wanted focused and passionate interactions with like-minded people.
+            </p>
+            <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
+            She finds a new post about baby lullaby tricks and comments about her own unique experience.
             </p>
             <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal">
-            He saves the post to easily find and review it in the future.
+            Hold on, this list of tricks may be good for future reference. She continues to add his favorite content to his personal library.
             </p>
           </div>
           <div class="md:w-1/2 md:flex items-center justify-center hidden">
@@ -115,13 +124,13 @@
             Curate your community, your way
             </h1>
             <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
-            Mark can't relate with the posts made by a particular person in a group.
+            Mark wants the tools and freedom to curate a social experience that fits him best. Huddle understands that.
             </p>
             <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal mb-2">
-            He uses the mute button to prevent seeing more of their content.
+            Tom from "Myspace" and Mark aren't getting along very well in the public photography group. It's better if they exist separately.
             </p>
             <p class="text-lg text-grey-darkest opacity-85 leading-normal font-normal">
-            A central-censor-free filter.
+            He uses the mute button to prevent seeing content produced by Tom. Each continue to exist in communities only they refine.
             </p>
           </div>
         </div>

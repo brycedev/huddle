@@ -7,7 +7,7 @@
             <div class="flex flex-col flex-grow w-full">
               <div class="flex items-center mb-2 w-full" v-if="postUser">
                 <img class="w-8 h-8 rounded-full mr-2" :src="postUser.avatar"/>
-                <h3 class="font-normal text-black text-xl tracking-wide">{{ postUser.name.replace('.id.blockstack','') }}</h3>
+                <h3 class="font-normal text-black text-xl tracking-wide">{{ postUser.username.replace('.id.blockstack','') }}</h3>
               </div>
               <p class="text-grey-darkest font-light text-xs pt-1 tracking-wide">Post Creation : {{ postDate }}</p>
             </div>
