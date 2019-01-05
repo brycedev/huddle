@@ -15,7 +15,7 @@
         <div class="w-full max-w-sm bg-white rounded-lg py-6 px-8 flex flex-col -mt-12 z-50">
           <div class="w-full mb-4">
             <p class="text-black font-medium mb-6">Choose your username! It's okay to get creative.</p>
-            <input v-model="username" type="text" class="block appearance-none text-grey-darker py-3 px-4 rounded-full w-full bg-khak-grey outline-none text-normal mb-3" placeholder="markhuddleberg">
+            <input v-model="username" type="text" class="block appearance-none text-grey-darker py-3 px-4 rounded-full w-full bg-khak-grey outline-none text-normal mb-3" placeholder="markhuddleberg" @keyup.enter="createProfile">
           </div>
           <div class="w-full">
             <p class="text-black font-medium mb-6">Do you plan to participate in public communities?</p>
@@ -46,7 +46,7 @@
         </div>
       </div>
     </div>
-    <img src="../assets/astronaut.svg" class="-mb-12 mt-12 table max-w-md mx-auto" alt="Huddle onboarding" width="100%">
+    <img src="../assets/astronaut.svg" class="-mb-12 -mt-32 table max-w-md mx-auto" alt="Huddle onboarding" width="100%">
   </div>
 </template>
 

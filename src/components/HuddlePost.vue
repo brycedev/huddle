@@ -21,7 +21,7 @@
         </div>
       </div>
       <div>
-        <p class="text-grey-darkest leading-loose">{{ post.content }}</p>
+        <p class="text-grey-darkest leading-loose break">{{ post.content }}</p>
       </div>
     </div>
   </div>
@@ -43,8 +43,9 @@ export default {
     },
     postDate(){
       return this.post 
-        ? (new Date()).toLocaleDateString() 
-        : new Date(Date.UTC(this.post.createdAt)).toLocaleDateString()
+        ? new Date(this.post.createdAt).toLocaleTimeString()
+        : (new Date()).toLocaleTimeString() 
+        
     }
   },
 }

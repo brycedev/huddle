@@ -43,10 +43,10 @@
             <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
             <span>Join Group</span>
           </div>
-          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in posts" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="isMember">
+          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in displayedPosts" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="isMember">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
-          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in posts.slice(0,2)" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="!isMember">
+          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in displayedPosts.slice(0,2)" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="!isMember">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
           <huddle-post class="md:mx-0 mx-2" :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num" v-if="!isMember"></huddle-post>
@@ -136,6 +136,9 @@ export default {
     }
   },
   computed: {
+    displayedPosts(){
+      return this.posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    },
     bgColor(){
       return { 
         backgroundColor: `hsla(${ this.huddle.hue }, 35%, 27%, .64)`
@@ -155,11 +158,6 @@ export default {
     isMember(){
       return this.huddle && this.memberIds.includes(this.user.id)
     },
-    tempPosts(){
-      return Array.from(Array(20), (x, index) => index).map(i => {
-        return { id: uuid(), content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: this.user, huddle: this.huddle.id }
-      })
-    },
     members(){
       return this.users.filter(u => this.memberIds.includes(u.id))
     },
@@ -173,7 +171,7 @@ export default {
   methods: {
     async joinGroup(){
       if(this.isPublic && this.user){
-        const newMember = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').put({ id: this.user.id })
+        const newMember = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').set({ id: this.user.id })
         this.user.publicGroups.push(this.huddle.id)
         const newPublicGroups = JSON.stringify(this.user.publicGroups)
         await blockstack.putFile('publicGroups.json', newPublicGroups, { encrypt : false })
@@ -187,7 +185,7 @@ export default {
         this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').map().on(user => {
           members.push(user)
         })
-        this.memberIds = Array.from(new Set(members))
+        this.memberIds = Array.from(new Set(members.map(m => m.id)))
       } else {
         this.memberIds = []
       }

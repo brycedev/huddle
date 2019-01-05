@@ -16,9 +16,8 @@
               <img src="../assets/share.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Share'">
             </div>
           </div>
-          
           <div class="mb-8">
-            <p class="text-grey-darkest leading-loose">{{ post.content }}</p>
+            <p class="text-grey-darkest leading-loose break">{{ post.content }}</p>
           </div>
           <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex h-32" v-if="user">
             <textarea v-model="comment" type="text" class="bg-transparent flex-grow mr-4 h-full block appearance-none text-grey-darker font-light leading-loose outline-none text-normal resize-none" placeholder="Some comment"></textarea>
@@ -72,8 +71,8 @@
       },
       postDate(){
         return this.post 
-          ? (new Date()).toLocaleDateString() 
-          : new Date(Date.UTC(this.post.createdAt)).toLocaleDateString()
+          ? new Date(this.post.createdAt).toLocaleTimeString()
+          : (new Date()).toLocaleTimeString() 
       }
     },
     methods: {

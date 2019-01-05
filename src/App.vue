@@ -11,7 +11,7 @@
             <img src="../src/assets/logomark-white.png" alt="Huddle logo" width="35">
           </router-link>
           <div class="sm:flex-grow hidden sm:flex">
-            <div class="w-full flex justify-center">
+            <div class="flex mx-auto self-center">
               <div class="flex -mb-px mr-6">
                 <router-link to="/#search" class="no-underline flex items-center text-white uppercase" active-class="active-link">
                   <img src="../src/assets/search.svg" alt="" width="14">
@@ -51,7 +51,7 @@
             <p class="no-underline flex items-center text-white uppercase opacity-75 text-xs mb-4">Community</p>
             <ul class="list-reset text-xs mb-6">
               <li class="mt-3 inline-block mr-2 sm:block sm:mr-0">
-                <router-link to="/h/huddlehq" class="text-white opacity-75 hover:opacity-100 no-underline">Support</router-link>
+                <router-link to="#" class="text-white opacity-75 hover:opacity-100 no-underline">Support</router-link>
               </li>
               <li class="mt-3 inline-block mr-2 sm:block sm:mr-0">
                 <a href="https://twitter.com/itshuddletime" target="_blank" class="text-white opacity-75 hover:opacity-100 no-underline">Twitter</a>

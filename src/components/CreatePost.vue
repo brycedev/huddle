@@ -1,14 +1,19 @@
 <template>
   <div class="z-max fixed pin bg-smoke justify-center subtle" :class="open" @click.self="close">
     <div class="flex justify-center mt-20">
-      <div class="rounded-lg shadow-lg p-6 bg-white w-full mb-4 max-w-smd relative">
+      <div class="rounded-lg shadow-lg p-6 px-8 bg-white w-full mb-4 max-w-smd relative">
         <div class="w-full flex flex-col">
-          <div class="flex items-center mb-2" v-if="post.user">
-            <img class="w-8 h-8 rounded-full mr-2" :src="post.user.avatar"/>
-            <h4 class="font-normal text-black">{{ post.user.name.replace('.id.blockstack','') }}</h4>
+          <div class="flex w-full justify-between mb-6">
+            <div class="flex flex-col flex-grow w-full">
+              <div class="flex items-center mb-2 w-full">
+                <img class="w-8 h-8 rounded-full mr-2" :src="this.user.avatar"/>
+                <h3 class="font-normal text-black text-xl tracking-wide">{{ this.user.username.replace('.id.blockstack','') }}</h3>
+              </div>
+               <p class="text-grey-darkest font-light text-xs pt-1 tracking-wide">Post Creation : {{ postDate }}</p>
+            </div>
           </div>
-          <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex">
-            <textarea v-model="post" type="text" class="bg-transparent flex-grow w-full mr-4 h-64 block appearance-none text-grey-darker font-light leading-loose outline-none text-normal h-24 resize-none" placeholder="Some post text"></textarea>
+          <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex mb-4">
+            <textarea id="text" v-model="post" class="bg-transparent flex-grow w-full mr-4 h-64 block appearance-none text-grey-darkest leading-loose font-light outline-none text-normal h-24 resize-none" placeholder="Write something interesting..."></textarea>
             <div class="bg-red-light rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer table self-end" v-show="isGivingThought" @click="cancelPost">
               <div class="ul m-0 p-0 inline-block">
                 <img src="../assets/spinner.svg" class="align-middle spin" alt="" width="16">
@@ -17,6 +22,24 @@
             </div>
             <div class="bg-huddle-blue rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer self-end" v-show="!isGivingThought" @click="clickPost">
               <span>Post</span>
+            </div>
+          </div>
+          <div class="flex justify-center items-center">
+            <div class="flex flex-col justify-center px-6">
+              <p class="text-grey-dark text-center">{{ counter.words }}</p>
+              <p class="text-grey-dark text-center text-xs">Words</p>
+            </div>
+            <div class="flex flex-col justify-center px-6">
+              <p class="text-grey-dark text-center">{{ counter.paragraphs }}</p>
+              <p class="text-grey-dark text-center text-xs">Paragraphs</p>
+            </div>
+            <div class="flex flex-col justify-center px-6">
+              <p class="text-grey-dark text-center">{{ counter.characters }}</p>
+              <p class="text-grey-dark text-center text-xs">Characters</p>
+            </div>
+            <div class="flex flex-col justify-center px-6">
+              <p class="text-grey-dark text-center">2:30</p>
+              <p class="text-grey-dark text-center text-xs">Read</p>
             </div>
           </div>
         </div>
@@ -28,12 +51,19 @@
 </template>
 
 <script>
+  const Countable = require('countable')
   export default {
     props: ['huddle', 'visible'],
     store: ['user'],
     name: 'CreatePost',
     data() {
       return {
+        counter: {
+          paragraphs: 0,
+          sentences: 0,
+          words: 0,
+          characters: 0
+        },
         post: '',
         isGivingThought: false,
         thoughtPromise: null,
@@ -48,6 +78,9 @@
       isMember(){
         return this.visible && this.huddle && this.user && this.user.publicGroups.includes(this.huddle.id)
       },
+      postDate(){
+        return (new Date()).toLocaleTimeString() 
+      }
     },
     methods: {
       cancelPost(){
@@ -86,7 +119,9 @@
           u: this.user.id,
           huddle: this.huddle.id,
           type: 'text',
-          content: this.post
+          content: this.post,
+          createdAt: Date.now(),
+          updatedAt : Date.now()
         }
         const gunData = { id: post.id, u: this.user.id }
         const newPost = this.$gun.get(`${gunPrefix}:posts/${post.id}`).put(gunData)
@@ -98,8 +133,17 @@
         this.post = ''
         this.close()
       },
+      mounted(){
+        
+      }
     },
     watch: {
+      post(value){
+        const area = document.getElementById('text')
+        Countable.count(area, counter => {
+          this.counter = counter
+        })
+      },
       visible(value) {
         if(value){
           document.getElementById('body').style.overflow = 'hidden'
