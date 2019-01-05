@@ -52,7 +52,7 @@
         return this.visible ? 'opacity-100 visible' : 'opacity-0 invisible'
       },
       approved(){
-        return (this.votes.filter(v => v.d).length)
+        return (this.votes.filter(v => v.d == 1).length)
       },
       approval(){
         return (this.approved / this.quorum) * 100
@@ -69,7 +69,7 @@
         this.$router.push(`/discover`)  
       },
       vote(d){
-        if(this.canVote){
+        if(!this.hasVoted){
           const vote = { id: uuid('vote'), u: this.user.id, h: this.huddle.id, d: d }
           const newVote = this.$gun.get(`${gunPrefix}:votes/${vote.id}`).put(vote)
           this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('votes').set(newVote)
