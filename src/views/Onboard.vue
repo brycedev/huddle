@@ -122,8 +122,15 @@ export default {
         blockstack.handlePendingSignIn().then(async userData => {
           this.userData = userData
           this.userData.bi = userData.username
-          const file = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
-          if(file && file.isOnboarded){
+          const hasFile = true
+          let getFile
+          try {
+            getFile = await blockstack.getFile('preferences.json', { decrypt: true })
+          } catch(err) {
+            hasFile = false
+          }
+          const file = JSON.parse(getFile)
+          if(file && file.isOnboarded && hasFile){
             if(this.users.find(u => u.id == userData.identityAddress)){ 
               this.userData.huddleUsername = file.username
               this.$parent.putUser(userData)
