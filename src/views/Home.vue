@@ -80,6 +80,9 @@ export default {
     HuddleEntry
   },
   computed: {
+    displayedHuddles(){
+      return this.publicHuddles.slice(0,9)
+    },
     myHuddles(){
       return this.publicHuddles.filter(h => this.user.publicGroups.includes(h.id))
     },
