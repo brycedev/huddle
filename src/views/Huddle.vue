@@ -21,8 +21,11 @@
             <p class="text-black font-normal mb-2">Members</p>
             <div class="w-full flex">
               <div class="flex flex-wrap z-50 overflow-hidden">
-                <router-link :to="'/i/' + member.username.replace('.id.blockstack', '')" v-for="member in members" :key="member.id"  class="block no-underline mr-2">
+                <!-- <router-link :to="'/i/' + member.username.replace('.id.blockstack', '')" v-for="member in members" :key="member.id"  class="block no-underline mr-2">
                   <img class="w-8 h-8 rounded-full" :src="member.avatar"/>
+                </router-link> -->
+                <router-link to="" v-for="member in members" :key="member.id"  class="block no-underline mr-2">
+                  <img class="w-8 h-8 rounded-full" :src="member.avatar" v-tooltip="member.username"/>
                 </router-link>
               </div>
             </div>
