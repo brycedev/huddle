@@ -2,7 +2,18 @@
   <div class="home w-full relative flex-grow">
     <div class="w-full bg-black relative canvas">
       <div class="container flex justify-center items-center sm:px-0 px-6">
-        <div class="flex flex-col py-24 my-16 mt-16 mx-4 w-full">
+        <div class="flex flex-col py-24 my-16 mt-16 mx-4 w-full" v-if="!user">
+          <h1 class="text-4xl text-white font-light flex-wrap md:w-full md:max-w-lg max-w-sm justify-center self-center mb-4 flex z-50 leading-normal text-center mb-8">
+            Communicate freely knowing you can’t be monitored or censored.
+          </h1>
+          <div class="flex flex-col md:flex-row justify-center items-center">
+            <router-link to="/about" class="no-underline flex z-50 md:mr-4 mb-4 md:mb-0">
+              <div class="bg-huddle-blue rounded-full text-white text-center py-2 px-4 text-md cursor-pointer">Learn More</div>
+            </router-link>
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 text-md cursor-pointer z-50" @click="$parent.signIn">Create Profile</div>
+          </div>
+        </div>
+        <div class="flex flex-col py-24 my-16 mt-16 mx-4 w-full" v-if="user">
           <h1 class="text-4xl text-white font-light flex-wrap md:w-full md:max-w-lg max-w-sm justify-center self-center mb-4 flex z-50 leading-normal text-center mb-8">
             Welcome back, {{ user.username }}
           </h1>
