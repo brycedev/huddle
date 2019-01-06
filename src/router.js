@@ -7,6 +7,7 @@ import Home from './views/Home.vue'
 import Huddle from './views/Huddle.vue'
 import Identity from './views/Identity.vue'
 import Onboard from './views/Onboard.vue'
+import Settings from './views/Settings.vue'
 
 Vue.use(Router)
 
@@ -86,6 +87,11 @@ export default new Router({
           name: 'ExpandedHuddlePostPrivate'
         }
       ]
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: Settings
     },
     {
       path: '/welcome',

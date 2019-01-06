@@ -112,6 +112,8 @@ router.afterEach((to, from) => {
   progress.done()
 })
 
+
+
 new Vue({
   data: () => ({
     store: store

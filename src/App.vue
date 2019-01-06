@@ -42,11 +42,13 @@
             </div>
             
             <div class="absolute pin-t w-full pin-l mt-14 flex flex-col items-center subtle opacity-0" :class="{ 'opacity-100' : showDropdown, 'pointer-events-none' : !showDropdown }">
-              <div class="flex items-center mb-4 justify-center bg-white py-2 px-4 rounded-full w-full cursor-pointer">
-                <img class="mr-2" width="20" src="../src/assets/cogs.svg"/>
-                <span>Settings</span>
-              </div>
-              <div class="flex items-center justify-center bg-huddle-blue text-white py-2 px-4 rounded-full w-full cursor-pointer" @click="logout()">
+              <router-link to="/settings" class="no-underline text-black block w-full">
+                <div class="flex items-center mb-4 justify-center bg-white shadow-md py-2 px-4 rounded-full w-full cursor-pointer">
+                  <img class="mr-2" width="20" src="../src/assets/cogs.svg"/>
+                  <span>Settings</span>
+                </div>
+              </router-link>
+              <div class="flex items-center justify-center bg-huddle-blue shadow-md text-white py-2 px-4 rounded-full w-full cursor-pointer" @click="logout()">
                 <img class="mr-2" width="20" src="../src/assets/logout-white.svg"/>
                 <span>Logout</span>
               </div>
@@ -64,7 +66,7 @@
             <p class="no-underline flex items-center text-white uppercase opacity-75 text-xs mb-4">Community</p>
             <ul class="list-reset text-xs mb-6">
               <li class="mt-3 inline-block mr-2 sm:block sm:mr-0">
-                <router-link to="#" class="text-white opacity-75 hover:opacity-100 no-underline">Support</router-link>
+                <a href="mailto:support@huddle.group" class="text-white opacity-75 hover:opacity-100 no-underline">Support</a>
               </li>
               <li class="mt-3 inline-block mr-2 sm:block sm:mr-0">
                 <a href="https://twitter.com/itshuddletime" target="_blank" class="text-white opacity-75 hover:opacity-100 no-underline">Twitter</a>
@@ -180,6 +182,11 @@ export default {
     signIn() {
       const origin = window.location.origin
       blockstack.redirectToSignIn(`${origin}/welcome`, `${origin}/manifest.json`)
+    }
+  },
+  watch: {
+    $route(){
+      if(this.showDropdown) this.showDropdown = false
     }
   }
 }

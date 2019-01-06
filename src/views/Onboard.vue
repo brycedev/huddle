@@ -16,13 +16,13 @@
           <div class="absolute pin bg-white rounded-lg flex items-center justify-center z-10" v-show="checkingUser">
             <img src="../assets/spinner-black.svg" class="spin" alt="" width="100">
           </div>
-          <div class="w-full mb-4">
+          <div class="w-full mb-6">
             <p class="text-black font-medium mb-6">Choose your username! It's okay to get creative.</p>
             <input v-model="username" type="text" class="block appearance-none text-grey-darker py-3 px-4 rounded-full w-full bg-khak-grey outline-none text-normal mb-3" placeholder="markhuddleberg" @keyup.enter="createProfile">
           </div>
-          <div class="w-full">
+          <div class="w-full mb-6">
             <p class="text-black font-medium mb-6">Do you plan to participate in public communities?</p>
-            <div class="flex w-full bg-khak-grey rounded-full mb-6">
+            <div class="flex w-full bg-khak-grey rounded-full">
               <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForParticipate(true)" @click="participate = true">
                 <p class="text-normal text-center">Yes</p>
               </div>

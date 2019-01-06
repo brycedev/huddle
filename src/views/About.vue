@@ -147,7 +147,7 @@
           </p>
           <div class="w-full relative rounded-full overflow-hidden" id="app">
             <input id="email" name="email" type="email" class="block appearance-none text-black py-4 px-4 w-full bg-khak-grey outline-none text-md" placeholder="Enter your email address"/>
-              <button type="submit" class="outline-none focus:outline-none w-16 absolute pin-t pin-b pin-r rounded-tr-full rounded-br-full flex items-center justify-center bg-blue cursor-pointer">
+              <button type="submit" class="outline-none focus:outline-none w-16 absolute pin-t pin-b pin-r rounded-tr-full rounded-br-full rounded-full flex items-center justify-center bg-blue cursor-pointer">
                 <img src="../assets/arrow-r.svg" width="22">
               </button>
           </div>
@@ -165,6 +165,12 @@ export default {
     return {
       person: null
     }
+  },
+  beforeRouteEnter(to, from, next){
+    if(!from.name && blockstack.isUserSignedIn()){
+      next('/welcome')
+    }
+    next()
   },
   mounted(){
     const people = [
