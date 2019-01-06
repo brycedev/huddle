@@ -34,15 +34,28 @@
               </div>
             </div>
           </div>
-          <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center" @click="!user ? signIn() : logout()">
-            <span v-if="!user">Login</span>
-            <img v-if="user" class="w-6 h-6 rounded-full mr-2" :src="user.avatar"/>
-            <span v-if="user">{{ user.username ? user.username : user.bi }}</span>
+          <div class="relative bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center" @click="signIn()" v-if="!user">Login</div>
+          <div class="relative" v-if="user">
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 flex items-center cursor-pointer" @click="toggleDropdown">
+              <img class="w-6 h-6 rounded-full mr-2 z-50" :src="user.avatar"/>
+              <span class="z-50">{{ user.username ? user.username : user.bi }}</span>
+            </div>
+            
+            <div class="absolute pin-t w-full pin-l mt-14 flex flex-col items-center subtle opacity-0" :class="{ 'opacity-100' : showDropdown, 'pointer-events-none' : !showDropdown }">
+              <div class="flex items-center mb-4 justify-center bg-white py-2 px-4 rounded-full w-full cursor-pointer">
+                <img class="mr-2" width="20" src="../src/assets/cogs.svg"/>
+                <span>Settings</span>
+              </div>
+              <div class="flex items-center justify-center bg-huddle-blue text-white py-2 px-4 rounded-full w-full cursor-pointer" @click="logout()">
+                <img class="mr-2" width="20" src="../src/assets/logout-white.svg"/>
+                <span>Logout</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </nav>
-    <router-view/>
+    <router-view ref="currentChild"/>
     <footer class="bg-black py-8 w-full mt-8">
       <div class="container mx-auto px-6">
         <div class="flex flex-col sm:items-start sm:flex-row w-full justify-center">
@@ -81,7 +94,8 @@ export default {
   store: ['bus', 'huddles', 'user', 'users'],
   data() {
     return {
-      scroll: 0
+      scroll: 0,
+      showDropdown: false,
     }
   },
   computed: {
@@ -98,31 +112,17 @@ export default {
     }
   },
   created(){
-    if(blockstack.isUserSignedIn()) {
-      setTimeout(async () => {
-        this.user = {}
-        this.user.privateHuddles = []
-        this.user.publicHuddles = []
-        this.user.publicPosts = []
-        this.user.privatePosts = []
-        this.user.publicComments = []
-        this.user.privateComments = []
-        this.user.publicLibrary = []
-        this.user.privateLibrary = []
-        const data = blockstack.loadUserData()
-        await this.putUser(data)
-        this.bus.$emit('instantiated')
-      })
-    }
     this.instantiateGun()
   },
   mounted(){
-    
     document.addEventListener('scroll', e => {
       this.scroll = window.scrollY
     })
   },
   methods: {
+    toggleDropdown(){
+      this.showDropdown = !this.showDropdown
+    },
     instantiateGun(){
       this.$gun.get(`${gunPrefix}:huddles`).once(async v => {
         if(typeof(v) == 'undefined') await this.seedData()

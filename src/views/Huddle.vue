@@ -87,22 +87,27 @@ export default {
     }
   },
   beforeRouteEnter (to, from, next) {
-    next(vm => {
-      vm.huddle = vm.huddles.find(h => h.slug == to.params.slug)
-      if(to.name.includes('ExpandedHuddlePost')){
-        setTimeout(() => {
-          vm.expandedPost = vm.posts.find(p => p.id == to.params.postId)
-          document.getElementById('body').style.overflowY = 'hidden'
-          if(!vm.expandedPost) vm.$router.push(`/h/${to.params.slug}`)
-        }, 200)
-      } else if(to.name.includes('CreatePost')){
-        next(vm => {
-          document.getElementById('body').style.overflowY = 'hidden'
-        })
-      } else {
-        document.getElementById('body').style.overflowY = 'auto'
-      }
-    })
+    if(!from.name && blockstack.isUserSignedIn()){
+      next('/welcome')
+    } else {
+      next(vm => {
+        vm.huddle = vm.huddles.find(h => h.slug == to.params.slug)
+        if(to.name.includes('ExpandedHuddlePost')){
+          setTimeout(() => {
+            vm.expandedPost = vm.posts.find(p => p.id == to.params.postId)
+            document.getElementById('body').style.overflowY = 'hidden'
+            if(!vm.expandedPost) vm.$router.push(`/h/${to.params.slug}`)
+          }, 200)
+        } else if(to.name.includes('CreatePost')){
+          next(vm => {
+            document.getElementById('body').style.overflowY = 'hidden'
+          })
+        } else {
+          document.getElementById('body').style.overflowY = 'auto'
+        }
+      })
+    }
+    
   },
   beforeRouteUpdate (to, from, next) {
     if(to.name.includes('ExpandedHuddlePost')){

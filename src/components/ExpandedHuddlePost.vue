@@ -12,8 +12,8 @@
               <p class="text-grey-darkest font-light text-xs pt-1 tracking-wide">Post Creation : {{ postDate }}</p>
             </div>
             <div class="flex ml-2">
-              <img src="../assets/save.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Save to Library'" @click="saveToLibrary">
-              <img src="../assets/share.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Share'">
+              <img src="../assets/save.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Save to Library'" @click="user ? saveToLibrary() : false">
+              <img src="../assets/share.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Share on Twitter'">
             </div>
           </div>
           <div class="mb-8">
@@ -77,9 +77,6 @@
       isMember(){
         return this.post && this.user && this.user.publicHuddles.includes(this.post.huddle)
       },
-      isSaved(){
-        return this.post && this.user && this.user.publicLibrary.map(l => l.p).includes(this.post.id)
-      },
       postUser(){
         return this.post && this.user
           ? this.users.find(u => u.id == this.post.u)
@@ -102,11 +99,12 @@
         this.thoughtPromise.cancel()
       },
       async saveToLibrary(){
-        if(!this.isSaved){
+        if(!this.user.publicLibrary.map(l => l.p).includes(this.post.id)){
           const save = { id: uuid('library'), u: this.user.id, p: this.post.id, h: this.post.huddle }
           const newSave = this.$gun.get(`${gunPrefix}:saves/${save.id}`).put(save)
           this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').set(newSave)
           this.user.publicLibrary.push({ id: save.id, p: save.p, h: save.h })
+          this.$parent.$refs.currentChild.fetchPosts()
           await blockstack.putFile('publicLibrary.json', JSON.stringify(this.user.publicLibrary), { encrypt : false })
         } else {
           // user has already saved to library

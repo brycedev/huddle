@@ -125,7 +125,14 @@ export default {
       })
     },
     async checkUser(){
-      if(!this.$route.query.authResponse) this.$router.push('/')
+      if(!this.$route.query.authResponse){
+        if(blockstack.isUserSignedIn()){
+          const data = blockstack.loadUserData()
+          await this.$parent.putUser(data)
+          this.bus.$emit('instantiated')
+        }
+        this.$router.push('/')
+      }
       if (blockstack.isSignInPending()) {
         blockstack.handlePendingSignIn().then(async userData => {
           this.userData = userData

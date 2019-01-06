@@ -19,12 +19,12 @@ export default {
   props: ['huddle'],
   data() {
     return {
-      approval: 0
+      votes: []
     }
   },
   computed: {
     approvalPercent(){
-      return { 'width' : `${this.approval}%`}
+      return { 'width' : `${(this.votes.filter(v => v.d == 1).length / 20) * 100}%`}
     },
     bgColor(){
       return { backgroundColor: `hsla(${ this.huddle.hue }, 35%, 27%, .64)` }
@@ -33,6 +33,14 @@ export default {
       return { 
         backgroundImage: `url('${this.huddle.background}')` 
       }
+    }
+  },
+  mounted(){
+    if(this.huddle){
+      this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('votes').map().on(vote => {
+        this.votes.push(vote)
+        this.votes = Array.from(new Set(this.votes))
+      })
     }
   }
 }

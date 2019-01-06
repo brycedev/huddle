@@ -37,10 +37,6 @@
               <p class="text-grey-dark text-center">{{ counter.characters }}</p>
               <p class="text-grey-dark text-center text-xs">Characters</p>
             </div>
-            <div class="flex flex-col justify-center px-6">
-              <p class="text-grey-dark text-center">2:30</p>
-              <p class="text-grey-dark text-center text-xs">Read</p>
-            </div>
           </div>
         </div>
       </div>

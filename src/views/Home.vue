@@ -158,7 +158,6 @@ export default {
     fetchStuff(){
       this.fetchSaves()
       this.fetchPosts()
-      // this.myHuddles = this.huddles.filter(h => this.user.publicHuddles.includes(h.id))
     },
     fetchPosts(){
       this.postFragments = []
@@ -185,11 +184,13 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next){
-    next(vm => {
-      if(from) {
+    if(!from.name && blockstack.isUserSignedIn()){
+      next('/welcome')
+    } else {
+      next(vm => {
         vm.fetchStuff()
-      }
-    })
+      })
+    }
   },
   mounted(){
     this.bus.$on('instantiated', () => {
@@ -197,6 +198,9 @@ export default {
     })
   },
   watch: {
+    $route(){
+      this.fetchStuff()
+    },
     postFragments(value){
       let posts = []
       value.forEach(async f => {
