@@ -78,7 +78,7 @@
 
 <script>
 export default {
-  store: ['huddles', 'user', 'users'],
+  store: ['bus', 'huddles', 'user', 'users'],
   data() {
     return {
       scroll: 0
@@ -97,30 +97,45 @@ export default {
       return this.huddles.filter(h => h.type == 'public' && h.isApproved)
     }
   },
-  mounted(){
+  created(){
     if(blockstack.isUserSignedIn()) {
       setTimeout(async () => {
+        this.user = {}
+        this.user.privateHuddles = []
+        this.user.publicHuddles = []
+        this.user.publicPosts = []
+        this.user.privatePosts = []
+        this.user.publicComments = []
+        this.user.privateComments = []
+        this.user.publicLibrary = []
+        this.user.privateLibrary = []
         const data = blockstack.loadUserData()
-        data.huddleUsername = data.username
         await this.putUser(data)
-      }, 100)
+        this.bus.$emit('instantiated')
+      })
     }
+    this.instantiateGun()
+  },
+  mounted(){
+    
     document.addEventListener('scroll', e => {
       this.scroll = window.scrollY
     })
-    this.$gun.get(`${gunPrefix}:huddles`).once(async v => {
-      if(typeof(v) == 'undefined') await this.seedData()
-    })
-    this.$gun.get(`${gunPrefix}:huddles`).map().on((node, key) => {
-      this.huddles.push(node)
-      this.huddles = Array.from(new Set(this.huddles))
-    })
-    this.$gun.get(`${gunPrefix}:users`).map().on((node, key) => {
-      this.users.push(node)
-      this.users = Array.from(new Set(this.users))
-    })
   },
   methods: {
+    instantiateGun(){
+      this.$gun.get(`${gunPrefix}:huddles`).once(async v => {
+        if(typeof(v) == 'undefined') await this.seedData()
+      })
+      this.$gun.get(`${gunPrefix}:huddles`).map().on((node, key) => {
+        this.huddles.push(node)
+        this.huddles = Array.from(new Set(this.huddles))
+      })
+      this.$gun.get(`${gunPrefix}:users`).map().on((node, key) => {
+        this.users.push(node)
+        this.users = Array.from(new Set(this.users))
+      })
+    },
     async seedData(){
       (await seedDatabase()).forEach(h => {
         const newHuddle = this.$gun.get(`${gunPrefix}:huddles/${h.id}`).put(h)
@@ -136,31 +151,34 @@ export default {
         this.user.bi = data.username
         this.user.id = data.identityAddress
         this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
-        this.user.username = data.huddleUsername
+        const exist = this.users.find(u => u.id === this.user.id)
+        exist ? this.user.username = exist.username : data.username
         await this.loadGaia()
         resolve()
       })
     },
-    async loadGaia(){
-      console.log('loading user gaia storage: ', this.user.username)
-      // user exists, load their gaia storage
-      this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
-      if(this.user.preferences && this.user.preferences.isPublic){
-        this.user.username = this.user.preferences.username
-        this.user.publicHuddles = JSON.parse(await blockstack.getFile('publicHuddles.json', { decrypt: false }))
-        this.user.publicPosts = JSON.parse(await blockstack.getFile('publicPosts.json', { decrypt: false }))
-        this.user.publicComments = JSON.parse(await blockstack.getFile('publicComments.json', { decrypt: false }))
-        this.user.publicLibrary = JSON.parse(await blockstack.getFile('publicLibrary.json', { decrypt: false }))
-      }
-      this.user.privateHuddles = JSON.parse(await blockstack.getFile('privateHuddles.json', { decrypt: true }))
-      this.user.privatePosts = JSON.parse(await blockstack.getFile('privatePosts.json', { decrypt: true }))
-      this.user.privateComments = JSON.parse(await blockstack.getFile('privateComments.json', { decrypt: true }))
-      this.user.privateLibrary = JSON.parse(await blockstack.getFile('privateLibrary.json', { decrypt: true }))
+    loadGaia(){
+      return new Promise(async(resolve, reject) => {
+        console.log('loading user gaia storage: ', this.user.username)
+        // user exists, load their gaia storage
+        this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
+        if(this.user.preferences && this.user.preferences.isPublic){
+          this.user.username = this.user.preferences.username
+          this.user.publicHuddles = JSON.parse(await blockstack.getFile('publicHuddles.json', { decrypt: false }))
+          this.user.publicPosts = JSON.parse(await blockstack.getFile('publicPosts.json', { decrypt: false }))
+          this.user.publicComments = JSON.parse(await blockstack.getFile('publicComments.json', { decrypt: false }))
+          this.user.publicLibrary = JSON.parse(await blockstack.getFile('publicLibrary.json', { decrypt: false }))
+        }
+        this.user.privateHuddles = JSON.parse(await blockstack.getFile('privateHuddles.json', { decrypt: true }))
+        this.user.privatePosts = JSON.parse(await blockstack.getFile('privatePosts.json', { decrypt: true }))
+        this.user.privateComments = JSON.parse(await blockstack.getFile('privateComments.json', { decrypt: true }))
+        this.user.privateLibrary = JSON.parse(await blockstack.getFile('privateLibrary.json', { decrypt: true }))
+        resolve()
+      })
       
     },
     signIn() {
       const origin = window.location.origin
-      // blockstack.redirectToSignIn()
       blockstack.redirectToSignIn(`${origin}/welcome`, `${origin}/manifest.json`)
     }
   }
@@ -203,6 +221,80 @@ body
 </style>
 
 <style>
+/* Make clicks pass-through */
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: #5F91D6;
+
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 2px;
+}
+
+/* Fancy blur effect */
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0px;
+  width: 100px;
+  height: 100%;
+  box-shadow: 0 0 10px #5F91D6, 0 0 5px #5F91D6;
+  opacity: 1.0;
+
+  -webkit-transform: rotate(3deg) translate(0px, -4px);
+      -ms-transform: rotate(3deg) translate(0px, -4px);
+          transform: rotate(3deg) translate(0px, -4px);
+}
+
+/* Remove these to get rid of the spinner */
+#nprogress .spinner {
+  display: block;
+  position: fixed;
+  z-index: 1031;
+  top: 15px;
+  right: 15px;
+}
+
+#nprogress .spinner-icon {
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+
+  border: solid 2px transparent;
+  border-top-color: #5F91D6;
+  border-left-color: #5F91D6;
+  border-radius: 50%;
+
+  -webkit-animation: nprogress-spinner 400ms linear infinite;
+          animation: nprogress-spinner 400ms linear infinite;
+}
+
+.nprogress-custom-parent {
+  overflow: hidden;
+  position: relative;
+}
+
+.nprogress-custom-parent #nprogress .spinner,
+.nprogress-custom-parent #nprogress .bar {
+  position: absolute;
+}
+
+@-webkit-keyframes nprogress-spinner {
+  0%   { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+@keyframes nprogress-spinner {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 
 .tooltip {
   display: block !important;

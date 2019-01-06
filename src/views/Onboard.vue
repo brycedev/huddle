@@ -12,7 +12,10 @@
     </div>
     <div class="container flex">
       <div class="w-full justify-center flex">
-        <div class="w-full max-w-sm bg-white rounded-lg py-6 px-8 flex flex-col -mt-12 z-50">
+        <div class="w-full max-w-sm bg-white rounded-lg py-6 px-8 flex flex-col -mt-12 z-50 relative">
+          <div class="absolute pin bg-white rounded-lg flex items-center justify-center z-10" v-show="checkingUser">
+            <img src="../assets/spinner-black.svg" class="spin" alt="" width="100">
+          </div>
           <div class="w-full mb-4">
             <p class="text-black font-medium mb-6">Choose your username! It's okay to get creative.</p>
             <input v-model="username" type="text" class="block appearance-none text-grey-darker py-3 px-4 rounded-full w-full bg-khak-grey outline-none text-normal mb-3" placeholder="markhuddleberg" @keyup.enter="createProfile">
@@ -53,13 +56,14 @@
 <script>
 export default {
   name: 'Onboard',
-  store: ['user', 'users'],
+  store: ['bus', 'user', 'users'],
   data() {
     return {
       isCreating: false,
       participate: true,
       hideNSFW: true,
-      username: ''
+      username: '',
+      checkingUser: true
     }
   },
   computed: {
@@ -137,7 +141,8 @@ export default {
           if(file && file.isOnboarded && hasFile){
             if(this.users.find(u => u.id == userData.identityAddress)){ 
               this.userData.huddleUsername = file.username
-              this.$parent.putUser(userData)
+              await this.$parent.putUser(userData)
+              this.bus.$emit('instantiated')
               this.$router.push('/')
             } else {
               // seeding/testing - restore state
@@ -154,12 +159,16 @@ export default {
               await blockstack.putFile('publicLibrary.json', cleanArray, { encrypt : false })
               await this.$parent.putUser(this.userData)
               this.$router.push('/welcome')
+              this.checkingUser = false
             }
           } else {
             this.userData.huddleUsername = this.userData.bi
             await this.$parent.putUser(this.userData)
             this.$router.push('/welcome')
+            this.checkingUser = false
           } 
+        }).catch(err => {
+          // error trying to authenticate 
         })
       }
     },

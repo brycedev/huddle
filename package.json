@@ -13,6 +13,7 @@
     "countable": "^3.0.1",
     "giphy-api": "^2.0.1",
     "gun": "^0.9.999995",
+    "nprogress": "^0.2.0",
     "portal-vue": "^1.5.1",
     "register-service-worker": "^1.5.2",
     "setimmediate": "^1.0.5",

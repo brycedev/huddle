@@ -94,7 +94,7 @@ export default {
           vm.expandedPost = vm.posts.find(p => p.id == to.params.postId)
           document.getElementById('body').style.overflowY = 'hidden'
           if(!vm.expandedPost) vm.$router.push(`/h/${to.params.slug}`)
-        }, 1200)
+        }, 200)
       } else if(to.name.includes('CreatePost')){
         next(vm => {
           document.getElementById('body').style.overflowY = 'hidden'

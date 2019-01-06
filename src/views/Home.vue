@@ -21,12 +21,15 @@
             <router-link to="/huddles/new" class="no-underline flex z-50 md:mr-4 mb-4 md:mb-0">
               <div class="bg-huddle-blue rounded-full text-white text-center py-2 px-4 text-md cursor-pointer">Create A Huddle</div>
             </router-link>
-            <!-- <div class="bg-white rounded-full text-black text-center py-2 px-4 text-md cursor-pointer z-50">Invite A Friend</div> -->
+            <router-link :to="`/i/${this.user.username}`" class="no-underline flex z-50 mb-4 md:mb-0">
+              <div class="bg-white rounded-full text-black text-center py-2 px-4 text-md cursor-pointer z-50">View Profile</div>
+            </router-link>
+            
           </div>
         </div>
       </div>
     </div>
-    <div class="container flex -mt-20 sm:px-0 px-6" v-if="!user">
+    <div class="container flex -mt-20 sm:px-0 px-6" v-show="!user">
       <div class="w-full">
         <div class="flex flex-wrap">
           <div class="w-full md:w-1/2 xl:w-1/3 mb-4 px-2" v-for="huddle in displayedHuddles" :key="huddle.id">
@@ -49,7 +52,7 @@
     <div class="container flex" v-if="user">
       <div class="w-full max-w-xl mx-auto justify-between flex">
         <div class="w-full flex-grow flex-col -mt-24 md:mr-4 z-50">
-          <div class="w-full self-center text-black text-center py-2 px-4 cursor-pointer flex justify-center items-center mb-2 h-12">
+          <div class="w-full self-center text-black text-center py-2 px-4 flex justify-center items-center mb-2 h-12">
             <div class="sm:flex-grow hidden sm:flex">
               <div class="flex">
                 <div class="flex -mb-px mr-6">
@@ -93,8 +96,8 @@
              
             </div>
           </div> -->
-          <div class="rounded-lg shadow p-6 bg-white w-full mb-4">
-            <p class="text-black font-light mb-4">Your Groups</p>
+          <div class="rounded-lg shadow p-6 bg-white w-full mb-4" v-if="myHuddles">
+            <p class="text-black font-light mb-4">Your Huddles</p>
             <div class="flex flex-col">
              <router-link :to="'/h/' + huddle.slug" v-for="huddle in myHuddles" :key="huddle.id"  class="block w-full block no-underline">
                 <huddle-entry class="mb-4" :huddle="huddle" :full="false"></huddle-entry>
@@ -113,7 +116,7 @@ import HuddlePost from '@/components/HuddlePost.vue'
 
 export default {
   name: 'Home',
-  store: ['huddles', 'user'],
+  store: ['bus', 'huddles', 'user'],
   components: {
     HuddleEntry, HuddlePost
   },
@@ -152,6 +155,11 @@ export default {
     document.getElementById('body').style.overflow = 'auto'
   },
   methods: {
+    fetchStuff(){
+      this.fetchSaves()
+      this.fetchPosts()
+      // this.myHuddles = this.huddles.filter(h => this.user.publicHuddles.includes(h.id))
+    },
     fetchPosts(){
       this.postFragments = []
       const huds = this.myHuddles.map(h => h.id)
@@ -163,30 +171,32 @@ export default {
       })
     },
     fetchSaves(){
-      this.saveFragments = []
-      this.user.publicLibrary.forEach(s => {
-        this.$gun.get(`${gunPrefix}:huddles/${s.h}`).get('posts').map().on(post => {
-          if(post.id == s.p){
-            this.saveFragments.push(post)
-            this.saveFragments = Array.from(new Set(this.saveFragments))
-          }
+      if(this.user.publicLibrary){
+        this.saveFragments = []
+        this.user.publicLibrary.forEach(s => {
+          this.$gun.get(`${gunPrefix}:huddles/${s.h}`).get('posts').map().on(post => {
+            if(post.id == s.p){
+              this.saveFragments.push(post)
+              this.saveFragments = Array.from(new Set(this.saveFragments))
+            }
+          })
         })
-      })
+      }
     }
+  },
+  beforeRouteEnter(to, from, next){
+    next(vm => {
+      if(from) {
+        vm.fetchStuff()
+      }
+    })
   },
   mounted(){
-    if(this.user){
-      this.fetchPosts()
-      this.fetchSaves()
-    }
+    this.bus.$on('instantiated', () => {
+      this.fetchStuff()
+    })
   },
   watch: {
-    $route(){
-      if(this.user){
-        this.fetchPosts()
-        this.fetchSaves()
-      }
-    },
     postFragments(value){
       let posts = []
       value.forEach(async f => {

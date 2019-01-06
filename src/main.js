@@ -1,6 +1,6 @@
 require('setimmediate')
 const isDev = window.location.host !== "huddle.group"
-const dbPrefix = 'aege3ahh3aa7tex'
+const dbPrefix = 'aege3ahaa7wehaw4hatex'
 
 import Vue from 'vue'
 import App from './App.vue'
@@ -8,15 +8,16 @@ import gun from 'vue-gun'
 import router from './router'
 import stash from 'vue-stash'
 import portal from 'portal-vue'
+import progress from 'nprogress'
 import tooltip from 'v-tooltip'
 import './util/registerServiceWorker'
 
 Vue.config.productionTip = false
 Vue.use(gun)
 Vue.use(portal)
+Vue.use(progress, { color: '#fff' })
 Vue.use(stash)
-Vue.use(tooltip, {
-  defaultHideOnTargetClick: false,
+Vue.use(tooltip, { defaultHideOnTargetClick: false,
   popover: {
     defaultPlacement: 'top'
   }
@@ -55,20 +56,6 @@ const store = {
   isDev: isDev,
   user: false,
   users: []
-}
-
-function toDataURL(url, callback) {
-  var xhr = new XMLHttpRequest();
-  xhr.onload = function() {
-    var reader = new FileReader();
-    reader.onloadend = function() {
-      callback(reader.result);
-    }
-    reader.readAsDataURL(xhr.response);
-  };
-  xhr.open('GET', url);
-  xhr.responseType = 'blob';
-  xhr.send();
 }
 
 window.seedDatabase = async () => {
@@ -114,6 +101,16 @@ window.seedDatabase = async () => {
   })
   return huddles
 }
+
+progress.configure({ showSpinner: false, color: '#fff' })
+router.beforeEach((to, from, next) => {
+  progress.start()
+  next()
+})
+
+router.afterEach((to, from) => {
+  progress.done()
+})
 
 new Vue({
   data: () => ({

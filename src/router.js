@@ -69,7 +69,7 @@ export default new Router({
       children: [
         { 
           path: 'post/:postId',
-          name: 'ExpandedHuddlePostPublic'
+          name: 'ExpandedHuddlePostIdentity'
         }
       ]
     },
