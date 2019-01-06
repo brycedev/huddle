@@ -34,7 +34,7 @@
               <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForNSFW(true)" @click="huddle.isNSFW = true">
                 <p class="text-normal text-center">Yes</p>
               </div>
-              <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForNSFW(false)" @click="huddle.nsfw = false">
+              <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForNSFW(false)" @click="huddle.isNSFW = false">
                 <p class="text-normal text-center">No</p>
               </div>
             </div>
@@ -89,7 +89,7 @@ export default {
       else return 'bg-transparent text-grey-darker'
     },
     styleForNSFW(type){
-      if(this.huddle.nsfw == type) return 'bg-black text-white'
+      if(this.huddle.isNSFW == type) return 'bg-black text-white'
       else return 'bg-transparent text-grey-darker'
     },
     async createHuddle(){
