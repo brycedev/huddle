@@ -75,10 +75,10 @@
         return this.visible ? 'opacity-100 visible' : 'opacity-0 invisible'
       },
       isMember(){
-        return this.post && this.user && this.user.publicGroups.includes(this.post.huddle)
+        return this.post && this.user && this.user.publicHuddles.includes(this.post.huddle)
       },
       isSaved(){
-        return this.post && this.user && this.user.library.includes(this.post.id)
+        return this.post && this.user && this.user.publicLibrary.map(l => l.p).includes(this.post.id)
       },
       postUser(){
         return this.post && this.user
@@ -106,8 +106,8 @@
           const save = { id: uuid('library'), u: this.user.id, p: this.post.id, h: this.post.huddle }
           const newSave = this.$gun.get(`${gunPrefix}:saves/${save.id}`).put(save)
           this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').set(newSave)
-          this.user.library.push(this.post.id)
-          await blockstack.putFile('library.json', JSON.stringify(this.user.library), { encrypt : false })
+          this.user.publicLibrary.push({ id: save.id, p: save.p, h: save.h })
+          await blockstack.putFile('publicLibrary.json', JSON.stringify(this.user.publicLibrary), { encrypt : false })
         } else {
           // user has already saved to library
         }

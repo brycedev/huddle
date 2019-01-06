@@ -14,17 +14,17 @@
       <div class="w-full flex justify-between z-50 mx-auto max-w-xl">
         <div class="w-120 mt-8 mr-4 md:flex md:flex-col hidden">
           <div class="rounded-lg shadow p-6 bg-white w-full mb-4">
-            <p class="text-black font-medium mb-2">Description</p>
+            <p class="text-black font-light mb-4">Description</p>
             <p class="text-grey-darkest leading-normal font-light break">{{ huddle.description }}</p>
           </div>
           <div class="rounded-lg shadow p-4 bg-white w-full mb-4" v-if="isMember">
-            <p class="text-black font-normal mb-2">Members</p>
+            <p class="text-black font-light mb-4">Members</p>
             <div class="w-full flex">
               <div class="flex flex-wrap z-50 overflow-hidden">
                 <!-- <router-link :to="'/i/' + member.username.replace('.id.blockstack', '')" v-for="member in members" :key="member.id"  class="block no-underline mr-2">
                   <img class="w-8 h-8 rounded-full" :src="member.avatar"/>
                 </router-link> -->
-                <router-link to="" v-for="member in members" :key="member.id"  class="block no-underline mr-2">
+                <router-link :to="`/i/${member.username}`" v-for="member in members" :key="member.id"  class="block no-underline mr-2">
                   <img class="w-8 h-8 rounded-full" :src="member.avatar" v-tooltip="member.username"/>
                 </router-link>
               </div>
@@ -55,7 +55,7 @@
           <huddle-post class="md:mx-0 mx-2" :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num" v-if="!isMember"></huddle-post>
           <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="isMember && !posts.length">
             <img class="px-8 w-96 mb-4" src="../assets/empty-post.svg" alt="Create an identity" width="100%">
-            <p class="text-grey-dark text-center md:font-thin md:text-xl font break" >No posts, yet. Start the conversation.</p>
+            <p class="text-grey-darker text-center md:font-thin md:text-xl font break" >No posts, yet. Start the conversation.</p>
           </div>
         </div>
       </div>
@@ -86,42 +86,23 @@ export default {
       postFragments: []
     }
   },
-  beforeMount(){
-    const isPrivate = this.$route.fullPath.includes('/p/')
-    if(isPrivate){
-      const huddle = this.huddles.find(h => h.id == this.$route.params.id)
-      if(!huddle){
-        const superHiddenHuddle = this.user.privateGroups.find(h => h == this.$route.params.id)
-        if(!superHiddenHuddle){
-          this.$router.push('/')
-        } else {
-          this.huddle = huddle
-        }
-      } else {
-        this.huddle = huddle
-      }
-    } else {
-      const huddle = this.huddles.find(h => h.slug == this.$route.params.slug)
-      if(!huddle) this.$router.push('/')
-      else this.huddle = huddle
-    }
-    
-  },
   beforeRouteEnter (to, from, next) {
-    if(to.name.includes('ExpandedHuddlePost')){
-      next(vm => {
-        vm.expandedPost = { id: uuid(), content: `This thing comes fully loaded. AM/FM radio, reclining bucket seats, and... power windows. Hey, you know how I'm, like, always trying to save the planet? Here's my chance. God help us, we're in the hands of engineers. Eventually, you do plan to have dinosaurs on your dinosaur tour, right?`, user: vm.user, huddle: to.params.id }
-        document.getElementById('body').style.overflowY = 'hidden'
-        vm.expandedPost ? next() : next(false)
-      })
-    } else if(to.name.includes('CreatePost')){
-      next(vm => {
-        document.getElementById('body').style.overflowY = 'hidden'
-      })
-    } else {
-      document.getElementById('body').style.overflowY = 'auto'
-      next()
-    }
+    next(vm => {
+      vm.huddle = vm.huddles.find(h => h.slug == to.params.slug)
+      if(to.name.includes('ExpandedHuddlePost')){
+        setTimeout(() => {
+          vm.expandedPost = vm.posts.find(p => p.id == to.params.postId)
+          document.getElementById('body').style.overflowY = 'hidden'
+          if(!vm.expandedPost) vm.$router.push(`/h/${to.params.slug}`)
+        }, 1200)
+      } else if(to.name.includes('CreatePost')){
+        next(vm => {
+          document.getElementById('body').style.overflowY = 'hidden'
+        })
+      } else {
+        document.getElementById('body').style.overflowY = 'auto'
+      }
+    })
   },
   beforeRouteUpdate (to, from, next) {
     if(to.name.includes('ExpandedHuddlePost')){
@@ -175,9 +156,9 @@ export default {
     async joinGroup(){
       if(this.isPublic && this.user){
         const newMember = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').set({ id: this.user.id })
-        this.user.publicGroups.push(this.huddle.id)
-        const newPublicGroups = JSON.stringify(this.user.publicGroups)
-        await blockstack.putFile('publicGroups.json', newPublicGroups, { encrypt : false })
+        this.user.publicHuddles.push(this.huddle.id)
+        const newPublicHuddles = JSON.stringify(this.user.publicHuddles)
+        await blockstack.putFile('publicHuddles.json', newPublicHuddles, { encrypt : false })
         this.fetchMembers()
         this.fetchPosts()
       }
@@ -206,10 +187,12 @@ export default {
     }
   },
   mounted(){
-    this.fetchMembers()
-    this.fetchPosts()
+    
   },
   watch: {
+    $route(value){
+
+    },
     huddle(newValue, oldValue) {
       this.fetchMembers()
       this.fetchPosts()

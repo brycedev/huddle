@@ -122,7 +122,7 @@ export default {
   },
   methods: {
     async seedData(){
-      seedDatabase().forEach(h => {
+      (await seedDatabase()).forEach(h => {
         const newHuddle = this.$gun.get(`${gunPrefix}:huddles/${h.id}`).put(h)
         this.$gun.get(`${gunPrefix}:huddles`).set(newHuddle)
       })
@@ -147,14 +147,15 @@ export default {
       this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
       if(this.user.preferences && this.user.preferences.isPublic){
         this.user.username = this.user.preferences.username
-        this.user.publicGroups = JSON.parse(await blockstack.getFile('publicGroups.json', { decrypt: false }))
+        this.user.publicHuddles = JSON.parse(await blockstack.getFile('publicHuddles.json', { decrypt: false }))
         this.user.publicPosts = JSON.parse(await blockstack.getFile('publicPosts.json', { decrypt: false }))
         this.user.publicComments = JSON.parse(await blockstack.getFile('publicComments.json', { decrypt: false }))
-        this.user.library = JSON.parse(await blockstack.getFile('library.json', { decrypt: false }))
+        this.user.publicLibrary = JSON.parse(await blockstack.getFile('publicLibrary.json', { decrypt: false }))
       }
-      this.user.privateGroups = JSON.parse(await blockstack.getFile('privateGroups.json', { decrypt: true }))
+      this.user.privateHuddles = JSON.parse(await blockstack.getFile('privateHuddles.json', { decrypt: true }))
       this.user.privatePosts = JSON.parse(await blockstack.getFile('privatePosts.json', { decrypt: true }))
       this.user.privateComments = JSON.parse(await blockstack.getFile('privateComments.json', { decrypt: true }))
+      this.user.privateLibrary = JSON.parse(await blockstack.getFile('privateLibrary.json', { decrypt: true }))
       
     },
     signIn() {
@@ -184,6 +185,7 @@ body
     transform scale(1.01)
 .centercenter
   background-position center center
+  background-size cover
 .spin
   animation-name spin
   animation-duration 5000ms

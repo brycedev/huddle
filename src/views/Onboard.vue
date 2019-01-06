@@ -29,7 +29,7 @@
             </div>
           </div>
           <div class="w-full">
-            <p class="text-black font-medium mb-6">Should we hide NSFW posts and groups?</p>
+            <p class="text-black font-medium mb-6">Should we hide NSFW posts and huddles?</p>
             <div class="flex w-full bg-khak-grey rounded-full mb-6">
               <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForHideNSFW(true)" @click="hideNSFW = true">
                 <p class="text-normal text-center">Yes</p>
@@ -73,13 +73,14 @@ export default {
         this.user.bi = data.bi
         this.user.username = data.username
         this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
-        this.user.privateGroups = []
-        this.user.publicGroups = []
+        this.user.privateHuddles = []
+        this.user.publicHuddles = []
         this.user.publicPosts = []
         this.user.privatePosts = []
         this.user.publicComments = []
         this.user.privateComments = []
-        this.user.library = []
+        this.user.publicLibrary = []
+        this.user.privateLibrary = []
         console.log('instantiating user : ', this.user.username)
         // add user to the gundb instance
         let identity = {}
@@ -106,14 +107,15 @@ export default {
         }
         const cleanArray = JSON.stringify([])
         await blockstack.putFile('preferences.json', JSON.stringify(this.user.preferences), { encrypt : true })
-        await blockstack.putFile('privateGroups.json', cleanArray, { encrypt : true })
+        await blockstack.putFile('privateHuddles.json', cleanArray, { encrypt : true })
         await blockstack.putFile('privatePosts.json', cleanArray, { encrypt : true })
         await blockstack.putFile('privateComments.json', cleanArray, { encrypt : true })
+        await blockstack.putFile('privateLibrary.json', cleanArray, { encrypt : true })
         if(isPublic){
-          await blockstack.putFile('publicGroups.json', cleanArray, { encrypt : false })
+          await blockstack.putFile('publicHuddles.json', cleanArray, { encrypt : false })
           await blockstack.putFile('publicPosts.json', cleanArray, { encrypt : false })
           await blockstack.putFile('publicComments.json', cleanArray, { encrypt : false })
-          await blockstack.putFile('library.json', cleanArray, { encrypt : false })
+          await blockstack.putFile('publicLibrary.json', cleanArray, { encrypt : false })
         }
         resolve()
       })
@@ -142,13 +144,14 @@ export default {
               this.userData.huddleUsername = this.userData.bi
               const cleanArray = JSON.stringify([])
               await blockstack.putFile('preferences.json', JSON.stringify({}), { encrypt : true })
-              await blockstack.putFile('privateGroups.json', cleanArray, { encrypt : true })
+              await blockstack.putFile('privateHuddles.json', cleanArray, { encrypt : true })
               await blockstack.putFile('privatePosts.json', cleanArray, { encrypt : true })
               await blockstack.putFile('privateComments.json', cleanArray, { encrypt : true })
-              await blockstack.putFile('publicGroups.json', cleanArray, { encrypt : false })
+              await blockstack.putFile('privateLibrary.json', cleanArray, { encrypt : true })
+              await blockstack.putFile('publicHuddles.json', cleanArray, { encrypt : false })
               await blockstack.putFile('publicPosts.json', cleanArray, { encrypt : false })
               await blockstack.putFile('publicComments.json', cleanArray, { encrypt : false })
-              await blockstack.putFile('library.json', cleanArray, { encrypt : false })
+              await blockstack.putFile('publicLibrary.json', cleanArray, { encrypt : false })
               await this.$parent.putUser(this.userData)
               this.$router.push('/welcome')
             }

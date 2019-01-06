@@ -1,6 +1,6 @@
 require('setimmediate')
 const isDev = window.location.host !== "huddle.group"
-const dbPrefix = 'aeg389807tex'
+const dbPrefix = 'aege3ahh3aa7tex'
 
 import Vue from 'vue'
 import App from './App.vue'
@@ -57,20 +57,34 @@ const store = {
   users: []
 }
 
-window.seedDatabase = () => {
+function toDataURL(url, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.onload = function() {
+    var reader = new FileReader();
+    reader.onloadend = function() {
+      callback(reader.result);
+    }
+    reader.readAsDataURL(xhr.response);
+  };
+  xhr.open('GET', url);
+  xhr.responseType = 'blob';
+  xhr.send();
+}
+
+window.seedDatabase = async () => {
   localStorage.clear()
   let huddles = []
   let publicObjs = [
-    { id: uuid('huddle'), name: 'Crypto', description: 'We believe crypto will revolutionize the financial system. Join us and escape the noise of Twitter. Bring Satoshi with you!', hue: Math.floor(Math.random() * 357), background: `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}`},
-    { id: uuid('huddle'), name: 'Futurology', description: `Autonomous cars, robotic surgery, aritificial intelligence. Let's build the future together!`, hue: Math.floor(Math.random() * 357), background: `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}`},
-    { id: uuid('huddle'), name: 'Fortnite', description: 'Tilted towers and battle royale; where are the winners at?', hue: Math.floor(Math.random() * 357), background: `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}` },
-    { id: uuid('huddle'), name: 'Request For Product', description: 'New ideas are worth sharing. This is their home.', hue: Math.floor(Math.random() * 357), background: `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}` },
-    { id: uuid('huddle'), name: 'Health & Fitness', description: 'Kale, protein powder, gallon water jugs. Seriously though, come be fit with us!', hue: Math.floor(Math.random() * 357), background: `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}` },
-    { id: uuid('huddle'), name: 'Photography School', description: 'If you love capturing beautiful moments, this is the place for you!', hue: Math.floor(Math.random() * 357), background: `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}` },
-    { id: uuid('huddle'), name: 'We Love Dogs', description: `Do you also agree we don't deserve dogs? This is your home.`, hue: Math.floor(Math.random() * 357), background: `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}` },
-    { id: uuid('huddle'), name: 'Book Club', description: `Sex is cool and all, but have you ever read a good book and discussed it?`, hue: Math.floor(Math.random() * 357), background: `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}` },
-    { id: uuid('huddle'), name: 'Best Travel Eats', description: `If your tastebuds guid your travels, come find the best places to eat around the world. Just don't salivate too much, please.`, hue: Math.floor(Math.random() * 357), background: `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}` },
-    { id: uuid('huddle'), name: 'Indie Makers', description: `What are we cooking up today? Come meeet the other digital makers that just keep on shipping.`, hue: Math.floor(Math.random() * 357), background: `https://picsum.photos/1920x1080/?random=${Math.floor(Math.random() * 357)}` },
+    { id: uuid('huddle'), name: 'Crypto', description: 'We believe crypto will revolutionize the financial system. Join us and escape the noise of Twitter. Bring Satoshi with you!', hue: Math.floor(Math.random() * 357), background: `https://huddle.ams3.cdn.digitaloceanspaces.com/huddles/crypto.jpg`},
+    { id: uuid('huddle'), name: 'Futurology', description: `Autonomous cars, robotic surgery, aritificial intelligence. Let's build the future together!`, hue: Math.floor(Math.random() * 357), background: 'https://huddle.ams3.cdn.digitaloceanspaces.com/huddles/futurology.jpg'},
+    { id: uuid('huddle'), name: 'Fortnite', description: 'Tilted towers and battle royale; where are the winners at?', hue: Math.floor(Math.random() * 357), background: `https://huddle.ams3.cdn.digitaloceanspaces.com/huddles/fortnite.jpg` },
+    { id: uuid('huddle'), name: 'Request For Product', description: 'New ideas are worth sharing. This is their home.', hue: Math.floor(Math.random() * 357), background: `https://huddle.ams3.cdn.digitaloceanspaces.com/huddles/rfp.jpg` },
+    { id: uuid('huddle'), name: 'Health & Fitness', description: 'Kale, protein powder, gallon water jugs. Seriously though, come be fit with us!', hue: Math.floor(Math.random() * 357), background: `https://huddle.ams3.cdn.digitaloceanspaces.com/huddles/healthfitness.jpg` },
+    { id: uuid('huddle'), name: 'Photography School', description: 'If you love capturing beautiful moments, this is the place for you!', hue: Math.floor(Math.random() * 357), background: `https://huddle.ams3.cdn.digitaloceanspaces.com/huddles/photographyschool.jpg` },
+    { id: uuid('huddle'), name: 'We Love Dogs', description: `Do you also agree we don't deserve dogs? This is your home.`, hue: Math.floor(Math.random() * 357), background: `https://huddle.ams3.cdn.digitaloceanspaces.com/huddles/welovedogs.jpg` },
+    { id: uuid('huddle'), name: 'Book Club', description: `Sex is cool and all, but have you ever read a good book and discussed it?`, hue: Math.floor(Math.random() * 357), background: `https://huddle.ams3.cdn.digitaloceanspaces.com/huddles/bookclub.jpg` },
+    { id: uuid('huddle'), name: 'Best Travel Eats', description: `If your tastebuds guide your travels, come find the best places to eat around the world. Just don't salivate too much, please.`, hue: Math.floor(Math.random() * 357), background: `https://huddle.ams3.cdn.digitaloceanspaces.com/huddles/besttraveleats.jpg` },
+    { id: uuid('huddle'), name: 'Indie Makers', description: `What are we cooking up today? Come meeet the other digital makers that just keep on shipping.`, hue: Math.floor(Math.random() * 357), background: `https://huddle.ams3.cdn.digitaloceanspaces.com/huddles/indiemakers.jpg` },
   ]
   publicObjs.forEach(o => {
     o.createdAt = Date.now()

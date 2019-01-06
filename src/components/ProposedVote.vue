@@ -69,7 +69,7 @@
         this.$router.push(`/discover`)  
       },
       vote(d){
-        if(!this.hasVoted){
+        if(!this.hasVoted && this.user){
           const vote = { id: uuid('vote'), u: this.user.id, h: this.huddle.id, d: d }
           const newVote = this.$gun.get(`${gunPrefix}:votes/${vote.id}`).put(vote)
           this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('votes').set(newVote)

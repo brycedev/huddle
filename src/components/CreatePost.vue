@@ -76,7 +76,7 @@
         return this.visible ? 'opacity-100 visible' : 'opacity-0 invisible'
       },
       isMember(){
-        return this.visible && this.huddle && this.user && this.user.publicGroups.includes(this.huddle.id)
+        return this.visible && this.huddle && this.user && this.user.publicHuddles.includes(this.huddle.id)
       },
       postDate(){
         return (new Date()).toLocaleTimeString() 

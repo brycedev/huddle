@@ -5,6 +5,7 @@ import CreateHuddle from './views/CreateHuddle.vue'
 import Discover from './views/Discover.vue'
 import Home from './views/Home.vue'
 import Huddle from './views/Huddle.vue'
+import Identity from './views/Identity.vue'
 import Onboard from './views/Onboard.vue'
 
 Vue.use(Router)
@@ -55,6 +56,17 @@ export default new Router({
           path: 'new',
           name: 'CreatePostPublic'
         },
+        { 
+          path: 'post/:postId',
+          name: 'ExpandedHuddlePostPublic'
+        }
+      ]
+    },
+    {
+      path: '/i/:username',
+      name: 'Identity',
+      component: Identity,
+      children: [
         { 
           path: 'post/:postId',
           name: 'ExpandedHuddlePostPublic'

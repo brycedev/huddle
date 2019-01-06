@@ -1,6 +1,5 @@
 <template>
-  <div class="w-full shadow-md rounded-lg overflow-hidden bg-cover relative cursor-pointer bg-blue-light entry" :style="bgImage">
-    <div class="overlay absolute pin z-auto" :style="bgColor"></div>
+  <div class="w-full shadow-md rounded-lg overflow-hidden canvas bg-black relative cursor-pointer entry">
     <div class="px-6 py-4 flex justify-between items-center z-50 overflow-hidden">
       <div class="flex justify-between flex-grow z-50 items-center">
         <div class="flex flex-col flex-grow mr-4">
