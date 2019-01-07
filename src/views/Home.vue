@@ -183,6 +183,9 @@ export default {
       }
     }
   },
+  created(){
+    this.fetchStuff()
+  },
   mounted(){
     this.bus.$on('instantiated', () => {
       this.fetchStuff()

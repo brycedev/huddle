@@ -89,7 +89,7 @@
         return this.post && this.user && this.user.publicHuddles.includes(this.post.huddle)
       },
       postHuddle(){
-        return this.post && this.user
+        return this.post && this.huddles
           ? this.huddles.find(h => h.id == this.post.huddle)
           : false
       },
@@ -104,7 +104,7 @@
           : (new Date()).toLocaleTimeString() 
       },
       sortedComments(){
-        return this.comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        return Array.from(new Set(this.comments)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       }
     },
     methods: {
@@ -207,18 +207,18 @@
       commentFragments(value){
         let comments = []
         value.forEach(async f => {
-          if(f.u == this.user.id){
+          if(f.u == this.user.id && this.user){
             let comment = this.user.publicComments.find(p => p.id == f.id)
             comment.username = this.user.username
             comment.avatar = this.user.avatar
             comments.push(comment)
           } else {
-            blockstack.getFile(`/publicComments/${f.id}.json`, {
+            blockstack.getFile(`publicComments/${f.id}.json`, {
               decrypt: false,
               app: window.location.origin,
               username: this.users.find(u => u.id == f.u).bi
-            }).then(file => {
-              console.log(file)
+            }).then(comment => {
+              this.comments.push(JSON.parse(comment))
             }).catch(err => {
               console.log(err)
             })
