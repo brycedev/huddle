@@ -70,12 +70,6 @@ export default {
   beforeMount(){
     if(!this.user) this.$router.push('/')
   },
-  beforeRouteEnter(to, from, next){
-    if(!from.name && blockstack.isUserSignedIn()){
-      next('/welcome')
-    }
-    next()
-  },
   methods: {
     styleForParticipate(type){
       if(type == true) return 'bg-black text-white'
@@ -88,11 +82,6 @@ export default {
   },
   mounted(){
     this.newSettings.username = this.user.username
-  },
-  watch: {
-    'huddle.type': function(value){
-      if(value == 'private') this.huddle.type = 'public'
-    }
   }
 }
 </script>

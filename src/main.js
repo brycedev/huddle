@@ -50,7 +50,9 @@ window.later = (delay, value) => {
       }
     }
   };
-};
+}
+
+window.entryRoute = ''
 
 const store = {
   bus: new Vue(),
@@ -104,10 +106,19 @@ window.seedDatabase = async () => {
   return huddles
 }
 
+let firstBoot = true
+
 progress.configure({ showSpinner: false, color: '#fff' })
 router.beforeEach((to, from, next) => {
   progress.start()
-  next()
+  if(!from.name && firstBoot && blockstack.isUserSignedIn()) {
+    // must be first boot, set intended route
+    window.entryRoute = to.fullPath
+    firstBoot = false
+    next({ path: '/welcome' })
+  } else {
+    next()
+  }
 })
 
 router.afterEach((to, from) => {

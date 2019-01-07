@@ -131,7 +131,7 @@ export default {
           await this.$parent.putUser(data)
           this.bus.$emit('instantiated')
         }
-        this.$router.push('/')
+        this.$router.push(window.entryRoute !== '' ? window.entryRoute : '/')
       }
       if (blockstack.isSignInPending()) {
         blockstack.handlePendingSignIn().then(async userData => {
@@ -150,7 +150,7 @@ export default {
               this.userData.huddleUsername = file.username
               await this.$parent.putUser(userData)
               this.bus.$emit('instantiated')
-              this.$router.push('/')
+              this.$router.push(window.entryRoute !== '' ? window.entryRoute : '/')
             } else {
               // seeding/testing - restore state
               this.userData.huddleUsername = this.userData.bi
@@ -194,7 +194,7 @@ export default {
         await this.setUser(this.userData, this.participate)
         await this.$parent.loadGaia()
         await this.$parent.putUser(this.userData)
-        this.$router.push('/')
+        this.$router.push(window.entryRoute !== '' ? window.entryRoute : '/')
         this.isCreating = false
       }, 2000)
     }

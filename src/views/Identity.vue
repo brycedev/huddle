@@ -121,7 +121,7 @@ export default {
     postFragments(value){
       let posts = []
       value.forEach(async f => {
-        if(f.u == this.user.id){
+        if(f.u == this.user.id && this.user){
           posts.push(this.user.publicPosts.find(p => p.id == f.id))
         } else {
           console.log(this.users.find(u => u.id == f.u).bi)

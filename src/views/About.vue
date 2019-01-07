@@ -166,12 +166,6 @@ export default {
       person: null
     }
   },
-  beforeRouteEnter(to, from, next){
-    if(!from.name && blockstack.isUserSignedIn()){
-      next('/welcome')
-    }
-    next()
-  },
   mounted(){
     const people = [
       { name: 'Hadiya', pro: 'She'}

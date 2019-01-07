@@ -183,15 +183,6 @@ export default {
       }
     }
   },
-  beforeRouteEnter(to, from, next){
-    if(!from.name && blockstack.isUserSignedIn()){
-      next('/welcome')
-    } else {
-      next(vm => {
-        vm.fetchStuff()
-      })
-    }
-  },
   mounted(){
     this.bus.$on('instantiated', () => {
       this.fetchStuff()

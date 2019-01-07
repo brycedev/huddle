@@ -80,7 +80,6 @@ export default {
   name: 'Huddle',
   store: ['huddles', 'user', 'users'],
   components: { CreatePost, ExpandedHuddlePost, HuddlePost },
-  
   data() {
     return {
       huddle: null,
@@ -91,26 +90,31 @@ export default {
     }
   },
   beforeRouteEnter (to, from, next) {
-    if(!from.name && blockstack.isUserSignedIn()){
-      next('/welcome')
-    } else {
-      next(vm => {
-        vm.huddle = vm.huddles.find(h => h.slug == to.params.slug)
-        if(to.name.includes('ExpandedHuddlePost')){
-          setTimeout(() => {
-            vm.expandedPost = vm.posts.find(p => p.id == to.params.postId)
-            document.getElementById('body').style.overflowY = 'hidden'
-            if(!vm.expandedPost) vm.$router.push(`/h/${to.params.slug}`)
-          }, 200)
-        } else if(to.name.includes('CreatePost')){
-          next(vm => {
-            document.getElementById('body').style.overflowY = 'hidden'
+    next(async vm => {
+      vm.huddle = vm.huddles.find(h => h.slug == to.params.slug)
+      if(to.name.includes('ExpandedHuddlePost')){
+        let maxSearchTime = 12 // 12 * 100 = 1200 milliseconds == 1.2 seconds
+        let currentTime = 0
+        let findPost = () => {
+          return new Promise((resolve, reject) => {
+            setInterval(() => {
+              const foundPost = vm.posts.find(p => p.id == vm.$route.params.postId)
+              if(foundPost) resolve(foundPost)
+              if(currentTime == maxSearchTime) resolve(foundPost)
+            }, 100)
           })
-        } else {
-          document.getElementById('body').style.overflowY = 'auto'
         }
-      })
-    }
+        vm.expandedPost = await findPost()
+        if(!vm.expandedPost) vm.$router.push(`/h/${to.params.slug}`)
+        else document.getElementById('body').style.overflowY = 'hidden'
+      } else if(to.name.includes('CreatePost')){
+        next(vm => {
+          document.getElementById('body').style.overflowY = 'hidden'
+        })
+      } else {
+        document.getElementById('body').style.overflowY = 'auto'
+      }
+    })
     
   },
   metaInfo(){
