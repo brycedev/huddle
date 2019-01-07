@@ -49,10 +49,13 @@
           <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in displayedPosts" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="isMember">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
-          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in displayedPosts.slice(0,2)" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="!isMember">
+          <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in displayedPosts.slice(0,2)" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="!isMember && posts.length">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
-          <huddle-post class="md:mx-0 mx-2" :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num" v-if="!isMember"></huddle-post>
+          <template v-if="!isMember">
+            <huddle-post :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num"></huddle-post>
+          </template>
+          
           <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="isMember && !posts.length">
             <img class="px-8 w-96 mb-4" src="../assets/empty-post.svg" alt="Create an identity" width="100%">
             <p class="text-grey-darker text-center md:font-thin md:text-xl font break" >No posts, yet. Start the conversation.</p>
@@ -77,6 +80,7 @@ export default {
   name: 'Huddle',
   store: ['huddles', 'user', 'users'],
   components: { CreatePost, ExpandedHuddlePost, HuddlePost },
+  
   data() {
     return {
       huddle: null,
@@ -109,6 +113,17 @@ export default {
     }
     
   },
+  metaInfo(){
+    return this.huddle ? {
+      title: `${this.huddle.name} | Huddle`,
+      meta: [
+        {
+          'property': 'og:title',
+          'content': `Join the ${this.huddle.name} group on Huddle!`,
+        }
+      ]
+    } : { }
+  },
   beforeRouteUpdate (to, from, next) {
     if(to.name.includes('ExpandedHuddlePost')){
       this.expandedPost = this.posts.find(p => p.id == to.params.postId)
@@ -118,7 +133,7 @@ export default {
       this.huddle ? next() : next(false)
     } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && from.name.includes('ExpandedHuddlePost')){
       this.expandedPost = null
-      this.fetchPosts()
+      // this.fetchPosts()
       next()
     } else {
       next()
@@ -126,7 +141,7 @@ export default {
   },
   computed: {
     displayedPosts(){
-      return this.posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     },
     bgColor(){
       return { 
@@ -203,24 +218,25 @@ export default {
       this.fetchPosts()
     },
     postFragments(value){
-      let posts = []
-      value.forEach(async f => {
-        if(f.u == this.user.id){
-          posts.push(this.user.publicPosts.find(p => p.id == f.id))
-        } else {
-          console.log(this.users.find(u => u.id == f.u).bi)
-          blockstack.getFile(`/publicPosts/${f.id}.json`, {
-            decrypt: false,
-            app: window.location.origin,
-            username: this.users.find(u => u.id == f.u).bi
-          }).then(file => {
-            console.log(file)
-          }).catch(err => {
-            console.log(err)
-          })
-        }
-      })
-      this.posts = posts
+      if(value && this.users){
+        let posts = []
+        value.forEach(async f => {
+          if(f.u == this.user.id && this.user){
+            posts.push(this.user.publicPosts.find(p => p.id == f.id))
+          } else {
+            blockstack.getFile(`publicPosts/${f.id}.json`, {
+              decrypt: false,
+              app: window.location.origin,
+              username: this.users.find(u => u.id == f.u).bi
+            }).then(post => {
+              posts.push(JSON.parse(post))
+            }).catch(err => {
+              console.log(err)
+            })
+          }
+        })
+        this.posts = posts
+      }
     }
   },
 }

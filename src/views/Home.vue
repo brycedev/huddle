@@ -116,7 +116,7 @@ import HuddlePost from '@/components/HuddlePost.vue'
 
 export default {
   name: 'Home',
-  store: ['bus', 'huddles', 'user'],
+  store: ['bus', 'huddles', 'user', 'users'],
   components: {
     HuddleEntry, HuddlePost
   },
@@ -131,7 +131,7 @@ export default {
   },
   computed: {
     displayedPosts(){
-      return this.posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     },
     displayedHuddles(){
       return this.publicHuddles.slice(0,8)
@@ -202,38 +202,39 @@ export default {
       this.fetchStuff()
     },
     postFragments(value){
-      let posts = []
-      value.forEach(async f => {
-        if(f.u == this.user.id){
-          posts.push(this.user.publicPosts.find(p => p.id == f.id))
-        } else {
-          console.log(this.users.find(u => u.id == f.u).bi)
-          blockstack.getFile(`/publicPosts/${f.id}.json`, {
-            decrypt: false,
-            app: window.location.origin,
-            username: this.users.find(u => u.id == f.u).bi
-          }).then(file => {
-            console.log(file)
-          }).catch(err => {
-            console.log(err)
-          })
-        }
-      })
-      this.posts = posts
+      if(value && this.users){
+        let posts = []
+        value.forEach(async f => {
+          if(f.u == this.user.id && this.user){
+            posts.push(this.user.publicPosts.find(p => p.id == f.id))
+          } else {
+            blockstack.getFile(`publicPosts/${f.id}.json`, {
+              decrypt: false,
+              app: window.location.origin,
+              username: this.users.find(u => u.id == f.u).bi
+            }).then(file => {
+              posts.push(JSON.parse(file))
+            }).catch(err => {
+              console.log(err)
+            })
+          }
+        })
+        this.posts = posts
+      }
     },
     saveFragments(value){
       let saves = []
       value.forEach(async f => {
-        if(f.u == this.user.id){
+        if(f.u == this.user.id && this.user){
           saves.push(this.user.publicPosts.find(p => p.id == f.id))
         } else {
-          console.log(this.users.find(u => u.id == f.u).bi)
-          blockstack.getFile(`/publicPosts/${f.id}.json`, {
+          console.log(f)
+          blockstack.getFile(`publicPosts/${f.id}.json`, {
             decrypt: false,
             app: window.location.origin,
             username: this.users.find(u => u.id == f.u).bi
           }).then(file => {
-            console.log(file)
+            saves.push(JSON.parse(file))
           }).catch(err => {
             console.log(err)
           })

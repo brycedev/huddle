@@ -42,7 +42,7 @@ export default {
   },
   computed: {
     postUser(){
-      return this.post && this.user
+      return this.post && this.users
         ? this.users.find(u => u.id == this.post.u)
         : false
     },

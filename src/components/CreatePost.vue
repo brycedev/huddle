@@ -13,14 +13,12 @@
             </div>
           </div>
           <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex mb-4">
-            <textarea id="text" v-model="post" class="bg-transparent flex-grow w-full mr-4 h-64 block appearance-none text-grey-darkest leading-loose font-light outline-none text-normal h-24 resize-none" placeholder="Write something interesting..."></textarea>
+            <textarea id="text" v-model="post" class="bg-transparent flex-grow mr-4 h-64 block appearance-none text-grey-darkest leading-loose font-light outline-none text-normal h-24 resize-none" placeholder="Write something interesting..."></textarea>
             <div class="bg-red-light rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer table self-end" v-show="isGivingThought" @click="cancelPost">
-              <div class="ul m-0 p-0 inline-block">
-                <img src="../assets/spinner.svg" class="align-middle spin" alt="" width="16">
+             <span><img src="../assets/spinner.svg" class="align-middle spin" alt="" width="16"></span>
                 <span class="align-middle ml-2 mb-4">{{ timer }}</span>
-              </div>
             </div>
-            <div class="bg-huddle-blue rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer self-end" v-show="!isGivingThought" @click="clickPost">
+            <div class="bg-huddle-blue rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer self-end" v-show="!isGivingThought" @click="post.length > 0 ? clickPost() : false">
               <span>Post</span>
             </div>
           </div>
@@ -80,7 +78,7 @@
     },
     methods: {
       cancelPost(){
-        this.thoughtPromise.cancel()
+        if(this.thoughtPromise && this.isGivingThought) this.thoughtPromise.cancel()
       },
       clickPost(){
         if(!this.isGivingThought && this.isMember){
@@ -144,6 +142,7 @@
         if(value){
           document.getElementById('body').style.overflow = 'hidden'
         } else {
+          this.cancelPost()
           document.getElementById('body').style.overflow = 'auto'
         }
       }

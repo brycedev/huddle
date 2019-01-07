@@ -1,12 +1,13 @@
 require('setimmediate')
 const isDev = window.location.host !== "huddle.group"
-const dbPrefix = 'aege3ahaa7wehaw4hatex'
+const dbPrefix = 'aege3aha7wehaw4hatex'
 
 import Vue from 'vue'
 import App from './App.vue'
 import gun from 'vue-gun'
 import router from './router'
 import stash from 'vue-stash'
+import meta from 'vue-meta'
 import portal from 'portal-vue'
 import progress from 'nprogress'
 import tooltip from 'v-tooltip'
@@ -14,6 +15,7 @@ import './util/registerServiceWorker'
 
 Vue.config.productionTip = false
 Vue.use(gun)
+Vue.use(meta)
 Vue.use(portal)
 Vue.use(progress, { color: '#fff' })
 Vue.use(stash)

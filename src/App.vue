@@ -181,7 +181,18 @@ export default {
     },
     signIn() {
       const origin = window.location.origin
-      blockstack.redirectToSignIn(`${origin}/welcome`, `${origin}/manifest.json`)
+      const date = new Date()
+      date.setHours(date.getHours() + 1)
+      const authRequest = blockstack.makeAuthRequest(
+        blockstack.generateAndStoreTransitKey(),
+        `${origin}/welcome`,
+        `${origin}/manifest.json`,
+        ['store_write', 'publish_data'],
+        origin,
+        date,
+        { solicitGaiaHubUrl: true }
+      )
+      blockstack.redirectToSignInWithAuthRequest(authRequest)
     }
   },
   watch: {

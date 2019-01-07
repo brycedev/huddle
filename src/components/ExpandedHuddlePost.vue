@@ -13,7 +13,7 @@
             </div>
             <div class="flex ml-2">
               <img src="../assets/save.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Save to Library'" @click="user ? saveToLibrary() : false">
-              <img src="../assets/share.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Share on Twitter'">
+              <img src="../assets/share.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Share on Twitter'" @click="shareOnTwitter">
             </div>
           </div>
           <div class="mb-8">
@@ -57,8 +57,19 @@
 <script>
   export default {
     props: ['post', 'visible'],
-    store: ['user', 'users'],
+    store: ['huddles', 'user', 'users'],
     name: 'ExpandedHuddlePost',
+    metaInfo(){
+      return this.post && this.postUser && this.postHuddle ? {
+        title: `${this.postUser.username} in ${ this.postHuddle.name } | Huddle`,
+        meta: [
+          {
+            'property': 'og:title',
+            'content': `${this.postUser.username}'s post in ${ this.postHuddle.name } on Huddle`,
+          }
+        ]
+      } : { }
+    },
     data() {
       return {
         comment: '',
@@ -77,8 +88,13 @@
       isMember(){
         return this.post && this.user && this.user.publicHuddles.includes(this.post.huddle)
       },
-      postUser(){
+      postHuddle(){
         return this.post && this.user
+          ? this.huddles.find(h => h.id == this.post.huddle)
+          : false
+      },
+      postUser(){
+        return this.post && this.users
           ? this.users.find(u => u.id == this.post.u)
           : false
       },
@@ -92,6 +108,16 @@
       }
     },
     methods: {
+      shareOnTwitter(){
+        let shareURL = "https://twitter.com/share?"
+        const params = {
+          url: window.location.href,
+          text: "Check out this great post on Huddle!",
+          hashtags: "huddle,itshuddletime"
+        }
+        for(var prop in params) shareURL += '&' + prop + '=' + encodeURIComponent(params[prop])
+        window.open(shareURL, '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0')
+      },
       close(){
         this.$router.push(`/h/${this.$route.params.slug}`)  
       },
@@ -104,7 +130,6 @@
           const newSave = this.$gun.get(`${gunPrefix}:saves/${save.id}`).put(save)
           this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').set(newSave)
           this.user.publicLibrary.push({ id: save.id, p: save.p, h: save.h })
-          this.$parent.$refs.currentChild.fetchPosts()
           await blockstack.putFile('publicLibrary.json', JSON.stringify(this.user.publicLibrary), { encrypt : false })
         } else {
           // user has already saved to library
