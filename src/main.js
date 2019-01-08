@@ -11,7 +11,7 @@ import meta from 'vue-meta'
 import portal from 'portal-vue'
 import progress from 'nprogress'
 import tooltip from 'v-tooltip'
-import './util/registerServiceWorker'
+// import './util/registerServiceWorker'
 
 Vue.config.productionTip = false
 Vue.use(gun)
