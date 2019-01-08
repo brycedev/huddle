@@ -112,8 +112,7 @@
         let shareURL = "https://twitter.com/share?"
         const params = {
           url: window.location.href,
-          text: "Check out this great post on Huddle!",
-          hashtags: "huddle,itshuddletime"
+          text: "Check out this great post on Huddle! @itshuddletime",
         }
         for(var prop in params) shareURL += '&' + prop + '=' + encodeURIComponent(params[prop])
         window.open(shareURL, '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0')
