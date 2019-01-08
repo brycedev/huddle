@@ -115,6 +115,17 @@ export default {
   components: {
     HuddleEntry, HuddlePost
   },
+  metaInfo(){
+    return {
+      title: `Home | Huddle`,
+      meta: [
+        {
+          'property': 'og:title',
+          'content': `Discover Huddles on Huddle!`,
+        }
+      ]
+    }
+  },
   data() {
     return {
       postFragments: [],

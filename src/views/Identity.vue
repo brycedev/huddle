@@ -78,6 +78,17 @@ export default {
   name: 'Identity',
   store: ['huddles', 'user', 'users'],
   components: { ExpandedHuddlePost, HuddleEntry, HuddlePost },
+  metaInfo(){
+    return this.identity ? {
+      title: `${this.identity.username} | Huddle`,
+      meta: [
+        {
+          'property': 'og:title',
+          'content': `${this.identity.username}'s profile on Huddle`,
+        }
+      ]
+    } : { }
+  },
   data() {
     return {
       profile: null,

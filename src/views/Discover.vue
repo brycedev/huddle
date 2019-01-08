@@ -68,6 +68,17 @@ export default {
       expanded: null
     }
   },
+  metaInfo(){
+    return {
+      title: `Discover | Huddle`,
+      meta: [
+        {
+          'property': 'og:title',
+          'content': `Discover Huddles on Huddle!`,
+        }
+      ]
+    }
+  },
   components: { HuddleEntry, ProposedEntry, ProposedVote  },
   computed: {
     publicHuddles(){

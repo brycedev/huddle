@@ -42,6 +42,12 @@
             </div>
             
             <div class="absolute pin-t w-full pin-l mt-14 flex flex-col items-center subtle opacity-0" :class="{ 'opacity-100' : showDropdown, 'pointer-events-none' : !showDropdown }">
+              <router-link :to="`/i/${this.user.username}`" class="no-underline text-black block w-full">
+                <div class="flex items-center mb-4 justify-center bg-white shadow-md py-2 px-4 rounded-full w-full cursor-pointer">
+                  <img class="mr-2" width="20" src="../src/assets/user-circle.svg"/>
+                  <span>Profile</span>
+                </div>
+              </router-link>
               <router-link to="/settings" class="no-underline text-black block w-full">
                 <div class="flex items-center mb-4 justify-center bg-white shadow-md py-2 px-4 rounded-full w-full cursor-pointer">
                   <img class="mr-2" width="20" src="../src/assets/cogs.svg"/>

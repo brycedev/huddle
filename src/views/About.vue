@@ -166,6 +166,17 @@ export default {
       person: null
     }
   },
+  metaInfo(){
+    return {
+      title: `About | Huddle`,
+      meta: [
+        {
+          'property': 'og:title',
+          'content': `About Huddle`,
+        }
+      ]
+    }
+  },
   mounted(){
     const people = [
       { name: 'Hadiya', pro: 'She'}

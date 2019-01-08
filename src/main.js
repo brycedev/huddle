@@ -14,7 +14,7 @@ import tooltip from 'v-tooltip'
 // import './util/registerServiceWorker'
 
 Vue.config.productionTip = false
-Vue.use(gun)
+Vue.use(gun, { peers: [isDev ? 'http://localhost:8765/gun' : 'http://friend.huddle.group/gun'] })
 Vue.use(meta)
 Vue.use(portal)
 Vue.use(progress, { color: '#fff' })
@@ -124,8 +124,6 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to, from) => {
   progress.done()
 })
-
-
 
 new Vue({
   data: () => ({
