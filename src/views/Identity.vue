@@ -1,7 +1,7 @@
 <template>
   <div class="home w-full relative flex-grow" v-if="identity">
-    <div class="w-full bg-black relative canvas">
-      <!-- <div class="overlay absolute pin z-auto" :style="bgColor"></div> -->
+    <div class="w-full bg-black relative centercenter" :style="bgImage">
+      <div class="overlay absolute pin z-auto" :style="bgColor"></div>
       <div class="container flex justify-center items-center">
         <div class="flex justify-center items-center flex-col py-20 my-12">
           <h1 class="text-4xl text-white font-light max-w-sm text-center mb-8 flex z-50">
@@ -11,20 +11,53 @@
       </div>
     </div>
     <div class="container flex">
-      <div class="w-full flex justify-between z-50 mx-auto max-w-xl">
-        <!-- <div class="w-120 mt-8 mr-4 md:flex md:flex-col hidden">
+      <div class="w-full max-w-xl mx-auto justify-between flex">
+        <div class="w-120 mt-8 md:block hidden md:mr-4">
           <div class="rounded-lg shadow p-6 bg-white w-full mb-4">
-            <p class="text-black font-light mb-4">Description</p>
-            <p class="text-grey-darkest leading-normal font-light break">{{ identity.description }}</p>
+            <p class="text-black font-light mb-4">Huddles</p>
+            <div class="flex flex-col">
+             <router-link :to="'/h/' + huddle.slug" v-for="huddle in displayedHuddles" :key="huddle.id"  class="block w-full block no-underline" v-if="displayedHuddles.length">
+                <huddle-entry class="mb-4" :huddle="huddle" :full="false"></huddle-entry>
+              </router-link>
+              <p class="text-grey-dark text-center pt-6 pb-2 leading-normal" v-if="!displayedHuddles.length">This user doesn't belong to any huddles, yet.</p>
+            </div>
           </div>
-        </div> -->
-        <div class="w-full flex-grow flex flex-col -mt-12 md:ml-4" v-if="posts.length">
-          <huddle-post class="md:mx-0 mx-2" :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num"></huddle-post>
         </div>
-        <div class="w-full flex-grow flex flex-col -mt-12 md:ml-4" v-if="!posts.length">
-          <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="!posts.length">
-            <img class="px-8 w-96 mb-4" src="../assets/empty-post.svg" alt="Create an identity" width="100%">
-            <p class="text-grey-darker text-center md:font-thin md:text-xl font break" >This user hasn't made any posts, yet.</p>
+        <div class="w-full flex-grow flex-col -mt-24 md:ml-4 z-50">
+          <div class="w-full self-center text-black text-center py-2 px-4 flex justify-center items-center mb-2 h-12">
+            <div class="sm:flex-grow hidden sm:flex">
+              <div class="flex">
+                <div class="flex -mb-px mr-6 cursor-pointer">
+                  <p class="no-underline flex items-center text-white hover:opacity-100 opacity-75" :class="{ 'opacity-100' : feed == 0 }" @click="feed = 0"><img src="../assets/save-white.svg" alt="" width="16"><span class="ml-2 text-sm ">Library</span>
+                  </p>
+                </div>
+                <div class="flex -mb-px cursor-pointer">
+                  <p class="no-underline flex items-center text-white hover:opacity-100 opacity-75" :class="{ 'opacity-100' : feed == 1 }" @click="feed = 1">
+                   <img src="../assets/hourglass.svg" alt="" width="10"><span class="ml-2 text-sm ">Posts</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="!displayedPosts.length && feed == 1">
+            <p class="text-grey-darker text-center md:font-thin md:text-xl font break mb-4" >This user hasn't made any posts, yet.</p>
+            <img class="px-8 w-96" src="../assets/empty-post.svg" alt="Create an identity" width="100%">
+            
+          </div>
+          <div class="w-full" v-if="displayedPosts.length && feed == 1">        
+            <router-link :to="`/h/${huddles.find(h => h.id == post.huddle).slug}/post/${post.id}`" v-for="post in displayedPosts" class="block md:mx-0 mx-2 no-underline" :key="post.id">
+            <huddle-post :loaded="true" :post="post"></huddle-post>
+          </router-link>
+          </div>
+          <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="!saves.length && feed == 0">
+            <p class="text-grey-darker text-center md:font-thin md:text-xl font break mb-4">This user hasn't saved any posts, yet.</p>
+            <img class="px-8 w-96" src="../assets/empty-post.svg" alt="Create an identity" width="100%">
+            
+          </div>
+          <div class="w-full" v-if="saves.length && feed == 0">        
+            <router-link :to="`/h/${huddles.find(h => h.id == post.huddle).slug}/post/${post.id}`" v-for="post in saves" class="block md:mx-0 mx-2 no-underline" :key="post.id">
+            <huddle-post :loaded="true" :post="post"></huddle-post>
+          </router-link>
           </div>
         </div>
       </div>
@@ -38,18 +71,23 @@
 
 <script>
 import ExpandedHuddlePost from '@/components/ExpandedHuddlePost.vue'
+import HuddleEntry from '@/components/HuddleEntry.vue'
 import HuddlePost from '@/components/HuddlePost.vue'
 
 export default {
   name: 'Identity',
   store: ['huddles', 'user', 'users'],
-  components: { ExpandedHuddlePost, HuddlePost },
+  components: { ExpandedHuddlePost, HuddleEntry, HuddlePost },
   data() {
     return {
+      profile: null,
       identity: null,
       expandedPost: null,
+      personHuddles: [],
       posts: [],
-      postFragments: []
+      saves: [],
+      saveFragments: [],
+      feed: 1
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -83,60 +121,134 @@ export default {
   },
   computed: {
     displayedPosts(){
-      return this.posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     },
-    // bgColor(){
-    //   return { 
-    //     backgroundColor: `hsla(${ this.huddle.hue }, 35%, 27%, .64)`
-    //   }
-    // },
-    // bgImage(){
-    //   return { 
-    //     backgroundImage: `url('${this.huddle.background}')` 
-    //   }
-    // },
+    displayedHuddles(){
+      return this.huddles.filter(h => this.personHuddles.includes(h.id))
+    },
+    bgColor(){
+      return this.profile ? { 
+        backgroundColor: `hsla(${ this.profile.hue }, 35%, 27%, .64)`
+      } : { }
+    },
+    bgImage(){
+      return this.profile ? { 
+        backgroundImage: `url('${this.profile.background}')` 
+      } : { }
+    },
     showExpandedPost(){
       return this.$route.name.includes('ExpandedHuddlePost') && this.expandedPost !== null
     }
   },
   methods: {
+    fetchHuddles(){
+      if(this.identity){
+        this.postFragments = []
+        blockstack.getFile(`publicHuddles.json`, {
+          decrypt: false,
+          app: window.location.origin,
+          username: this.users.find(u => u.id == this.identity.id).bi
+        }).then(file => {
+          this.personHuddles = JSON.parse(file)
+        }).catch(err => {
+          console.log(err)
+        })        
+      }
+    },
+    fetchProfile(){
+      if(this.identity){
+        blockstack.getFile(`profile.json`, {
+          decrypt: false,
+          app: window.location.origin,
+          username: this.users.find(u => u.id == this.identity.id).bi
+        }).then(file => {
+          this.profile = JSON.parse(file)
+        })
+        .catch(err => {
+          console.log(err)
+        })      
+      }
+    },
+    fetchSaves(){
+      if(this.identity){
+        this.saveFragments = []
+        blockstack.getFile(`publicLibrary.json`, {
+          decrypt: false,
+          app: window.location.origin,
+          username: this.users.find(u => u.id == this.identity.id).bi
+        }).then(file => {
+          const allLibrary = JSON.parse(file)
+          allLibrary.forEach(l => {
+            this.$gun.get(`${gunPrefix}:huddles/${l.h}`).get('posts').map().on(post => {
+              if(post.id == l.p){
+                this.saveFragments.push(post)
+                this.saveFragments = Array.from(new Set(this.saveFragments))
+              }
+            })
+          })
+        })
+        .catch(err => {
+          console.log(err)
+        })        
+      }
+    },
     fetchPosts(){
       if(this.identity){
-        
-      } else {
-        
+        this.postFragments = []
+        blockstack.getFile(`publicPosts.json`, {
+          decrypt: false,
+          app: window.location.origin,
+          username: this.users.find(u => u.id == this.identity.id).bi
+        }).then(file => {
+          const allPosts = JSON.parse(file)
+          allPosts.forEach(p => {
+            blockstack.getFile(`publicPosts/${p.id}.json`, {
+              decrypt: false,
+              app: window.location.origin,
+              username: this.users.find(u => u.id == this.identity.id).bi
+            }).then(post => {
+              this.posts.push(JSON.parse(post))
+            }).catch(err => {
+              console.log(err)
+            })
+          })
+        }).catch(err => {
+          console.log(err)
+        })        
       }
     }
   },
   mounted(){
-
+  
   },
   watch: {
     $route(value){
 
     },
     identity(newValue, oldValue) {
+      this.fetchProfile()
+      this.fetchHuddles()
       this.fetchPosts()
+      this.fetchSaves()
     },
-    postFragments(value){
-      let posts = []
+    saveFragments(value){
+      let saves = []
       value.forEach(async f => {
         if(f.u == this.user.id && this.user){
-          posts.push(this.user.publicPosts.find(p => p.id == f.id))
+          saves.push(this.user.publicPosts.find(p => p.id == f.id))
         } else {
-          console.log(this.users.find(u => u.id == f.u).bi)
-          blockstack.getFile(`/publicPosts/${f.id}.json`, {
+          blockstack.getFile(`publicPosts/${f.id}.json`, {
             decrypt: false,
             app: window.location.origin,
             username: this.users.find(u => u.id == f.u).bi
-          }).then(file => {
-            console.log(file)
+          }).then(save => {
+            saves.push(JSON.parse(save))
           }).catch(err => {
             console.log(err)
           })
         }
       })
-      this.posts = posts
+      this.saves = saves
     }
   },
 }

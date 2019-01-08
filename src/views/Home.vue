@@ -51,7 +51,18 @@
     </div>
     <div class="container flex" v-if="user">
       <div class="w-full max-w-xl mx-auto justify-between flex">
-        <div class="w-full flex-grow flex-col -mt-24 md:mr-4 z-50">
+        <div class="w-120 mt-8 md:block hidden md:mr-4">
+          <div class="rounded-lg shadow p-6 bg-white w-full mb-4" v-if="myHuddles">
+            <p class="text-black font-light mb-4">Your Huddles</p>
+            <div class="flex flex-col">
+             <router-link :to="'/h/' + huddle.slug" v-for="huddle in myHuddles" :key="huddle.id"  class="block w-full block no-underline" v-if="myHuddles.length">
+                <huddle-entry class="mb-4" :huddle="huddle" :full="false"></huddle-entry>
+              </router-link>
+              <p class="text-grey-dark text-center pt-6 pb-2 leading-normal" v-if="!myHuddles.length">Go join a Huddle!</p>
+            </div>
+          </div>
+        </div>
+        <div class="w-full flex-grow flex-col -mt-24 md:ml-4 z-50">
           <div class="w-full self-center text-black text-center py-2 px-4 flex justify-center items-center mb-2 h-12">
             <div class="sm:flex-grow hidden sm:flex">
               <div class="flex">
@@ -89,22 +100,6 @@
           </router-link>
           </div>
         </div>
-        <div class="w-120 mt-8 md:block hidden md:ml-4">
-          <!-- <div class="rounded-lg shadow p-6 bg-white w-full mb-6">
-            <p class="text-black font-light mb-4">Your Notifications</p>
-            <div class="flex flex-col">
-             
-            </div>
-          </div> -->
-          <div class="rounded-lg shadow p-6 bg-white w-full mb-4" v-if="myHuddles">
-            <p class="text-black font-light mb-4">Your Huddles</p>
-            <div class="flex flex-col">
-             <router-link :to="'/h/' + huddle.slug" v-for="huddle in myHuddles" :key="huddle.id"  class="block w-full block no-underline">
-                <huddle-entry class="mb-4" :huddle="huddle" :full="false"></huddle-entry>
-              </router-link>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -126,7 +121,7 @@ export default {
       saveFragments: [],
       posts: [],
       saves: [],
-      feed: 0
+      feed: 1
     }
   },
   computed: {
@@ -222,13 +217,12 @@ export default {
         if(f.u == this.user.id && this.user){
           saves.push(this.user.publicPosts.find(p => p.id == f.id))
         } else {
-          console.log(f)
           blockstack.getFile(`publicPosts/${f.id}.json`, {
             decrypt: false,
             app: window.location.origin,
             username: this.users.find(u => u.id == f.u).bi
-          }).then(file => {
-            saves.push(JSON.parse(file))
+          }).then(save => {
+            saves.push(JSON.parse(save))
           }).catch(err => {
             console.log(err)
           })
