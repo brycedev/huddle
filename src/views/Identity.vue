@@ -24,7 +24,7 @@
           </div>
         </div>
         <div class="w-full flex-grow flex-col -mt-24 md:ml-4 z-50">
-          <div class="w-full self-center text-black text-center py-2 px-4 flex justify-center items-center mb-2 h-12">
+          <div class="w-full self-center text-black text-center py-2 px-4 flex items-center mb-2 h-12">
             <div class="sm:flex-grow hidden sm:flex">
               <div class="flex">
                 <div class="flex -mb-px mr-6 cursor-pointer">
@@ -37,6 +37,10 @@
                   </p>
                 </div>
               </div>
+            </div>
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center" v-if="isOwn">
+              <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
+              <span>Edit Profile</span>
             </div>
           </div>
           <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="!displayedPosts.length && feed == 1">
@@ -131,6 +135,9 @@ export default {
     }
   },
   computed: {
+    isOwn(){
+      return this.user && this.identity && this.user.id == this.identity.id
+    },
     displayedPosts(){
       return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     },

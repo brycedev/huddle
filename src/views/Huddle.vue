@@ -32,7 +32,7 @@
           </div>
         </div>
         <div class="w-full flex-grow flex flex-col -mt-20 md:ml-4">
-          <router-link :to="`${$route.fullPath}/new`" class="block no-underline self-end" v-if="isMember">
+          <router-link :to="`${$route.fullPath}/new`" class="block no-underline self-end px-4" v-if="isMember">
             <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center mb-4">
               <img src="../assets/plus-dark.svg" alt="" class="w-4 h-4 mr-2">
               <span>Create Post</span>

@@ -1,5 +1,5 @@
 require('setimmediate')
-const isDev = window.location.host !== "huddle.group"
+const isDev = process.env.NODE_ENV == 'development'
 const dbPrefix = 'aege3aehwhaaw4hatex'
 
 import Vue from 'vue'
