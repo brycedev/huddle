@@ -5,7 +5,7 @@ const dbPrefix = 'oapeiawegwuptiawoe'
 import Vue from 'vue'
 import App from './App.vue'
 import gun from 'vue-gun'
-// import unset from 'gun/lib/unset'
+
 require('gun')
 require('gun/lib/unset.js')
 import router from './router'
@@ -14,10 +14,9 @@ import meta from 'vue-meta'
 import portal from 'portal-vue'
 import progress from 'nprogress'
 import tooltip from 'v-tooltip'
-// import './util/registerServiceWorker'
 
 Vue.config.productionTip = false
-Vue.use(gun, { peers: [isDev ? 'http://localhost:8765/gun' : 'https://friend.huddle.group/gun'] })
+Vue.use(gun, { peers: [isDev ? 'http://localhost:8765/gun' : 'http://friend.huddle.group/gun'] })
 // Vue.use(gun)
 Vue.use(meta)
 Vue.use(portal)
