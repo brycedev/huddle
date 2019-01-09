@@ -32,19 +32,19 @@
           </div>
         </div>
         <div class="w-full flex-grow flex flex-col -mt-20 md:ml-4">
-          <router-link :to="`${$route.fullPath}/new`" class="block no-underline self-end px-4" v-if="isMember">
+          <router-link :to="`${$route.fullPath}/new`" class="block no-underline self-end mr-4 md:mr-0" v-if="isMember">
             <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center mb-4">
               <img src="../assets/plus-dark.svg" alt="" class="w-4 h-4 mr-2">
               <span>Create Post</span>
             </div>
           </router-link>
-          <div class="self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center mb-4" v-if="isHybrid && !isMember">
+          <div class="self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer mr-4 md:mr-0 flex items-center mb-4" v-if="isHybrid && !isMember">
             <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
             <span>Request Invite</span>
           </div>
-          <div class="self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center mb-4" v-if="!isHybrid && !isMember" @click="joinGroup">
+          <div class="self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer mr-4 md:mr-0 flex items-center mb-4" v-if="!isHybrid && !isMember" @click="joinHuddle">
             <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
-            <span>Join Group</span>
+            <span>Join Huddle</span>
           </div>
           <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in displayedPosts" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="isMember">
             <huddle-post :loaded="true" :post="post"></huddle-post>
@@ -164,7 +164,7 @@ export default {
       return this.huddle && this.huddle.type == 'public'
     },
     isMember(){
-      return this.huddle && this.memberIds.includes(this.user.id)
+      return this.huddle && this.user.publicHuddles.includes(this.huddle.id)
     },
     members(){
       return this.users.filter(u => this.memberIds.includes(u.id))
@@ -177,14 +177,21 @@ export default {
     }
   },
   methods: {
-    async joinGroup(){
+    async leaveHuddle(){
+      const save = this.$gun.get(`${gunPrefix}:saves/${userSave.id}`)
+      this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').unset(save)
+      this.user.publicHuddles = this.user.publicHuddles.filter(s => s !== this.huddle.id)
+      this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').unset({ id: this.user.id })
+      await blockstack.putFile('publicHuddles.json', JSON.stringify(this.user.publicHuddles), { encrypt : false })
+      this.fetchStuff()
+    },
+    async joinHuddle(){
       if(this.isPublic && this.user){
         const newMember = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').set({ id: this.user.id })
         this.user.publicHuddles.push(this.huddle.id)
         const newPublicHuddles = JSON.stringify(this.user.publicHuddles)
         await blockstack.putFile('publicHuddles.json', newPublicHuddles, { encrypt : false })
-        this.fetchMembers()
-        this.fetchPosts()
+        this.fetchStuff()
       }
     },
     fetchMembers(){
@@ -199,7 +206,7 @@ export default {
       }
     },
     fetchPosts(){
-      if(this.isPublic && this.users){
+      if(this.isPublic){
         this.postFragments = []
         this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('posts').map().on(post => {
           this.postFragments.push(post)
@@ -208,6 +215,10 @@ export default {
       } else {
         
       }
+    },
+    fetchStuff(){
+      this.fetchMembers()
+      this.fetchPosts()
     }
   },
   mounted(){

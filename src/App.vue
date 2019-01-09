@@ -18,18 +18,18 @@
                 </router-link>
               </div> -->
               <div class="flex -mb-px mr-6">
-                <router-link to="/about" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75" active-class="opacity-100">
-                  <span class="text-xs cursor-pointer">About</span>
-                </router-link>
-              </div>
-              <div class="flex -mb-px mr-6">
                 <router-link to="/discover" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75" active-class="opacity-100">
                   <span class="text-xs cursor-pointer">Discover</span>
                 </router-link>
               </div>
-              <div class="flex -mb-px">
+              <div class="flex -mb-px mr-6">
                 <router-link :to="randomSlug" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75">
                   <span class="text-xs cursor-pointer">Random</span>
+                </router-link>
+              </div>
+              <div class="flex -mb-px">
+                <router-link to="/about" class="no-underline flex items-center text-white uppercase hover:opacity-100 opacity-75" active-class="opacity-100">
+                  <span class="text-xs cursor-pointer">About</span>
                 </router-link>
               </div>
             </div>
@@ -40,8 +40,7 @@
               <img class="w-6 h-6 rounded-full mr-2 z-50" :src="user.avatar"/>
               <span class="z-50">{{ user.username ? user.username : user.bi }}</span>
             </div>
-            
-            <div class="absolute pin-t w-full pin-l mt-14 flex flex-col items-center subtle opacity-0" :class="{ 'opacity-100' : showDropdown, 'pointer-events-none' : !showDropdown }">
+            <div class="absolute pin-t w-40 pin-r mt-14 flex flex-col items-center subtle opacity-0" :class="{ 'opacity-100' : showDropdown, 'pointer-events-none' : !showDropdown }">
               <router-link :to="`/i/${this.user.username}`" class="no-underline text-black block w-full">
                 <div class="flex items-center mb-4 justify-center bg-white shadow-md py-2 px-4 rounded-full w-full cursor-pointer">
                   <img class="mr-2" width="20" src="../src/assets/user-circle.svg"/>
@@ -99,7 +98,7 @@
 
 <script>
 export default {
-  store: ['bus', 'huddles', 'user', 'users'],
+  store: ['bus', 'isDev', 'huddles', 'user', 'users'],
   data() {
     return {
       scroll: 0,
@@ -167,7 +166,7 @@ export default {
     },
     loadGaia(){
       return new Promise(async(resolve, reject) => {
-        console.log('loading user gaia storage: ', this.user.username)
+        if(this.isDev) console.log('loading user gaia storage: ', this.user.username)
         // user exists, load their gaia storage
         this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
         if(this.user.preferences && this.user.preferences.isPublic){
@@ -204,6 +203,7 @@ export default {
   watch: {
     $route(){
       if(this.showDropdown) this.showDropdown = false
+      this.instantiateGun()
     }
   }
 }

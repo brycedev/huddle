@@ -11,8 +11,9 @@
               </div>
               <p class="text-grey-darkest font-light text-xs pt-1 tracking-wide">Post Creation : {{ postDate }}</p>
             </div>
-            <div class="flex ml-2">
-              <img src="../assets/save.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Save to Library'" @click="user ? saveToLibrary() : false">
+            <div class="flex ml-2 items-center self-start">
+              <svg width="28" height="28" class="outline-none fill-current cursor-pointer ml-2 opacity-75 hover:opacity-90 subtle" :class="{ 'text-red' : isSaved }" v-tooltip="!isSaved ? 'Save to Library' : 'Remove from Library'" @click="user ? saveToLibrary() : false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M92.1 32C76.6 32 64 44.6 64 60.1V452c0 15.5 12.6 28.1 28.1 28.1H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H112.5c-8.2 0-15.4-6-16.4-14.1-1.1-9.7 6.5-18 15.9-18h208V32H92.1z"/><path d="M432 416c8.8 0 16-7.2 16-16V60.1c0-15.5-12.6-28.1-28.1-28.1H368v384h64z"/></svg>
+              <!-- <img src="../assets/save.svg" alt="" class="" > -->
               <img src="../assets/share.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Share on Twitter'" @click="shareOnTwitter">
             </div>
           </div>
@@ -78,7 +79,7 @@
         isGivingThought: false,
         comments: [],
         timerInterval : null,
-        timer: 7
+        timer: 4
       }
     },
     computed: {
@@ -105,6 +106,9 @@
       },
       sortedComments(){
         return Array.from(new Set(this.comments)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      },
+      isSaved(){
+        return this.post && this.user.publicLibrary.find(s => s.p == this.post.id)
       }
     },
     methods: {
@@ -112,7 +116,7 @@
         let shareURL = "https://twitter.com/share?"
         const params = {
           url: window.location.href,
-          text: "Check out this great post on Huddle! @itshuddletime",
+          text: "Check out this great post on Huddle! @itshuddletime \n\n",
         }
         for(var prop in params) shareURL += '&' + prop + '=' + encodeURIComponent(params[prop])
         window.open(shareURL, '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0')
@@ -124,32 +128,41 @@
         this.thoughtPromise.cancel()
       },
       async saveToLibrary(){
-        if(!this.user.publicLibrary.map(l => l.p).includes(this.post.id)){
+        if(!this.isSaved){
           const save = { id: uuid('library'), u: this.user.id, p: this.post.id, h: this.post.huddle }
           const newSave = this.$gun.get(`${gunPrefix}:saves/${save.id}`).put(save)
           this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').set(newSave)
           this.user.publicLibrary.push({ id: save.id, p: save.p, h: save.h })
           await blockstack.putFile('publicLibrary.json', JSON.stringify(this.user.publicLibrary), { encrypt : false })
+          this.$parent.$refs.currentChild.fetchStuff()
         } else {
           // user has already saved to library
+          const userSave = this.user.publicLibrary.find(s => s.p == this.post.id)
+          if(userSave){
+            const save = this.$gun.get(`${gunPrefix}:saves/${userSave.id}`)
+            this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').unset(save)
+            this.user.publicLibrary = this.user.publicLibrary.filter(s => s.p !== this.post.id)
+            await blockstack.putFile('publicLibrary.json', JSON.stringify(this.user.publicLibrary), { encrypt : false })
+            this.$parent.$refs.currentChild.fetchStuff()
+          }
         }
       },
       clickPost(){
         if(!this.isGivingThought && this.isMember){
           this.isGivingThought = true
-          this.thoughtPromise = later(7000, "posting comment")
+          this.thoughtPromise = later(this.timer * 1000, "posting comment")
           this.timerInterval = setInterval(() => {
             this.timer--
           }, 1000)
           this.thoughtPromise.promise.then(async msg => { 
             await this.submitComment()
             clearInterval(this.timerInterval)
-            this.timer = 7
+            this.timer = 4
             this.isGivingThought = false
           }).catch(() => { 
             console.log("cancelled comment")
             clearInterval(this.timerInterval)
-            this.timer = 7
+            this.timer = 4
             this.isGivingThought = false 
           })
         } else {

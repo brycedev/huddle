@@ -109,7 +109,11 @@ export default {
             // { type: 'wordIs', match: 'jeffblum' }
           ]
         }
-        const profile = { hue: Math.floor(Math.random() * 357), background: `https://picsum.photos/1280x720/?random=1` }
+        const profile = { 
+          description: '',
+          hue: Math.floor(Math.random() * 357), 
+          background: `https://picsum.photos/1280x720/?random=1`
+        }
         const cleanArray = JSON.stringify([])
         await blockstack.putFile('preferences.json', JSON.stringify(this.user.preferences), { encrypt : true })
         await blockstack.putFile('profile.json', JSON.stringify(profile), { encrypt : false })

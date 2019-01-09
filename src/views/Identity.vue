@@ -9,22 +9,27 @@
           </h1>
         </div>
       </div>
-    </div>
+    </div> 
     <div class="container flex">
       <div class="w-full max-w-xl mx-auto justify-between flex">
         <div class="w-120 mt-8 md:block hidden md:mr-4">
+          <div class="rounded-lg shadow p-6 bg-white w-full mb-4">
+            <p class="text-black font-light mb-4">Description</p>
+            <p class="text-grey-darkest leading-normal font-light break" v-if="profile && profile.description && profile.description !== ''">{{ profile.description }}</p>
+            <p class="text-grey-dark py-2 leading-normal" v-else>This user hasn't added a description to their profile, yet.</p>
+          </div>
           <div class="rounded-lg shadow p-6 bg-white w-full mb-4">
             <p class="text-black font-light mb-4">Huddles</p>
             <div class="flex flex-col">
              <router-link :to="'/h/' + huddle.slug" v-for="huddle in displayedHuddles" :key="huddle.id"  class="block w-full block no-underline" v-if="displayedHuddles.length">
                 <huddle-entry class="mb-4" :huddle="huddle" :full="false"></huddle-entry>
               </router-link>
-              <p class="text-grey-dark text-center pt-6 pb-2 leading-normal" v-if="!displayedHuddles.length">This user doesn't belong to any huddles, yet.</p>
+              <p class="text-grey-dark py-2 leading-normal" v-if="!displayedHuddles.length">This user doesn't belong to any huddles, yet.</p>
             </div>
           </div>
         </div>
         <div class="w-full flex-grow flex-col -mt-24 md:ml-4 z-50">
-          <div class="w-full self-center text-black text-center py-2 px-4 flex items-center mb-2 h-12">
+          <div class="w-full self-center text-black text-center py-2 px-4 md:px-0 flex items-center mb-2 h-12">
             <div class="sm:flex-grow hidden sm:flex">
               <div class="flex">
                 <div class="flex -mb-px mr-6 cursor-pointer">
@@ -38,7 +43,7 @@
                 </div>
               </div>
             </div>
-            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center" v-if="isOwn">
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 mr-4 md:mr-0 cursor-pointer flex items-center" v-if="isOwn">
               <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
               <span>Edit Profile</span>
             </div>

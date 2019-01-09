@@ -12,14 +12,20 @@
                <p class="text-grey-darkest font-light text-xs pt-1 tracking-wide">Post Creation : {{ postDate }}</p>
             </div>
           </div>
-          <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex mb-4">
-            <textarea id="text" v-model="post" class="bg-transparent flex-grow mr-4 h-64 block appearance-none text-grey-darkest leading-loose font-light outline-none text-normal h-24 resize-none" placeholder="Write something interesting..."></textarea>
-            <div class="bg-red-light rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer table self-end" v-show="isGivingThought" @click="cancelPost">
-             <span><img src="../assets/spinner.svg" class="align-middle spin" alt="" width="16"></span>
-                <span class="align-middle ml-2 mb-4">{{ timer }}</span>
-            </div>
-            <div class="bg-huddle-blue rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer self-end" v-show="!isGivingThought" @click="post.length > 0 ? clickPost() : false">
-              <span>Post</span>
+          <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex flex-col mb-4">
+            <textarea id="text" v-model="post" class="bg-transparent flex-grow mb-4 h-40 block appearance-none text-grey-darkest leading-loose font-light outline-none text-normal h-24 resize-none" placeholder="Write something interesting..."></textarea>
+            
+            <div class="w-full flex justify-between items-center">
+              <div>
+
+              </div>
+              <div class="bg-huddle-blue rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer" v-show="!isGivingThought" @click="post.length > 0 ? clickPost() : false">
+                <span>Post</span>
+              </div>
+              <div class="bg-red-light rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer table" v-show="isGivingThought" @click="cancelPost">
+                <span><img src="../assets/spinner.svg" class="align-middle spin" alt="" width="15"></span>
+                  <span class="align-middle ml-2 mb-4">{{ timer }}</span>
+              </div>
             </div>
           </div>
           <div class="flex justify-center items-center">
@@ -62,7 +68,7 @@
         isGivingThought: false,
         thoughtPromise: null,
         timerInterval: null,
-        timer: 7
+        timer: 4
       }
     },
     computed: {
@@ -83,19 +89,19 @@
       clickPost(){
         if(!this.isGivingThought && this.isMember){
           this.isGivingThought = true
-          this.thoughtPromise = later(7000, "posting comment")
+          this.thoughtPromise = later(this.timer * 1000, "posting comment")
           this.timerInterval = setInterval(() => {
             this.timer--
           }, 1000)
           this.thoughtPromise.promise.then(async msg => { 
             await this.submitPost()
             clearInterval(this.timerInterval)
-            this.timer = 7
+            this.timer = 4
             this.isGivingThought = false
           }).catch(() => { 
             console.log("cancelled comment")
             clearInterval(this.timerInterval)
-            this.timer = 7
+            this.timer = 4
             this.isGivingThought = false 
           })
         } else {

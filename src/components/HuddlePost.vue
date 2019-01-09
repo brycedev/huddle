@@ -52,11 +52,21 @@ export default {
         : (new Date()).toLocaleTimeString() 
     }
   },
+  methods: {
+    fetchSaves(){
+      this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').map().on(save => {
+        this.saves.push(save)
+        this.saves = Array.from(new Set(this.saves.filter(s => s !== null)))
+      })
+    }
+  },
   mounted(){
-    this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').map().on(save => {
-      this.saves.push(save)
-      this.saves = Array.from(new Set(this.saves))
-    })
+    this.fetchSaves()
+  },
+  watch: {
+    user(){
+      if(this.loaded && this.post) this.fetchSaves()
+    }
   }
 }
 </script>

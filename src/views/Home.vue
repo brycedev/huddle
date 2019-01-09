@@ -21,9 +21,7 @@
             <router-link to="/huddles/new" class="no-underline flex z-50 md:mr-4 mb-4 md:mb-0">
               <div class="bg-huddle-blue rounded-full text-white text-center py-2 px-4 text-md cursor-pointer">Create A Huddle</div>
             </router-link>
-            <router-link :to="`/i/${this.user.username}`" class="no-underline flex z-50 mb-4 md:mb-0">
-              <div class="bg-white rounded-full text-black text-center py-2 px-4 text-md cursor-pointer z-50">View Profile</div>
-            </router-link>
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 text-md cursor-pointer z-50" @click="invite">Invite Friends</div>
             
           </div>
         </div>
@@ -161,6 +159,15 @@ export default {
     document.getElementById('body').style.overflow = 'auto'
   },
   methods: {
+    invite(){
+      let shareURL = "https://twitter.com/share?"
+      const params = {
+        url: 'https://huddle.group',
+        text: "Join me on Huddle! @itshuddletime \n\n",
+      }
+      for(var prop in params) shareURL += '&' + prop + '=' + encodeURIComponent(params[prop])
+      window.open(shareURL, '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0')
+    },
     fetchStuff(){
       this.fetchSaves()
       this.fetchPosts()
