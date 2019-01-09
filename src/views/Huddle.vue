@@ -55,7 +55,6 @@
           <template v-if="!isMember">
             <huddle-post :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num"></huddle-post>
           </template>
-          
           <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="isMember && !posts.length">
             <img class="px-8 w-96 mb-4" src="../assets/empty-post.svg" alt="Create an identity" width="100%">
             <p class="text-grey-darker text-center md:font-thin md:text-xl font break" >No posts, yet. Start the conversation.</p>

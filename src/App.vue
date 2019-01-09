@@ -34,7 +34,7 @@
               </div>
             </div>
           </div>
-          <div class="relative bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center" @click="signIn()" v-if="!user">Login</div>
+          <div class="relative bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center" @click="signIn()" v-if="!user" v-tooltip.left="'Try the testnet!'">Login</div>
           <div class="relative" v-if="user">
             <div class="bg-white rounded-full text-black text-center py-2 px-4 flex items-center cursor-pointer" @click="toggleDropdown">
               <img class="w-6 h-6 rounded-full mr-2 z-50" :src="user.avatar"/>
