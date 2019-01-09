@@ -164,7 +164,7 @@ export default {
       return this.huddle && this.huddle.type == 'public'
     },
     isMember(){
-      return this.huddle && this.user.publicHuddles.includes(this.huddle.id)
+      return this.huddle && this.user && this.user.publicHuddles.includes(this.huddle.id)
     },
     members(){
       return this.users.filter(u => this.memberIds.includes(u.id))
