@@ -177,8 +177,6 @@ export default {
   },
   methods: {
     async leaveHuddle(){
-      const save = this.$gun.get(`${gunPrefix}:saves/${userSave.id}`)
-      this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').unset(save)
       this.user.publicHuddles = this.user.publicHuddles.filter(s => s !== this.huddle.id)
       this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').unset({ id: this.user.id })
       await blockstack.putFile('publicHuddles.json', JSON.stringify(this.user.publicHuddles), { encrypt : false })
