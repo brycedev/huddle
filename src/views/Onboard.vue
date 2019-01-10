@@ -99,15 +99,16 @@ export default {
           isOnboarded: true,
           username: this.user.username,
           isPublic: isPublic,
-          blockedUsers : [],
           hideUnlikelyHuddleProposals: false,
           hideNonVerifiedUsers: false,
           hideNSFW: true,
-          filters : [
+          filters : {
+            blockedUsers : [],
+            reportedPosts : []
             // example filters
             // { type: 'wordBeginsWith', match: 'poli' },
             // { type: 'wordIs', match: 'jeffblum' }
-          ]
+          }
         }
         const profile = { 
           description: '',

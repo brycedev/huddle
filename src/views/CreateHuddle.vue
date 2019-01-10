@@ -23,7 +23,7 @@
               <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForType('public')" @click="huddle.type = 'public'">
                 <p class="text-normal text-center">Public</p>
               </div>
-              <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForType('private')" @click="huddle.type = 'private'" v-tooltip="'Coming soon!'">
+              <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForType('private')" @click="huddle.type = 'private'">
                 <p class="text-normal text-center">Private</p>
               </div>
             </div>
@@ -128,8 +128,8 @@ export default {
 
   },
   watch: {
-    'huddle.type': function(value){
-      if(value == 'private') this.huddle.type = 'public'
+    'huddle.type'(value){
+      // if(value == 'private') this.huddle.type = 'public'
     }
   }
 }

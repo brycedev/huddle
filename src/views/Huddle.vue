@@ -32,12 +32,18 @@
           </div>
         </div>
         <div class="w-full flex-grow flex flex-col -mt-20 md:ml-4">
-          <router-link :to="`${$route.fullPath}/new`" class="block no-underline self-end mr-4 md:mr-0" v-if="isMember">
-            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center mb-4">
-              <img src="../assets/plus-dark.svg" alt="" class="w-4 h-4 mr-2">
-              <span>Create Post</span>
+          <div class="self-end flex items-center mr-4 md:mr-0" v-if="isMember && isPublic">
+            <router-link :to="`${$route.fullPath}/new`" class="block no-underline self-end ">
+              <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center mb-4">
+                <img src="../assets/plus-dark.svg" alt="" class="w-4 h-4 mr-2">
+                <span>Create Post</span>
+              </div>
+            </router-link>
+            <div class="bg-red-light rounded-full py-2 px-4 cursor-pointer hidden md:flex items-center ml-2 mb-4" @click="leaveHuddle">
+              <img src="../assets/logout-white.svg" alt="" class="w-4 h-4">
             </div>
-          </router-link>
+          </div>
+          
           <div class="self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer mr-4 md:mr-0 flex items-center mb-4" v-if="isHybrid && !isMember">
             <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
             <span>Request Invite</span>
@@ -181,6 +187,7 @@ export default {
       this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').unset({ id: this.user.id })
       await blockstack.putFile('publicHuddles.json', JSON.stringify(this.user.publicHuddles), { encrypt : false })
       this.fetchStuff()
+      this.$router.push('/')
     },
     async joinHuddle(){
       if(this.isPublic && this.user){
@@ -214,12 +221,13 @@ export default {
       }
     },
     fetchStuff(){
+      this.$parent.loadGaia()
       this.fetchMembers()
       this.fetchPosts()
     }
   },
   mounted(){
-    
+    console.log(this.$parent)
   },
   watch: {
     $route(value){

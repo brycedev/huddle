@@ -4,7 +4,7 @@
       <div class="rounded-lg shadow-lg p-6 px-8 bg-white w-full mb-4 max-w-md relative">
         <div class="w-full flex flex-col">
           <div class="flex w-full justify-between mb-6">
-            <div class="flex flex-col flex-grow w-full">
+            <div class="flex flex-col flex-grow">
               <div class="flex items-center mb-2 w-full" v-if="postUser">
                 <img class="w-8 h-8 rounded-full mr-2" :src="postUser.avatar"/>
                 <h3 class="font-normal text-black text-xl tracking-wide">{{ postUser.username.replace('.id.blockstack','') }}</h3>
@@ -12,9 +12,10 @@
               <p class="text-grey-darkest font-light text-xs pt-1 tracking-wide">Post Creation : {{ postDate }}</p>
             </div>
             <div class="flex ml-2 items-center self-start">
-              <svg width="28" height="28" class="outline-none fill-current cursor-pointer ml-2 opacity-75 hover:opacity-90 subtle" :class="{ 'text-red' : isSaved }" v-tooltip="!isSaved ? 'Save to Library' : 'Remove from Library'" @click="user ? saveToLibrary() : false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M92.1 32C76.6 32 64 44.6 64 60.1V452c0 15.5 12.6 28.1 28.1 28.1H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H112.5c-8.2 0-15.4-6-16.4-14.1-1.1-9.7 6.5-18 15.9-18h208V32H92.1z"/><path d="M432 416c8.8 0 16-7.2 16-16V60.1c0-15.5-12.6-28.1-28.1-28.1H368v384h64z"/></svg>
+              <svg  class="w-6 h-6 outline-none fill-current cursor-pointer ml-2 opacity-75 hover:opacity-90 subtle" :class="{ 'text-red' : saved }" v-tooltip="!saved ? 'Save to Library' : 'Remove from Library'" @click="user ? saveToLibrary() : false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M92.1 32C76.6 32 64 44.6 64 60.1V452c0 15.5 12.6 28.1 28.1 28.1H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H112.5c-8.2 0-15.4-6-16.4-14.1-1.1-9.7 6.5-18 15.9-18h208V32H92.1z"/><path d="M432 416c8.8 0 16-7.2 16-16V60.1c0-15.5-12.6-28.1-28.1-28.1H368v384h64z"/></svg>
               <!-- <img src="../assets/save.svg" alt="" class="" > -->
               <img src="../assets/share.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Share on Twitter'" @click="shareOnTwitter">
+              <img src="../assets/ban.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Report Post'" @click="reportPost">
             </div>
           </div>
           <div class="mb-8">
@@ -73,6 +74,7 @@
     },
     data() {
       return {
+        saved: false,
         comment: '',
         commentFragments: [],
         thoughtPromise: null,
@@ -107,11 +109,17 @@
       sortedComments(){
         return Array.from(new Set(this.comments)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       },
-      isSaved(){
-        return this.post && this.user.publicLibrary.find(s => s.p == this.post.id)
-      }
+      
     },
     methods: {
+      reportPost(){
+
+      },
+      isSaved(){
+        if(this.user.publicLibrary.filter(s => s.p == this.post.id).length)
+          return true 
+        return false
+      },
       shareOnTwitter(){
         let shareURL = "https://twitter.com/share?"
         const params = {
@@ -128,24 +136,26 @@
         this.thoughtPromise.cancel()
       },
       async saveToLibrary(){
-        if(!this.isSaved){
-          const save = { id: uuid('library'), u: this.user.id, p: this.post.id, h: this.post.huddle }
-          const newSave = this.$gun.get(`${gunPrefix}:saves/${save.id}`).put(save)
-          this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').set(newSave)
-          this.user.publicLibrary.push({ id: save.id, p: save.p, h: save.h })
-          await blockstack.putFile('publicLibrary.json', JSON.stringify(this.user.publicLibrary), { encrypt : false })
-          this.$parent.$refs.currentChild.fetchStuff()
+        console.log(this.user.publicLibrary)
+        if(!this.isSaved()){
+          const save = { u: this.user.id, p: this.post.id, h: this.post.huddle }
+          this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').set(save)
+          this.user.publicLibrary.push({ p: save.p, h: save.h })
+          await blockstack.putFile('publicLibrary.json', JSON.stringify(Array.from(new Set(this.user.publicLibrary))), { encrypt : false })
+          await this.$parent.loadGaia()
+          this.saved = true
         } else {
           // user has already saved to library
-          const userSave = this.user.publicLibrary.find(s => s.p == this.post.id)
-          if(userSave){
-            const save = this.$gun.get(`${gunPrefix}:saves/${userSave.id}`)
+          const save = this.user.publicLibrary.find(s => s.p == this.post.id)
+          if(save){
             this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').unset(save)
             this.user.publicLibrary = this.user.publicLibrary.filter(s => s.p !== this.post.id)
             await blockstack.putFile('publicLibrary.json', JSON.stringify(this.user.publicLibrary), { encrypt : false })
-            this.$parent.$refs.currentChild.fetchStuff()
+            await this.$parent.loadGaia()
+            this.saved = false
           }
         }
+        console.log(this.user.publicLibrary)
       },
       clickPost(){
         if(!this.isGivingThought && this.isMember){
@@ -199,7 +209,7 @@
       }
     },
     mounted(){
-
+      this.saved = this.isSaved()
     },
     watch: {
       visible(value) {

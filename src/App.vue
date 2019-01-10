@@ -203,7 +203,10 @@ export default {
   watch: {
     $route(){
       if(this.showDropdown) this.showDropdown = false
-      this.instantiateGun()
+      this.loadGaia()
+    },
+    user(value){
+      if(value) this.loadGaia()
     }
   }
 }
