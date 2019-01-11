@@ -160,7 +160,9 @@
         window.open(shareURL, '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0')
       },
       close(){
-        this.$router.push(`/h/${this.$route.params.slug}`)  
+        if(this.huddle.type == 'public') this.$router.push(`/h/${this.$route.params.slug}`)
+        else if(this.huddle.type == 'hybrid') this.$router.push(`/p/${this.$route.params.slug}`)  
+        else if(this.huddle.type == 'private') this.$router.push(`/p/${this.$route.params.id}`)
       },
       cancelPost(){
         this.thoughtPromise.cancel()

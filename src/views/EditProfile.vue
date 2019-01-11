@@ -24,8 +24,8 @@
             <textarea v-model="description" class="leading-loose h-32 block resize-none appearance-none text-grey-darker py-3 px-4 rounded-lg w-full bg-khak-grey outline-none text-normal mb-3" height="200"></textarea>
           </div>
           <div class="bg-huddle-blue rounded-full px-6 text-white text-center py-3 cursor-pointer" @click="updateProfile">
-            <span v-show="!isCreating">Create</span>
-            <img src="../assets/spinner.svg" class="spin" alt="" width="16" v-show="isCreating">
+            <span v-show="!isUpdating">Update</span>
+            <img src="../assets/spinner.svg" class="spin" alt="" width="16" v-show="isUpdating">
           </div>
         </div>
       </div>
@@ -40,7 +40,7 @@ export default {
   store: ['user', 'users'],
   data() {
     return {
-      isCreating: false,
+      isUpdating: false,
       background: '',
       description: '',
       hue: 0,
@@ -68,7 +68,7 @@ export default {
       else return 'bg-transparent text-grey-darker'
     },
     async updateProfile(){
-      this.isCreating = true
+      this.isUpdating = true
       const profile = {
         hue: this.profile.hue !== this.hue ? this.hue : this.profile.hue,
         background: this.profile.background !== this.background ? this.background : this.profile.background,

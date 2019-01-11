@@ -143,7 +143,18 @@ export default {
     if(to.name.includes('ExpandedHuddlePost')){
       this.expandedPost = this.posts.find(p => p.id == to.params.postId)
       this.expandedPost ? next() : next(false)
-    } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && !from.name.includes('ExpandedHuddlePost')){
+    } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && from.name.includes('CreatePost')){
+      const isPublic = to.fullPath.includes('/h/')
+      if(isPublic){
+        this.huddle = this.huddles.find(h => h.slug == from.params.slug)
+      } else {
+        this.huddle = this.user.privateHuddles.find(h => h.id === from.params.id)
+      }
+      this.huddle ? next() : next(false)
+    } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && from.name.includes('ExpandedHuddlePost')){
+      this.expandedPost = null
+      next()
+    } else {
       const isPublic = to.fullPath.includes('/h/')
       if(isPublic){
         this.huddle = this.huddles.find(h => h.slug == to.params.slug)
@@ -151,10 +162,6 @@ export default {
         this.huddle = this.user.privateHuddles.find(h => h.id === to.params.id)
       }
       this.huddle ? next() : next(false)
-    } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && from.name.includes('ExpandedHuddlePost')){
-      this.expandedPost = null
-      next()
-    } else {
       next()
     }
   },

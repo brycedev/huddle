@@ -17,8 +17,9 @@
             <p class="text-black font-medium mb-6">Change your Huddle username.</p>
             <div class="w-full relative">
               <input v-model="newSettings.username" type="text" class="block appearance-none text-grey-darker py-3 px-4 rounded-full w-full bg-khak-grey outline-none text-normal">
-              <button type="submit" class="outline-none focus:outline-none px-4 absolute pin-t pin-b pin-r rounded-tr-full rounded-br-full rounded-full flex items-center justify-center bg-blue cursor-pointer">
-                <img src="../assets/arrow-r.svg" class="opacity-90" width="20">
+              <button type="submit" class="outline-none focus:outline-none px-4 absolute pin-t pin-b pin-r rounded-tr-full rounded-br-full rounded-full flex items-center justify-center bg-blue cursor-pointer" @click="changeUsername()">
+                <img src="../assets/arrow-r.svg" class="opacity-90" width="20" v-show="!isChangingUsername">
+                <img src="../assets/spinner.svg" class="spin" alt="" width="16" v-show="isChangingUsername">
               </button>
             </div>
           </div>
@@ -36,10 +37,10 @@
           <div class="w-full mb-6">
             <p class="text-black font-medium mb-6">Should we hide NSFW posts and huddles?</p>
             <div class="flex w-full bg-khak-grey rounded-full">
-              <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForHideNSFW(true)">
+              <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForHideNSFW(true)" @click="hideNSFW = true">
                 <p class="text-normal text-center">Yes</p>
               </div>
-              <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForHideNSFW(false)">
+              <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForHideNSFW(false)" @click="hideNSFW = false">
                 <p class="text-normal text-center">No</p>
               </div>
             </div>
@@ -59,7 +60,8 @@ export default {
       isChangingUsername: false,
       newSettings: {
         username: ''
-      }
+      },
+      hideNSFW: false
     }
   },
   computed: {
@@ -71,17 +73,46 @@ export default {
     if(!this.user) this.$router.push('/')
   },
   methods: {
+    async changeUsername(){
+      this.isChangingUsername = true
+      if(!this.users.find(u => u.username == this.newSettings.username) && this.newSettings.username !== this.user.username){
+        this.user.preferences.username = this.newSettings.username
+        await blockstack.putFile('preferences.json', JSON.stringify(this.user.preferences), { encrypt : true })
+        const thisUser = this.$gun.get(`${gunPrefix}:users/${this.user.id}`).put({ id: this.user.id, bi: this.user.bi, username: this.newSettings.username, avatar: this.user.avatar, public: true })
+        this.$gun.get(`${gunPrefix}:users`).set(thisUser)
+        const data = blockstack.loadUserData()
+        data.huddlerUsername = this.newSettings.username
+        await this.$parent.putUser(data)
+        this.isChangingUsername = false
+      } else {
+        // name is taken
+        this.isChangingUsername = false
+      }
+    },
     styleForParticipate(type){
       if(type == true) return 'bg-black text-white'
       else return 'bg-transparent text-grey-darker'
     },
     styleForHideNSFW(type){
-      if(type == true) return 'bg-black text-white'
+      if(type == this.hideNSFW) return 'bg-black text-white'
       else return 'bg-transparent text-grey-darker'
     }
   },
   mounted(){
     this.newSettings.username = this.user.username
+    this.hideNSFW = this.user.preferences.hideNSFW
+  },
+  watch: {
+    hideNSFW(value){
+      setTimeout(async () => {
+        if(value == false){
+          this.user.preferences.hideNSFW = false
+        } else if(value == true){
+          this.user.preferences.hideNSFW = true
+        }
+        await blockstack.putFile('preferences.json', JSON.stringify(this.user.preferences), { encrypt : true })
+      })
+    }
   }
 }
 </script>

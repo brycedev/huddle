@@ -87,7 +87,7 @@ export default {
         this.user.privateLibrary = []
         console.log('instantiating user : ', this.user.username)
         // add user to the gundb instance
-        let identity = {}
+        let identity = {} 
         if(isPublic)
           identity = { id: this.user.id, bi: data.bi, username: this.user.username, avatar: this.user.avatar, public: true }
         else

@@ -128,7 +128,7 @@
       close(){
         if(this.huddle.type == 'public') this.$router.push(`/h/${this.$route.params.slug}`)
         else if(this.huddle.type == 'hybrid') this.$router.push(`/p/${this.$route.params.slug}`)  
-        else this.$router.push(`/p/${this.$route.params.slug}`)
+        else if(this.huddle.type == 'private') this.$router.push(`/p/${this.$route.params.id}`)
       },
       async submitPost(){
         const post = {
