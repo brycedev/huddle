@@ -11,6 +11,9 @@
               </div>
                <p class="text-grey-darkest font-light text-xs pt-1 tracking-wide">Post Creation : {{ postDate }}</p>
             </div>
+            <div class="flex ml-2 items-center self-start">
+              <svg  class="w-8 outline-none fill-current cursor-pointer ml-2 opacity-75 hover:opacity-90 subtle" :class="{ 'text-red' : isNSFW }" v-tooltip="isNSFW ? 'Unmark as NSFW' : 'Mark as NSFW'" @click="toggleNSFW()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M320.67 64c-442.6 0-357.57 384-158.46 384 39.9 0 77.47-20.69 101.42-55.86l25.73-37.79c15.66-22.99 46.97-22.99 62.63 0l25.73 37.79C401.66 427.31 439.23 448 479.13 448c189.86 0 290.63-384-158.46-384zM184 308.36c-41.06 0-67.76-25.66-80.08-41.05-5.23-6.53-5.23-16.09 0-22.63 12.32-15.4 39.01-41.05 80.08-41.05s67.76 25.66 80.08 41.05c5.23 6.53 5.23 16.09 0 22.63-12.32 15.4-39.02 41.05-80.08 41.05zm272 0c-41.06 0-67.76-25.66-80.08-41.05-5.23-6.53-5.23-16.09 0-22.63 12.32-15.4 39.01-41.05 80.08-41.05s67.76 25.66 80.08 41.05c5.23 6.53 5.23 16.09 0 22.63-12.32 15.4-39.02 41.05-80.08 41.05z"/></svg>
+            </div>
           </div>
           <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex flex-col mb-4">
             <textarea id="text" v-model="post" class="bg-transparent flex-grow mb-4 h-40 block appearance-none text-grey-darkest leading-loose font-light outline-none text-normal h-24 resize-none" placeholder="Write something interesting..."></textarea>
@@ -64,6 +67,7 @@
           characters: 0
         },
         post: '',
+        isNSFW: false,
         isGivingThought: false,
         thoughtPromise: null,
         timerInterval: null,
@@ -95,6 +99,9 @@
     methods: {
       cancelPost(){
         if(this.thoughtPromise && this.isGivingThought) this.thoughtPromise.cancel()
+      },
+      toggleNSFW(){
+        this.isNSFW = !this.isNSFW
       },
       clickPost(){
         if(!this.isGivingThought && this.isMember){
@@ -128,6 +135,7 @@
           id: uuid(),
           u: this.user.id,
           huddle: this.huddle.id,
+          isNSFW: this.isNSFW,
           type: 'text',
           content: this.post,
           createdAt: Date.now(),

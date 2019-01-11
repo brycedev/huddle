@@ -32,18 +32,18 @@
           </div>
         </div>
         <div class="w-full flex-grow flex flex-col -mt-20 md:ml-4">
-          <div class="self-end flex items-center mr-4 md:mr-0" v-if="isMember">
+          <div class="self-end flex items-center mr-4 md:mr-0 mb-4" v-if="isMember">
             <router-link :to="`${$route.fullPath}/new`" class="block no-underline self-end ">
-              <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center mb-4">
+              <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center">
                 <img src="../assets/plus-dark.svg" alt="" class="w-4 h-4 mr-2">
                 <span>Create Post</span>
               </div>
             </router-link>
-            <div class="bg-red-light rounded-full py-2 px-4 cursor-pointer hidden md:flex items-center ml-2 mb-4" @click="leaveHuddle">
+            <div class="bg-red-light rounded-full py-2 px-4 cursor-pointer hidden md:flex items-center ml-2" @click="leaveHuddle">
               <img src="../assets/logout-white.svg" alt="" class="w-4 h-4">
             </div>
           </div>
-          <div class="self-end flex items-center mr-4 md:mr-0" v-if="!isMember">
+          <div class="self-end flex items-center mr-4 md:mr-0 mb-4" v-if="!isMember">
             <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" v-if="isHybrid">
               <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
               <span>Request Invite</span>
@@ -144,7 +144,13 @@ export default {
       this.expandedPost = this.posts.find(p => p.id == to.params.postId)
       this.expandedPost ? next() : next(false)
     } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && !from.name.includes('ExpandedHuddlePost')){
-      next()
+      const isPublic = to.fullPath.includes('/h/')
+      if(isPublic){
+        this.huddle = this.huddles.find(h => h.slug == to.params.slug)
+      } else {
+        this.huddle = this.user.privateHuddles.find(h => h.id === to.params.id)
+      }
+      this.huddle ? next() : next(false)
     } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && from.name.includes('ExpandedHuddlePost')){
       this.expandedPost = null
       next()
