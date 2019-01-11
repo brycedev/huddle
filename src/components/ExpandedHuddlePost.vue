@@ -1,8 +1,26 @@
 <template>
   <div class="z-max fixed pin bg-smoke justify-center subtle overflow-y-scroll" :class="open" @click.self="close">
     <div class="flex justify-center mt-20" v-if="post !== null">
-      <div class="rounded-lg shadow-lg p-6 px-8 bg-white w-full mb-4 max-w-md relative">
-        <div class="w-full flex flex-col">
+      <div class="rounded-lg shadow-lg p-6 px-8 bg-white w-full mb-4 max-w-md">
+        <div class="w-full flex flex-col relative">
+          
+          <div class="absolute pin bg-white subtle opacity-0 flex flex-col items-center justify-center z-50 pointer-events-none" :class="{ 'opacity-100 pointer-events-auto' : showReportPost }">
+            <h2 class="text-grey-darkest pb-4 leading-normal font-thin text-center max-w-xs">Are you sure you want to report this post?</h2>
+            <div class="absolute w-6 h-6 pin-t pin-l opacity-75 hover:opacity-90 subtle" @click="showReportPost = false">
+              <svg class="w-6 fill-current text-black cursor-pointer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M427 234.625H167.296l119.702-119.702L256 85 85 256l171 171 29.922-29.924-118.626-119.701H427v-42.75z"/></svg>
+            </div>
+            <div class="py-3 px-4 rounded-lg w-full max-w-sm bg-khak-grey flex flex-col mt-6">
+              <textarea id="text" v-model="reportReason" class="bg-transparent flex-grow mb-4 h-24 block appearance-none text-grey-darkest leading-loose font-light outline-none text-normal h-24 resize-none" placeholder="Brief reason for reporting..."></textarea>
+              <div class="w-full flex justify-between items-center">
+                <div>
+
+                </div>
+                <div class="bg-huddle-blue rounded-full px-4 text-sm text-white text-center py-2 cursor-pointer" @click="false">
+                  <span>Report</span>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="flex w-full justify-between mb-6">
             <div class="flex flex-col flex-grow">
               <div class="flex items-center mb-2 w-full" v-if="postUser">
@@ -15,11 +33,11 @@
               <svg  class="w-6 h-6 outline-none fill-current cursor-pointer ml-2 opacity-75 hover:opacity-90 subtle" :class="{ 'text-red' : saved }" v-tooltip="!saved ? 'Save to Library' : 'Remove from Library'" @click="user ? saveToLibrary() : false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M92.1 32C76.6 32 64 44.6 64 60.1V452c0 15.5 12.6 28.1 28.1 28.1H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H112.5c-8.2 0-15.4-6-16.4-14.1-1.1-9.7 6.5-18 15.9-18h208V32H92.1z"/><path d="M432 416c8.8 0 16-7.2 16-16V60.1c0-15.5-12.6-28.1-28.1-28.1H368v384h64z"/></svg>
               <!-- <img src="../assets/save.svg" alt="" class="" > -->
               <img src="../assets/share.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Share on Twitter'" @click="shareOnTwitter">
-              <img src="../assets/ban.svg" alt="" class="cursor-pointer w-6 h-6 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Report Post'" @click="reportPost">
+              <img src="../assets/ban.svg" alt="" class="cursor-pointer w-5 h-5 ml-2 opacity-75 hover:opacity-90 subtle" v-tooltip="'Report Post'" @click="showReportPost = true">
             </div>
           </div>
           <div class="mb-8">
-            <p class="text-grey-darkest leading-loose break">{{ post.content }}</p>
+            <p class="text-grey-darkest leading-loose break"><span v-html="formattedContent"></span></p>
           </div>
           <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex h-32" v-if="user">
             <textarea v-model="comment" type="text" class="bg-transparent flex-grow mr-4 h-full block appearance-none text-grey-darker font-light leading-loose outline-none text-normal resize-none" placeholder="Some comment"></textarea>
@@ -37,7 +55,7 @@
             <p class="text-grey-dark text-center pt-8 pb-2" >No comments. Be the first.</p>
           </div>
           <div class="flex flex-col w-full mt-8" v-if="comments.length">
-            <div class="w-full flex flex-col mb-6 opacity-90" v-for="comment in sortedComments">
+            <div class="w-full flex flex-col mb-6 opacity-90" v-for="comment in sortedComments" :key="comment.id">
               <div class="flex items-center mb-2">
                 <img class="w-5 h-5 rounded-full mr-2" :src="comment.avatar"/>
                 <div class="flex flex-col">
@@ -74,6 +92,7 @@
     },
     data() {
       return {
+        reportReason: '',
         saved: false,
         comment: '',
         commentFragments: [],
@@ -81,7 +100,8 @@
         isGivingThought: false,
         comments: [],
         timerInterval : null,
-        timer: 4
+        timer: 4,
+        showReportPost: false
       }
     },
     computed: {
@@ -109,7 +129,17 @@
       sortedComments(){
         return Array.from(new Set(this.comments)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       },
-      
+      formattedContent(){
+        return linkifyHtml(this.post.content, { 
+          className: 'text-huddle-blue font-semibold',
+          format: (value, type) => {
+            if (type === 'url' && value.length > 25) {
+              value = value.slice(0, 25) + '…'
+            }
+            return value;
+          }
+        })
+      }
     },
     methods: {
       reportPost(){
@@ -136,26 +166,25 @@
         this.thoughtPromise.cancel()
       },
       async saveToLibrary(){
-        console.log(this.user.publicLibrary)
         if(!this.isSaved()){
+          this.saved = true
           const save = { u: this.user.id, p: this.post.id, h: this.post.huddle }
           this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').set(save)
           this.user.publicLibrary.push({ p: save.p, h: save.h })
           await blockstack.putFile('publicLibrary.json', JSON.stringify(Array.from(new Set(this.user.publicLibrary))), { encrypt : false })
           await this.$parent.loadGaia()
-          this.saved = true
         } else {
           // user has already saved to library
           const save = this.user.publicLibrary.find(s => s.p == this.post.id)
           if(save){
+            this.saved = false
+            save.u = this.user.id
             this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').unset(save)
             this.user.publicLibrary = this.user.publicLibrary.filter(s => s.p !== this.post.id)
             await blockstack.putFile('publicLibrary.json', JSON.stringify(this.user.publicLibrary), { encrypt : false })
             await this.$parent.loadGaia()
-            this.saved = false
           }
         }
-        console.log(this.user.publicLibrary)
       },
       clickPost(){
         if(!this.isGivingThought && this.isMember){
@@ -209,7 +238,7 @@
       }
     },
     mounted(){
-      this.saved = this.isSaved()
+      
     },
     watch: {
       visible(value) {
@@ -219,12 +248,14 @@
         } else {
           document.getElementById('body').style.overflowY = 'auto'
           setTimeout(() => {
+            this.showReportPost = false
             this.comments = []
           }, 400)
         }
       },
       post(value) {
         this.comment = ''
+        this.saved = this.post && this.user.publicLibrary.filter(s => s.p == this.post.id).length ? true : false
       },
       commentFragments(value){
         let comments = []

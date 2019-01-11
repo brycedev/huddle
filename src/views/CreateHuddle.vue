@@ -107,13 +107,12 @@ export default {
           huddle.isApproved = false
         } else {
           this.user.privateHuddles.push(huddle.id)
-          const newPrivateGroup = JSON.stringify(huddle)
+          const newPrivateHuddle = JSON.stringify(huddle)
           const newPrivateHuddles = JSON.stringify(this.user.privateHuddles)
-          await blockstack.putFile(`privateHuddles/${huddle.id}.json`, newPrivateGroup, { encrypt : true })
+          await blockstack.putFile(`privateHuddles/${huddle.id}.json`, newPrivateHuddle, { encrypt : true })
           await blockstack.putFile('privateHuddles.json', newPrivateHuddles, { encrypt : true })
         }
         if(this.huddle.type !== 'private'){
-          console.log('adding huddle to gundb: ', huddle.id)
           const newHuddle = this.$gun.get(`${gunPrefix}:huddles/${huddle.id}`).put(huddle)
           this.$gun.get(`${gunPrefix}:huddles`).set(newHuddle)
         }

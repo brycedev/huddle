@@ -64,7 +64,7 @@ export default {
       this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').map().on(user => {
         members.push(user)
       })
-      this.memberIds = Array.from(new Set(members.map(m => m.id)))
+      this.memberIds = Array.from(new Set(members.filter(m => m !== null).map(m => m.id)))
     },
   },
   mounted(){

@@ -32,7 +32,7 @@
           </div>
         </div>
         <div class="w-full flex-grow flex flex-col -mt-20 md:ml-4">
-          <div class="self-end flex items-center mr-4 md:mr-0" v-if="isMember && isPublic">
+          <div class="self-end flex items-center mr-4 md:mr-0" v-if="isMember">
             <router-link :to="`${$route.fullPath}/new`" class="block no-underline self-end ">
               <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center mb-4">
                 <img src="../assets/plus-dark.svg" alt="" class="w-4 h-4 mr-2">
@@ -43,14 +43,15 @@
               <img src="../assets/logout-white.svg" alt="" class="w-4 h-4">
             </div>
           </div>
-          
-          <div class="self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer mr-4 md:mr-0 flex items-center mb-4" v-if="isHybrid && !isMember">
-            <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
-            <span>Request Invite</span>
-          </div>
-          <div class="self-end bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer mr-4 md:mr-0 flex items-center mb-4" v-if="!isHybrid && !isMember" @click="joinHuddle">
-            <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
-            <span>Join Huddle</span>
+          <div class="self-end flex items-center mr-4 md:mr-0" v-if="!isMember">
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" v-if="isHybrid">
+              <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
+              <span>Request Invite</span>
+            </div>
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" v-if="isPublic" @click="joinHuddle">
+              <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
+              <span>Join Huddle</span>
+            </div>
           </div>
           <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in displayedPosts" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="isMember">
             <huddle-post :loaded="true" :post="post"></huddle-post>
@@ -96,7 +97,12 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(async vm => {
-      vm.huddle = vm.huddles.find(h => h.slug == to.params.slug)
+      const isPublic = to.fullPath.includes('/h/')
+      if(isPublic){
+        vm.huddle = vm.huddles.find(h => h.slug == to.params.slug)
+      } else {
+        vm.huddle = vm.user.privateHuddles.find(h => h.id === to.params.id)
+      }
       if(to.name.includes('ExpandedHuddlePost')){
         let maxSearchTime = 12 // 12 * 100 = 1200 milliseconds == 1.2 seconds
         let currentTime = 0
@@ -138,11 +144,9 @@ export default {
       this.expandedPost = this.posts.find(p => p.id == to.params.postId)
       this.expandedPost ? next() : next(false)
     } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && !from.name.includes('ExpandedHuddlePost')){
-      this.huddle = this.huddles.find(h => h.slug == to.params.slug)
-      this.huddle ? next() : next(false)
+      next()
     } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && from.name.includes('ExpandedHuddlePost')){
       this.expandedPost = null
-      // this.fetchPosts()
       next()
     } else {
       next()
@@ -168,8 +172,15 @@ export default {
     isPublic(){
       return this.huddle && this.huddle.type == 'public'
     },
+    isPrivate(){
+      return this.huddle && this.huddle.type == 'private'
+    },
     isMember(){
-      return this.huddle && this.user && this.user.publicHuddles.includes(this.huddle.id)
+      return this.huddle && this.user 
+        ? this.isPublic
+          ? this.user.publicHuddles.includes(this.huddle.id)
+          : this.user.privateHuddles.map(h => h.id).includes(this.huddle.id)
+        : false
     },
     members(){
       return this.users.filter(u => this.memberIds.includes(u.id))
@@ -227,11 +238,12 @@ export default {
     }
   },
   mounted(){
-    console.log(this.$parent)
+    
   },
   watch: {
     $route(value){
-
+      this.$parent.loadGaia()
+      this.fetchMembers()
     },
     huddle(newValue, oldValue) {
       this.fetchMembers()

@@ -176,7 +176,15 @@ export default {
           this.user.publicComments = JSON.parse(await blockstack.getFile('publicComments.json', { decrypt: false }))
           this.user.publicLibrary = JSON.parse(await blockstack.getFile('publicLibrary.json', { decrypt: false }))
         }
-        this.user.privateHuddles = JSON.parse(await blockstack.getFile('privateHuddles.json', { decrypt: true }))
+        const tempHuddles = []
+        const privHuddles = JSON.parse(await blockstack.getFile('privateHuddles.json', { decrypt: true }))
+        privHuddles.forEach(h => {
+          blockstack.getFile(`privateHuddles/${h}.json`, { decrypt: true })
+          .then(file => {
+            tempHuddles.push(JSON.parse(file))
+          })
+        })
+        this.user.privateHuddles = tempHuddles
         this.user.privatePosts = JSON.parse(await blockstack.getFile('privatePosts.json', { decrypt: true }))
         this.user.privateComments = JSON.parse(await blockstack.getFile('privateComments.json', { decrypt: true }))
         this.user.privateLibrary = JSON.parse(await blockstack.getFile('privateLibrary.json', { decrypt: true }))

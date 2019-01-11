@@ -182,7 +182,7 @@ export default {
       { name: 'Hadiya', pro: 'She'}
     ]
     var typed = new Typed('.typi', {
-      strings: ["you", "your group", "your mindshare", "your family"],
+      strings: ["you", "your brand", "your mindshare", "your community"],
       typeSpeed: 200,
       loop: true,
       showCursor: false,

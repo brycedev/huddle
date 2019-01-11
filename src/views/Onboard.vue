@@ -56,7 +56,7 @@
 <script>
 export default {
   name: 'Onboard',
-  store: ['bus', 'user', 'users'],
+  store: ['bus', 'isDev', 'user', 'users'],
   data() {
     return {
       isCreating: false,
@@ -113,7 +113,7 @@ export default {
         const profile = { 
           description: '',
           hue: Math.floor(Math.random() * 357), 
-          background: `https://picsum.photos/1280x720/?random=1`
+          background: this.isDev ? `https://picsum.photos/1280x720/?random=1` : ''
         }
         const cleanArray = JSON.stringify([])
         await blockstack.putFile('preferences.json', JSON.stringify(this.user.preferences), { encrypt : true })

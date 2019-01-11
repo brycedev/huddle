@@ -14,7 +14,6 @@
           </div>
           <div class="py-3 px-4 rounded-lg w-full bg-khak-grey flex flex-col mb-4">
             <textarea id="text" v-model="post" class="bg-transparent flex-grow mb-4 h-40 block appearance-none text-grey-darkest leading-loose font-light outline-none text-normal h-24 resize-none" placeholder="Write something interesting..."></textarea>
-            
             <div class="w-full flex justify-between items-center">
               <div>
 
@@ -80,6 +79,17 @@
       },
       postDate(){
         return (new Date()).toLocaleTimeString() 
+      },
+      formattedContent(){
+        return linkifyHtml(this.post, { 
+          className: 'text-huddle-blue font-semibold',
+          format: (value, type) => {
+            if (type === 'url' && value.length > 25) {
+              value = value.slice(0, 25) + '…'
+            }
+            return value;
+          }
+        })
       }
     },
     methods: {

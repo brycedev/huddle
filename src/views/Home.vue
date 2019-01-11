@@ -53,7 +53,7 @@
           <div class="rounded-lg shadow p-6 bg-white w-full mb-4" v-if="myHuddles">
             <p class="text-black font-light mb-4">Your Huddles</p>
             <div class="flex flex-col">
-             <router-link :to="'/h/' + huddle.slug" v-for="huddle in myHuddles" :key="huddle.id"  class="block w-full block no-underline" v-if="myHuddles.length">
+              <router-link :to="huddle.type == 'public' ? '/h/' + huddle.slug : '/p/' + huddle.id" v-for="huddle in myHuddles" :key="huddle.id"  class="block w-full block no-underline" v-if="myHuddles.length">
                 <huddle-entry class="mb-4" :huddle="huddle" :full="false"></huddle-entry>
               </router-link>
               <p class="text-grey-dark text-center pt-6 pb-2 leading-normal" v-if="!myHuddles.length">Go join a Huddle!</p>
@@ -141,8 +141,8 @@ export default {
       return this.publicHuddles.slice(0,8)
     },
     myHuddles(){
-      return this.user && this.user.publicHuddles
-        ? this.publicHuddles.filter(h => this.user.publicHuddles.includes(h.id))
+      return this.user && this.user.publicHuddles && this.user.privateHuddles
+        ? this.user.privateHuddles.concat(this.publicHuddles.filter(h => this.user.publicHuddles.includes(h.id)))
         : []
     },
     publicHuddles(){
