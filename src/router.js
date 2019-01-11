@@ -5,6 +5,7 @@ import CreateHuddle from './views/CreateHuddle.vue'
 import Discover from './views/Discover.vue'
 import Home from './views/Home.vue'
 import Huddle from './views/Huddle.vue'
+import EditProfile from './views/EditProfile.vue'
 import Identity from './views/Identity.vue'
 import Onboard from './views/Onboard.vue'
 import Settings from './views/Settings.vue'
@@ -73,6 +74,11 @@ export default new Router({
           name: 'ExpandedHuddlePostIdentity'
         }
       ]
+    },
+    {
+      path: '/i/:username/edit',
+      name: 'EditProfile',
+      component: EditProfile
     },
     {
       path: '/p/:id',

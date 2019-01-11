@@ -15,7 +15,7 @@
         <div class="w-120 mt-8 md:block hidden md:mr-4">
           <div class="rounded-lg shadow p-6 bg-white w-full mb-4">
             <p class="text-black font-light mb-4">Description</p>
-            <p class="text-grey-darkest leading-normal font-light break" v-if="profile && profile.description && profile.description !== ''">{{ profile.description }}</p>
+            <p class="text-grey-darkest leading-normal font-light break" v-if="profile && profile.description && profile.description !== ''">{{ profile.description.slice(0, 200) }}</p>
             <p class="text-grey-dark py-2 leading-normal" v-else>This user hasn't added a description to their profile, yet.</p>
           </div>
           <div class="rounded-lg shadow p-6 bg-white w-full mb-4">
@@ -43,10 +43,12 @@
                 </div>
               </div>
             </div>
-            <div class="bg-white rounded-full text-black text-center py-2 px-4 mr-4 md:mr-0 cursor-pointer flex items-center" v-if="isOwn">
-              <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
-              <span>Edit Profile</span>
-            </div>
+            <router-link :to="'/i/' + user.username + '/edit'" class="block self-end block no-underline mr-4 md:mr-0" v-if="isOwn">
+              <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center">
+                <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
+                <span>Edit Profile</span>
+              </div>
+            </router-link>
           </div>
           <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="!displayedPosts.length && feed == 1">
             <p class="text-grey-darker text-center md:font-thin md:text-xl font break mb-4" >This user hasn't made any posts, yet.</p>

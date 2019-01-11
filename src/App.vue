@@ -4,14 +4,16 @@
     <nav class="w-full fixed z-max subtle" :class="{'bg-black' : scroll > 32}">
       <div class="container px-6 sm:px-0">
         <div class="flex justify-between items-center py-3 px-2">
+         <div class="w-1/3">
           <router-link class="sm:block no-underline hidden" to="/">
             <img src="../src/assets/logo.svg" alt="Huddle logo" width="120">
           </router-link>
           <router-link class="sm:hidden block no-underline" to="/">
             <img src="../src/assets/logomark-white.png" alt="Huddle logo" width="35">
           </router-link>
-          <div class="hidden sm:block">
-            <div class="flex mx-auto self-center">
+         </div>
+          <div class="hidden sm:block w-1/3">
+            <div class="flex mx-auto justify-center">
               <!-- <div class="flex -mb-px mr-6">
                 <router-link to="/#search" class="no-underline flex items-center text-white uppercase" active-class="active-link">
                   <img src="../src/assets/search.svg" alt="" width="14">
@@ -34,31 +36,34 @@
               </div>
             </div>
           </div>
-          <div class="relative bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer flex items-center" @click="signIn()" v-if="!user" v-tooltip.left="'Try the testnet!'">Login</div>
-          <div class="relative" v-if="user">
-            <div class="bg-white rounded-full text-black text-center py-2 px-4 flex items-center cursor-pointer" @click="toggleDropdown">
-              <img class="w-6 h-6 rounded-full mr-2 z-50" :src="user.avatar"/>
-              <span class="z-50">{{ user.username ? user.username : user.bi }}</span>
-            </div>
-            <div class="absolute pin-t w-40 pin-r mt-14 flex flex-col items-center subtle opacity-0" :class="{ 'opacity-100' : showDropdown, 'pointer-events-none' : !showDropdown }">
-              <router-link :to="`/i/${this.user.username}`" class="no-underline text-black block w-full">
-                <div class="flex items-center mb-4 justify-center bg-white shadow-md py-2 px-4 rounded-full w-full cursor-pointer">
-                  <img class="mr-2" width="20" src="../src/assets/user-circle.svg"/>
-                  <span>Profile</span>
+          <div class="w-1/3 flex justify-end">
+            <div class="relative bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer table items-center" @click="signIn()" v-if="!user" v-tooltip.left="'Try the testnet!'">Login</div>
+            <div class="relative" v-if="user">
+              <div class="bg-white rounded-full text-black text-center py-2 px-4 flex items-center cursor-pointer" @click="toggleDropdown">
+                <img class="w-6 h-6 rounded-full mr-2 z-50" :src="user.avatar"/>
+                <span class="z-50">{{ user.username ? user.username : user.bi }}</span>
+              </div>
+              <div class="absolute pin-t w-40 pin-r mt-14 flex flex-col items-center subtle opacity-0" :class="{ 'opacity-100' : showDropdown, 'pointer-events-none' : !showDropdown }">
+                <router-link :to="`/i/${this.user.username}`" class="no-underline text-black block w-full">
+                  <div class="flex items-center mb-4 justify-center bg-white shadow-md py-2 px-4 rounded-full w-full cursor-pointer">
+                    <img class="mr-2" width="20" src="../src/assets/user-circle.svg"/>
+                    <span>Profile</span>
+                  </div>
+                </router-link>
+                <router-link to="/settings" class="no-underline text-black block w-full">
+                  <div class="flex items-center mb-4 justify-center bg-white shadow-md py-2 px-4 rounded-full w-full cursor-pointer">
+                    <img class="mr-2" width="20" src="../src/assets/cogs.svg"/>
+                    <span>Settings</span>
+                  </div>
+                </router-link>
+                <div class="flex items-center justify-center bg-huddle-blue shadow-md text-white py-2 px-4 rounded-full w-full cursor-pointer" @click="logout()">
+                  <img class="mr-2" width="20" src="../src/assets/logout-white.svg"/>
+                  <span>Logout</span>
                 </div>
-              </router-link>
-              <router-link to="/settings" class="no-underline text-black block w-full">
-                <div class="flex items-center mb-4 justify-center bg-white shadow-md py-2 px-4 rounded-full w-full cursor-pointer">
-                  <img class="mr-2" width="20" src="../src/assets/cogs.svg"/>
-                  <span>Settings</span>
-                </div>
-              </router-link>
-              <div class="flex items-center justify-center bg-huddle-blue shadow-md text-white py-2 px-4 rounded-full w-full cursor-pointer" @click="logout()">
-                <img class="mr-2" width="20" src="../src/assets/logout-white.svg"/>
-                <span>Logout</span>
               </div>
             </div>
           </div>
+          
         </div>
       </div>
     </nav>
