@@ -190,7 +190,7 @@ export default {
     },
     isMember(){
       return this.huddle && this.user 
-        ? this.isPublic
+        ? this.isPublic && this.user.publicHuddles && this.user.privateHuddles
           ? this.user.publicHuddles.includes(this.huddle.id)
           : this.user.privateHuddles.map(h => h.id).includes(this.huddle.id)
         : false
@@ -210,16 +210,20 @@ export default {
       this.user.publicHuddles = this.user.publicHuddles.filter(s => s !== this.huddle.id)
       this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').unset({ id: this.user.id })
       await blockstack.putFile('publicHuddles.json', JSON.stringify(this.user.publicHuddles), { encrypt : false })
-      this.fetchStuff()
+      await blockstack.putFile('publicHuddles.json', newPublicHuddles, { encrypt : false })
       this.$router.push('/')
     },
     async joinHuddle(){
       if(this.isPublic && this.user){
+        progress.start()
         const newMember = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').set({ id: this.user.id })
         this.user.publicHuddles.push(this.huddle.id)
         const newPublicHuddles = JSON.stringify(this.user.publicHuddles)
         await blockstack.putFile('publicHuddles.json', newPublicHuddles, { encrypt : false })
-        this.fetchStuff()
+        const data = blockstack.loadUserData()
+        await this.$parent.putUser(data)
+        progress.done()
+        this.$router.push(`${this.$route.fullPath}#welcome`)
       }
     },
     fetchMembers(){

@@ -159,7 +159,7 @@ export default {
     },
     putUser(data){
       return new Promise(async (resolve, reject) => {
-        this.user = new blockstack.Person(data.profile)
+        if(!this.user) this.user = new blockstack.Person(data.profile)
         this.user.bi = data.username
         this.user.id = data.identityAddress
         this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'

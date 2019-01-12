@@ -12,7 +12,6 @@ import router from './router'
 import stash from 'vue-stash'
 import meta from 'vue-meta'
 import portal from 'portal-vue'
-import progress from 'nprogress'
 import tooltip from 'v-tooltip'
 
 Vue.config.productionTip = false
@@ -20,7 +19,6 @@ Vue.config.productionTip = false
 Vue.use(gun)
 Vue.use(meta)
 Vue.use(portal)
-Vue.use(progress, { color: '#fff' })
 Vue.use(stash)
 Vue.use(tooltip, { defaultHideOnTargetClick: false,
   popover: {
@@ -31,6 +29,7 @@ window.axios = require('axios')
 window.blockstack = require('blockstack')
 window.gunPrefix = dbPrefix
 window.linkifyHtml = require('linkifyjs/html')
+window.progress = require('nprogress')
 window.slug = require('slug')
 window.uuid = ((a, b) => {
   for (b = a = ''; a++ < 36; b += a * 51 & 52 ? (a ^ 15 ? 8 ^ Math.random() * (a ^ 20 ? 16 : 4) : 4).toString(16) : '-');
