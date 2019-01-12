@@ -142,9 +142,6 @@
       }
     },
     methods: {
-      reportPost(){
-
-      },
       isSaved(){
         if(this.user.publicLibrary.filter(s => s.p == this.post.id).length)
           return true 
@@ -257,7 +254,9 @@
       },
       post(value) {
         this.comment = ''
-        this.saved = this.post && this.user.publicLibrary.filter(s => s.p == this.post.id).length ? true : false
+        this.saved = this.post && this.user 
+          ? this.user.publicLibrary.filter(s => s.p == this.post.id).length ? true : false
+          : false
       },
       commentFragments(value){
         let comments = []

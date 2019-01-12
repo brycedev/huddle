@@ -82,10 +82,14 @@ export default {
   components: { HuddleEntry, ProposedEntry, ProposedVote  },
   computed: {
     publicHuddles(){
-      return this.huddles.filter(h => h.isApproved && h.type == 'public').filter(h => this.user.preferences.hideNSFW ? !h.isNSFW : true)
+      return this.user && this.user.preferences 
+        ? this.huddles.filter(h => h.isApproved && h.type == 'public').filter(h => this.user.preferences.hideNSFW ? !h.isNSFW : true)
+        : this.huddles.filter(h => h.isApproved && h.type == 'public')
     },
     proposedHuddles(){
-      return this.huddles.filter(h => h.isProposed).slice(0,3).filter(h => this.user.preferences.hideNSFW ? !h.isNSFW : true)
+      return this.user && this.user.preferences 
+        ? this.huddles.filter(h => h.isProposed).slice(0,3).filter(h => this.user.preferences.hideNSFW ? !h.isNSFW : true)
+        : this.huddles.filter(h => h.isProposed).slice(0,3)
     },
     showProposedVote(){
       return this.$route.name == ('ProposedVote') && this.expanded !== null

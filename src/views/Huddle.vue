@@ -167,7 +167,9 @@ export default {
   },
   computed: {
     displayedPosts(){
-      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => !this.user.preferences.filters.blockedUsers.includes(p.u)).filter(h => this.user.preferences.hideNSFW ? !p.isNSFW : true)
+      return this.user && this.user.preferences
+        ? Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => !this.user.preferences.filters.blockedUsers.includes(p.u)).filter(h => this.user.preferences.hideNSFW ? !p.isNSFW : true)
+        : Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     },
     bgColor(){
       return { 
