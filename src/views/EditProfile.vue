@@ -14,9 +14,11 @@
       <div class="w-full justify-center flex">
         <div class="w-full max-w-sm bg-white rounded-lg py-6 px-8 flex flex-col -mt-12 z-50">
           <div class="w-full mb-6">
-             <p class="text-black font-medium mb-6">Please enter a short description about yourself.</p>
-            <div class="h-32 py-3 px-4 rounded-lg w-full relative" :style="bgImage" :class="{ 'centercenter' : bgImage !== {}, 'canvas' : bgImage == {}}">
-              <div class="overlay absolute pin z-auto" :style="bgColor"></div>
+            <p class="text-black font-medium mb-6">Click or drag and drop a profile image.</p>
+            <input type="file" ref="imageInput" multiple accept="image/*" @change="handleImageFile" class="hidden">
+            <div id="dropzone" class="cursor-pointer h-32 py-3 px-4 rounded-lg w-full relative" :style="bgImage" :class="{ 'centercenter' : bgImage !== false, 'canvas bg-black' : bgImage == false }" @click="showFilePicker()">
+              <div class="rounded-lg overlay absolute pin z-auto" :style="bgColor" v-if="bgImage"></div>
+              <div class="rounded-lg overlay absolute pin z-auto" :style="bgColor" v-if="!bgImage"></div>
             </div>
           </div>
           <div class="w-full mb-6">
@@ -36,7 +38,7 @@
 
 <script>
 export default {
-  name: 'updateProfile',
+  name: 'EditProfile',
   store: ['user', 'users'],
   data() {
     return {
@@ -44,15 +46,30 @@ export default {
       background: '',
       description: '',
       hue: 0,
-      profile: {}
+      profile: {},
+      imageSrc: '',
+      isChangingImage: true
+    }
+  },
+  metaInfo(){
+    return {
+      title: `Edit Profile | Huddle`
     }
   },
   computed: {
     bgColor(){
-      return {  backgroundColor: `hsla(${ this.profile.hue }, 35%, 27%, .64)` } 
+      return this.imageSrc == ''
+        ? this.profile.background !== ''
+          ? {  backgroundColor: `hsla(${ this.profile.hue }, 35%, 27%, .64)` } 
+          : false
+        : {  backgroundColor: `hsla(${ this.profile.hue }, 35%, 27%, .64)` } 
     },
     bgImage(){
-      return { backgroundImage: `url('${this.profile.background}')` } 
+      return this.imageSrc == ''
+        ? this.profile.background !== ''
+          ? { backgroundImage: `url('${this.profile.background}')` } 
+          : false
+        : { backgroundImage: `url('${this.imageSrc}')` } 
     },
   },
   beforeMount(){
@@ -67,15 +84,29 @@ export default {
       if(this.huddle.isNSFW == type) return 'bg-black text-white'
       else return 'bg-transparent text-grey-darker'
     },
+    showFilePicker(){
+      this.$refs.imageInput.click()
+    },
     async updateProfile(){
       this.isUpdating = true
       const profile = {
         hue: this.profile.hue !== this.hue ? this.hue : this.profile.hue,
-        background: this.profile.background !== this.background ? this.background : this.profile.background,
+        background: this.profile.background !== this.imageSrc ? this.imageSrc : this.profile.background,
         description: this.profile.description !== this.description ? this.description : this.profile.description
       }
       await blockstack.putFile(`profile.json`, JSON.stringify(profile), { encrypt : false })
       this.$router.push(`/i/${this.user.username}`)
+    },
+    handleImageFile(){
+      this.isChangingImage = true
+      const file = this.$refs.imageInput.files[0]
+      const allowedTypes = ["image/gif", "image/jpeg", "image/png"]
+      const FR = new FileReader()
+      FR.addEventListener("load", e => {
+        this.imageSrc = e.target.result
+        this.isChangingImage = false
+      })
+      FR.readAsDataURL(file)
     }
   },
   mounted(){
@@ -84,6 +115,38 @@ export default {
       this.description = this.profile.description
       this.background = this.profile.background
     })
+    let dragTimer
+    let dropzone = document.getElementById('dropzone')
+    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, e => {
+        e.preventDefault()
+        e.stopPropagation()
+      }, false)
+    })
+    dropzone.addEventListener('dragover', (e) => {
+      let dt = e.dataTransfer
+      if (dt.types && (dt.types.indexOf ? dt.types.indexOf('Files') != -1 : dt.types.contains('Files'))) {
+        this.isDraggingAndDropping = true
+        clearTimeout(dragTimer)
+      }
+    })
+    dropzone.addEventListener('dragleave', (e) => {
+      dragTimer = setTimeout(() => {
+        this.isDraggingAndDropping = false
+      }, 25)
+    })
+    dropzone.addEventListener('drop', (e) => {
+      let dt = e.dataTransfer
+      let files = Array.from(dt.files)
+      this.isDraggingAndDropping = false
+      const allowedTypes = ["image/gif", "image/jpeg", "image/png"]
+      const FR = new FileReader()
+      FR.addEventListener("load", e => {
+        this.imageSrc = e.target.result
+        this.isChangingImage = false
+      })
+      FR.readAsDataURL(files[0])
+    }, false)
   }
 }
 </script>
