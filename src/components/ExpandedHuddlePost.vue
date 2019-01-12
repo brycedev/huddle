@@ -3,7 +3,6 @@
     <div class="flex justify-center mt-20" v-if="post !== null">
       <div class="rounded-lg shadow-lg p-6 px-8 bg-white w-full mb-4 max-w-md">
         <div class="w-full flex flex-col relative">
-          
           <div class="absolute pin bg-white subtle opacity-0 flex flex-col items-center justify-center z-50 pointer-events-none" :class="{ 'opacity-100 pointer-events-auto' : showReportPost }">
             <h2 class="text-grey-darkest pb-4 leading-normal font-thin text-center max-w-xs">Are you sure you want to report this post?</h2>
             <div class="absolute w-6 h-6 pin-t pin-l opacity-75 hover:opacity-90 subtle" @click="showReportPost = false">
@@ -68,7 +67,7 @@
           </div>
         </div>
       </div>
-      <img src="../assets/close.svg" alt="" class="cursor-pointer w-6 h-6 ml-4" @click="close">
+      <img src="../assets/close.svg" alt="" class="cursor-pointer w-6 h-6 ml-4 hidden md:block" @click="close">
     </div>
     
   </div>

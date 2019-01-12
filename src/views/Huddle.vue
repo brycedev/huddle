@@ -228,7 +228,6 @@ export default {
         const data = blockstack.loadUserData()
         await this.$parent.putUser(data)
         progress.done()
-        this.$router.push(`${this.$route.fullPath}#welcome`)
       }
     },
     fetchMembers(){

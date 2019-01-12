@@ -36,7 +36,7 @@
               </div>
             </div>
           </div>
-          <div class="w-1/3 flex justify-end">
+          <div class="md:w-1/3 w-1/2 flex justify-end">
             <div class="relative bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer table items-center" @click="signIn()" v-if="!user" v-tooltip.left="'Try the testnet!'">Login</div>
             <div class="relative" v-if="user">
               <div class="bg-white rounded-full text-black text-center py-2 px-4 flex items-center cursor-pointer" @click="toggleDropdown">

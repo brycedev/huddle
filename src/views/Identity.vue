@@ -1,7 +1,7 @@
 <template>
   <div class="home w-full relative flex-grow" v-if="identity">
     <div class="w-full bg-black relative" :style="bgImage" :class="{ 'centercenter' : bgImage !== false, 'canvas bg-black' : bgImage == false}">
-      <div class="overlay absolute pin z-auto" :style="bgColor"></div>
+      <div class="overlay absolute pin z-auto" :style="bgColor" v-if="bgImage"></div>
       <div class="container flex justify-center items-center">
         <div class="flex justify-center items-center flex-col py-20 my-12">
           <h1 class="text-4xl text-white font-light max-w-sm text-center mb-8 flex z-50">
