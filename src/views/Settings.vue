@@ -64,6 +64,11 @@ export default {
       hideNSFW: false
     }
   },
+  metaInfo(){
+    return {
+      title: `Settings | Huddle`
+    }
+  },
   computed: {
     canSubmit(){
       return this.false

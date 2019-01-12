@@ -49,6 +49,9 @@
                 <span>Edit Profile</span>
               </div>
             </router-link>
+            <div class="bg-red-light rounded-full py-2 px-4 cursor-pointer hidden md:flex items-center ml-2" @click="showBlockDialog = true" v-if="!isOwn">
+                <svg class="w-4 fill-current text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 8C119.034 8 8 119.033 8 256s111.034 248 248 248 248-111.034 248-248S392.967 8 256 8zm130.108 117.892c65.448 65.448 70 165.481 20.677 235.637L150.47 105.216c70.204-49.356 170.226-44.735 235.638 20.676zM125.892 386.108c-65.448-65.448-70-165.481-20.677-235.637L361.53 406.784c-70.203 49.356-170.226 44.736-235.638-20.676z"/></svg>
+              </div>
           </div>
           <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="!displayedPosts.length && feed == 1">
             <p class="text-grey-darker text-center md:font-thin md:text-xl font break mb-4" >This user hasn't made any posts, yet.</p>
@@ -102,6 +105,7 @@ export default {
   },
   data() {
     return {
+      showBlockDialog: false,
       profile: null,
       identity: null,
       expandedPost: null,
@@ -168,6 +172,9 @@ export default {
     }
   },
   methods: {
+    blockUser(){
+
+    },
     fetchHuddles(){
       if(this.identity){
         this.postFragments = []
