@@ -49,7 +49,7 @@
                 <span>Edit Profile</span>
               </div>
             </router-link>
-            <div class="bg-red-light rounded-full py-2 px-4 cursor-pointer hidden md:flex items-center ml-2" @click="showReportUser = true" v-if="isOwn">
+            <div class="bg-red-light rounded-full py-2 px-4 cursor-pointer hidden md:flex items-center ml-2" @click="showReportUser = true" v-if="!isOwn">
                 <svg class="w-4 fill-current text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 8C119.034 8 8 119.033 8 256s111.034 248 248 248 248-111.034 248-248S392.967 8 256 8zm130.108 117.892c65.448 65.448 70 165.481 20.677 235.637L150.47 105.216c70.204-49.356 170.226-44.735 235.638 20.676zM125.892 386.108c-65.448-65.448-70-165.481-20.677-235.637L361.53 406.784c-70.203 49.356-170.226 44.736-235.638-20.676z"/></svg>
               </div>
           </div>
@@ -153,10 +153,10 @@ export default {
       return this.user && this.identity && this.user.id == this.identity.id
     },
     displayedPosts(){
-      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => this.user.preferences.hideNSFW ? !p.isNSFW : true)
     },
     displayedSaves(){
-      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => !this.user.preferences.filters.blockedUsers.includes(p.u))
+      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => !this.user.preferences.filters.blockedUsers.includes(p.u)).filter(h => this.user.preferences.hideNSFW ? !p.isNSFW : true)
     },
     displayedHuddles(){
       return this.huddles.filter(h => this.personHuddles.includes(h.id))

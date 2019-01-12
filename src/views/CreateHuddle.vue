@@ -58,6 +58,11 @@
 export default {
   name: 'CreateHuddle',
   store: ['user', 'users'],
+  metaInfo(){
+    return {
+      title: `Create a Huddle | Huddle`,
+    }
+  },
   data() {
     return {
       isCreating: false,

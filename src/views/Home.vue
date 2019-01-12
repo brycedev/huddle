@@ -77,23 +77,23 @@
               </div>
             </div>
           </div>
-          <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="!posts.length && feed == 1">
+          <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="!displayedPosts.length && feed == 1">
             <p class="text-grey-darker text-center md:font-thin md:text-xl font break mb-4" >No posts, yet. Join some huddles, first!</p>
             <img class="px-8 w-96" src="../assets/empty-post.svg" alt="Create an identity" width="100%">
             
           </div>
-          <div class="w-full" v-if="posts.length && feed == 1">        
+          <div class="w-full" v-if="displayedPosts.length && feed == 1">        
             <router-link :to="`/h/${publicHuddles.find(h => h.id == post.huddle).slug}/post/${post.id}`" v-for="post in displayedPosts" class="block md:mx-0 mx-2 no-underline" :key="post.id">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
           </div>
-          <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="!saves.length && feed == 0">
+          <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="!displayedSaves.length && feed == 0">
             <p class="text-grey-darker text-center md:font-thin md:text-xl font break mb-4">No saved posts, yet.</p>
             <img class="px-8 w-96" src="../assets/empty-post.svg" alt="Create an identity" width="100%">
             
           </div>
-          <div class="w-full" v-if="saves.length && feed == 0">        
-            <router-link :to="`/h/${publicHuddles.find(h => h.id == post.huddle).slug}/post/${post.id}`" v-for="post in saves" class="block md:mx-0 mx-2 no-underline" :key="post.id">
+          <div class="w-full" v-if="displayedSaves.length && feed == 0">        
+            <router-link :to="`/h/${publicHuddles.find(h => h.id == post.huddle).slug}/post/${post.id}`" v-for="post in displayedSaves" class="block md:mx-0 mx-2 no-underline" :key="post.id">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
           </div>
@@ -135,7 +135,10 @@ export default {
   },
   computed: {
     displayedPosts(){
-      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => !this.user.preferences.filters.blockedUsers.includes(p.u))
+      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => !this.user.preferences.filters.blockedUsers.includes(p.u)).filter(h => this.user.preferences.hideNSFW ? !p.isNSFW : true)
+    },
+    displayedSaves(){
+      return Array.from(new Set(this.saves)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => !this.user.preferences.filters.blockedUsers.includes(p.u)).filter(h => this.user.preferences.hideNSFW ? !p.isNSFW : true)
     },
     displayedHuddles(){
       return this.publicHuddles.slice(0,8)

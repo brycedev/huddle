@@ -118,9 +118,11 @@ export default {
     },
     eligibleRandomSlugs(){
       if(['HuddlePublic', 'HuddlePrivate'].includes(this.$route.name)){
-        return this.huddles.filter(h => h.slug !== this.$route.params.slug && h.type == 'public' && h.isApproved)
+        return this.huddles.filter(h => h.slug !== this.$route.params.slug && h.type == 'public' && h.isApproved).filter(h => this.user.preferences.hideNSFW ? !h.isNSFW : true)
       }
-      return this.huddles.filter(h => h.type == 'public' && h.isApproved)
+      return this.user && this.user.preferences
+        ? this.huddles.filter(h => h.type == 'public' && h.isApproved).filter(h => this.user.preferences.hideNSFW ? !h.isNSFW : true)
+        : this.huddles.filter(h => h.type == 'public' && h.isApproved)
     }
   },
   created(){

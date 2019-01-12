@@ -74,7 +74,7 @@ export default {
       meta: [
         {
           'property': 'og:title',
-          'content': `Discover Huddles on Huddle!`,
+          'content': `Discover public communities on Huddle!`,
         }
       ]
     }
@@ -82,10 +82,10 @@ export default {
   components: { HuddleEntry, ProposedEntry, ProposedVote  },
   computed: {
     publicHuddles(){
-      return this.huddles.filter(h => h.isApproved && h.type == 'public')
+      return this.huddles.filter(h => h.isApproved && h.type == 'public').filter(h => this.user.preferences.hideNSFW ? !h.isNSFW : true)
     },
     proposedHuddles(){
-      return this.huddles.filter(h => h.isProposed).slice(0,3)
+      return this.huddles.filter(h => h.isProposed).slice(0,3).filter(h => this.user.preferences.hideNSFW ? !h.isNSFW : true)
     },
     showProposedVote(){
       return this.$route.name == ('ProposedVote') && this.expanded !== null

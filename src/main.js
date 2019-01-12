@@ -15,8 +15,8 @@ import portal from 'portal-vue'
 import tooltip from 'v-tooltip'
 
 Vue.config.productionTip = false
-// Vue.use(gun, { peers: [isDev ? 'http://localhost:8765/gun' : 'https://friend.huddle.group/gun'] })
-Vue.use(gun)
+Vue.use(gun, { peers: [isDev ? 'http://localhost:8765/gun' : 'https://friend.huddle.group/gun'] })
+// Vue.use(gun)
 Vue.use(meta)
 Vue.use(portal)
 Vue.use(stash)
