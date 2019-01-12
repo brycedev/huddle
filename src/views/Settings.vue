@@ -86,7 +86,7 @@ export default {
         const thisUser = this.$gun.get(`${gunPrefix}:users/${this.user.id}`).put({ id: this.user.id, bi: this.user.bi, username: this.newSettings.username, avatar: this.user.avatar, public: true })
         this.$gun.get(`${gunPrefix}:users`).set(thisUser)
         const data = blockstack.loadUserData()
-        data.huddlerUsername = this.newSettings.username
+        data.huddleUsername = this.newSettings.username
         await this.$parent.putUser(data)
         this.isChangingUsername = false
       } else {
