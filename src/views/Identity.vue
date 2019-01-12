@@ -69,7 +69,7 @@
             
           </div>
           <div class="w-full" v-if="saves.length && feed == 0">        
-            <router-link :to="`/h/${huddles.find(h => h.id == post.huddle).slug}/post/${post.id}`" v-for="post in saves" class="block md:mx-0 mx-2 no-underline" :key="post.id">
+            <router-link :to="`/h/${huddles.find(h => h.id == post.huddle).slug}/post/${post.id}`" v-for="post in displayedSaves" class="block md:mx-0 mx-2 no-underline" :key="post.id">
             <huddle-post :loaded="true" :post="post"></huddle-post>
           </router-link>
           </div>
@@ -121,6 +121,7 @@ export default {
   beforeRouteEnter (to, from, next) {
     next(vm => {
       vm.identity = vm.users.find(h => h.username == to.params.username)
+      if(vm.user.preferences.filters.blockedUsers.includes(vm.identity.id)) next(false)
       if(to.name.includes('ExpandedHuddlePost')){
         setTimeout(() => {
           vm.expandedPost = vm.posts.find(p => p.id == to.params.postId)
@@ -153,6 +154,9 @@ export default {
     },
     displayedPosts(){
       return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    },
+    displayedSaves(){
+      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => !this.user.preferences.filters.blockedUsers.includes(p.u))
     },
     displayedHuddles(){
       return this.huddles.filter(h => this.personHuddles.includes(h.id))

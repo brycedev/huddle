@@ -135,7 +135,7 @@ export default {
   },
   computed: {
     displayedPosts(){
-      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => !this.user.preferences.filters.blockedUsers.includes(p.u))
     },
     displayedHuddles(){
       return this.publicHuddles.slice(0,8)

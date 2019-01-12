@@ -167,7 +167,7 @@ export default {
   },
   computed: {
     displayedPosts(){
-      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => !this.user.preferences.filters.blockedUsers.includes(p.u))
     },
     bgColor(){
       return { 
@@ -196,7 +196,9 @@ export default {
         : false
     },
     members(){
-      return this.users.filter(u => this.memberIds.includes(u.id))
+      return this.user 
+        ? this.users.filter(u => this.memberIds.includes(u.id)).filter(u => !this.user.preferences.filters.blockedUsers.includes(u.id))
+        : []
     },
     showCreatePost(){
       return this.$route.name.includes('CreatePost')

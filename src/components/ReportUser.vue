@@ -39,9 +39,8 @@
 
 <script>
   export default {
-    prop: ['identity'],
     name: 'ReportUser',
-    props: ['visible'],
+    props: ['identity', 'visible'],
     store: ['bus', 'user', 'users'],
     data() {
       return {
