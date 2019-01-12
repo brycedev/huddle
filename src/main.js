@@ -1,6 +1,6 @@
 require('setimmediate')
 const isDev = process.env.NODE_ENV == 'development'
-const dbPrefix = 'oapeiawoe'
+const dbPrefix = 'oapeiawojowjegowoije'
 
 import Vue from 'vue'
 import App from './App.vue'

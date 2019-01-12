@@ -1,6 +1,6 @@
 <template>
   <div class="home w-full relative flex-grow" v-if="identity">
-    <div class="w-full bg-black relative" :style="bgImage" :class="{ 'centercenter' : bgImage !== {}, 'canvas' : bgImage == {}}">
+    <div class="w-full bg-black relative" :style="bgImage" :class="{ 'centercenter' : bgImage !== false, 'canvas bg-black' : bgImage == false}">
       <div class="overlay absolute pin z-auto" :style="bgColor"></div>
       <div class="container flex justify-center items-center">
         <div class="flex justify-center items-center flex-col py-20 my-12">
@@ -171,7 +171,7 @@ export default {
         ? this.profile.background !== ''
           ? { backgroundImage: `url('${this.profile.background}')` } 
           : { } 
-        : { }
+        : false
     },
     showExpandedPost(){
       return this.$route.name.includes('ExpandedHuddlePost') && this.expandedPost !== null
