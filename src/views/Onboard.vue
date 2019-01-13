@@ -135,10 +135,13 @@ export default {
       if(!this.$route.query.authResponse){
         if(blockstack.isUserSignedIn()){
           const data = blockstack.loadUserData()
+          data.bi = data.username ? data.username : false
           await this.$parent.putUser(data)
           this.bus.$emit('instantiated')
+          this.$router.push(!['', '/welcome'].includes(window.entryRoute) ? window.entryRoute : '/')
+        } else {
+          this.$router.push(!['', '/welcome'].includes(window.entryRoute) ? window.entryRoute : '/')
         }
-        this.$router.push(!['', '/welcome'].includes(window.entryRoute) ? window.entryRoute : '/')
       }
       if (blockstack.isSignInPending()) {
         blockstack.handlePendingSignIn().then(async userData => {

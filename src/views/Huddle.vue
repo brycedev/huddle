@@ -205,7 +205,7 @@ export default {
   },
   methods: {
     checkMembership(){
-      return this.huddle && this.user 
+      return this.huddle && this.user && this.user.publicHuddles && this.user.privateHuddles
         ? this.isPublic && this.user.publicHuddles && this.user.privateHuddles
           ? this.user.publicHuddles.includes(this.huddle.id)
           : this.user.privateHuddles.map(h => h.id).includes(this.huddle.id)
@@ -260,7 +260,6 @@ export default {
       }
     },
     fetchStuff(){
-      this.$parent.loadGaia()
       this.fetchMembers()
       this.fetchPosts()
     }
@@ -270,7 +269,6 @@ export default {
   },
   watch: {
     $route(value){
-      this.$parent.loadGaia()
       this.fetchMembers()
       this.isMember = this.checkMembership()
     },

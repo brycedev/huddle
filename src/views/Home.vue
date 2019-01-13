@@ -211,6 +211,9 @@ export default {
     $route(){
       this.fetchStuff()
     },
+    user(){
+      this.fetchStuff()
+    },
     postFragments(value){
       if(value && this.users){
         let posts = []

@@ -118,7 +118,7 @@ export default {
     },
     eligibleRandomSlugs(){
       if(['HuddlePublic', 'HuddlePrivate'].includes(this.$route.name)){
-        return this.user 
+        return this.user && this.user.preferences
           ? this.huddles.filter(h => h.slug !== this.$route.params.slug && h.type == 'public' && h.isApproved).filter(h => this.user.preferences.hideNSFW ? !h.isNSFW : true)
           : this.huddles.filter(h => h.slug !== this.$route.params.slug && h.type == 'public' && h.isApproved)
       }
@@ -160,37 +160,43 @@ export default {
         this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
         const exist = this.users.find(u => u.id === this.user.id)
         exist ? this.user.username = exist.username : this.user.username = data.huddleUsername
-        if(exist) this.loadGaia()
+        if(exist) await this.loadGaia()
         resolve()
       })
     },
     loadGaia(){
-      if(this.user && typeof(this.user.id) !== 'undefined' && this.user.preferences){
-        return new Promise(async(resolve, reject) => {
-          if(!this.user) resolve()
-          // user exists, load their gaia storage
-          this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
-          if(this.user.preferences && this.user.preferences.isPublic){
-            this.user.username = this.user.preferences.username
-            this.user.publicHuddles = JSON.parse(await blockstack.getFile('publicHuddles.json', { decrypt: false }))
-            this.user.publicPosts = JSON.parse(await blockstack.getFile('publicPosts.json', { decrypt: false }))
-            this.user.publicComments = JSON.parse(await blockstack.getFile('publicComments.json', { decrypt: false }))
-            this.user.publicLibrary = JSON.parse(await blockstack.getFile('publicLibrary.json', { decrypt: false }))
-          }
-          const tempHuddles = []
-          const privHuddles = JSON.parse(await blockstack.getFile('privateHuddles.json', { decrypt: true }))
-          privHuddles.forEach(h => {
-            blockstack.getFile(`privateHuddles/${h}.json`, { decrypt: true })
-            .then(file => {
-              tempHuddles.push(JSON.parse(file))
+      if(this.user && typeof(this.user.id) !== 'undefined'){
+        const exist = this.users.find(u => u.id === this.user.id)
+        if(exist){
+          return new Promise(async(resolve, reject) => {
+            if(!this.user) resolve()
+            console.log('loading gaia :', exist.username)
+            // user exists, load their gaia storage
+            this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
+            if(this.user.preferences && this.user.preferences.isPublic){
+              this.user.username = this.user.preferences.username
+              this.user.publicHuddles = JSON.parse(await blockstack.getFile('publicHuddles.json', { decrypt: false }))
+              this.user.publicPosts = JSON.parse(await blockstack.getFile('publicPosts.json', { decrypt: false }))
+              this.user.publicComments = JSON.parse(await blockstack.getFile('publicComments.json', { decrypt: false }))
+              this.user.publicLibrary = JSON.parse(await blockstack.getFile('publicLibrary.json', { decrypt: false }))
+            }
+            const tempHuddles = []
+            const privHuddles = JSON.parse(await blockstack.getFile('privateHuddles.json', { decrypt: true }))
+            privHuddles.forEach(h => {
+              blockstack.getFile(`privateHuddles/${h}.json`, { decrypt: true })
+              .then(file => {
+                tempHuddles.push(JSON.parse(file))
+              })
             })
+            this.user.privateHuddles = tempHuddles
+            this.user.privatePosts = JSON.parse(await blockstack.getFile('privatePosts.json', { decrypt: true }))
+            this.user.privateComments = JSON.parse(await blockstack.getFile('privateComments.json', { decrypt: true }))
+            this.user.privateLibrary = JSON.parse(await blockstack.getFile('privateLibrary.json', { decrypt: true }))
+            resolve()
           })
-          this.user.privateHuddles = tempHuddles
-          this.user.privatePosts = JSON.parse(await blockstack.getFile('privatePosts.json', { decrypt: true }))
-          this.user.privateComments = JSON.parse(await blockstack.getFile('privateComments.json', { decrypt: true }))
-          this.user.privateLibrary = JSON.parse(await blockstack.getFile('privateLibrary.json', { decrypt: true }))
-          resolve()
-        })
+        } else {
+          return false
+        }
       } else {
         return false
       }
