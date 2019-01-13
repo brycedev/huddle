@@ -147,6 +147,7 @@ export default {
       this.$gun.get(`${gunPrefix}:users`).map().on((node, key) => {
         this.users.push(node)
         this.users = Array.from(new Set(this.users))
+        console.log(node)
       })
     },
     logout () {
