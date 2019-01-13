@@ -143,7 +143,8 @@ export default {
       if (blockstack.isSignInPending()) {
         blockstack.handlePendingSignIn().then(async userData => {
           this.userData = userData
-          this.userData.bi = userData.username
+          this.userData.bi = userData.username ? userData.username : false
+          this.userData.huddleUsername = this.userData.profile.name.replace(' ', '')
           const hasFile = true
           let getFile
           try {
@@ -160,7 +161,6 @@ export default {
               this.$router.push(!['', '/welcome'].includes(window.entryRoute) ? window.entryRoute : '/')
             } else {
               // seeding/testing - restore state
-              this.userData.huddleUsername = this.userData.bi
               const cleanArray = JSON.stringify([])
               await blockstack.putFile('preferences.json', JSON.stringify({}), { encrypt : true })
               await blockstack.putFile('privateHuddles.json', cleanArray, { encrypt : true })
@@ -176,7 +176,6 @@ export default {
               this.checkingUser = false
             }
           } else {
-            this.userData.huddleUsername = this.userData.bi
             await this.$parent.putUser(this.userData)
             this.$router.push('/welcome')
             this.checkingUser = false
@@ -195,15 +194,19 @@ export default {
       else return 'bg-transparent text-grey-darker'
     },
     async createProfile(){
-      this.isCreating = true
-      setTimeout(async() => {
-        this.userData.username = this.username
-        await this.setUser(this.userData, this.participate)
-        await this.$parent.loadGaia()
-        await this.$parent.putUser(this.userData)
-        this.$router.push('/')
-        this.isCreating = false
-      }, 2000)
+      if(this.username !== ''){
+        this.isCreating = true
+        setTimeout(async() => {
+          this.userData.username = this.username
+          await this.setUser(this.userData, this.participate)
+          await this.$parent.loadGaia()
+          await this.$parent.putUser(this.userData)
+          this.$router.push('/')
+          this.isCreating = false
+        }, 2000)
+      } else {
+        // username validation
+      }
     }
   },
   mounted(){

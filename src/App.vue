@@ -5,10 +5,10 @@
       <div class="container px-6 sm:px-0">
         <div class="flex justify-between items-center py-3 px-2">
          <div class="w-1/3">
-          <router-link class="sm:block no-underline hidden" to="/">
+          <router-link class="sm:table no-underline hidden" to="/">
             <img src="../src/assets/logo.svg" alt="Huddle logo" width="120">
           </router-link>
-          <router-link class="sm:hidden block no-underline" to="/">
+          <router-link class="sm:hidden table no-underline" to="/">
             <img src="../src/assets/logomark-white.png" alt="Huddle logo" width="35">
           </router-link>
          </div>
@@ -155,17 +155,17 @@ export default {
     putUser(data){
       return new Promise(async (resolve, reject) => {
         if(!this.user) this.user = new blockstack.Person(data.profile)
-        this.user.bi = data.username
+        this.user.bi = data.bi
         this.user.id = data.identityAddress
         this.user.avatar = this.user.avatarUrl() ? this.user.avatarUrl() : 'https://placehold.it/300x300'
         const exist = this.users.find(u => u.id === this.user.id)
-        exist ? this.user.username = exist.username : data.username
-        await this.loadGaia()
+        exist ? this.user.username = exist.username : this.user.username = data.huddleUsername
+        if(exist) this.loadGaia()
         resolve()
       })
     },
     loadGaia(){
-      if(this.user && typeof(this.user.id) !== 'undefined'){
+      if(this.user && typeof(this.user.id) !== 'undefined' && this.user.preferences){
         return new Promise(async(resolve, reject) => {
           if(!this.user) resolve()
           // user exists, load their gaia storage
@@ -212,12 +212,9 @@ export default {
     }
   },
   watch: {
-    $route(){
+    $route(value){
       if(this.showDropdown) this.showDropdown = false
-      if(this.user) this.loadGaia()
-    },
-    user(value){
-      if(value) this.loadGaia()
+      if(this.user && value.name !== 'Onboard') this.loadGaia()
     }
   }
 }
