@@ -274,7 +274,9 @@ export default {
       if(value && this.users){
         let posts = []
         value.forEach(async f => {
+          console.log(f)
           const user = this.users.find(u => u.id == f.u)
+          console.log(user)
           if(f.u == this.user.id && this.user){
             posts.push(this.user.publicPosts.find(p => p.id == f.id))
           } else {
