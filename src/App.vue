@@ -140,9 +140,6 @@ export default {
       this.showDropdown = !this.showDropdown
     },
     instantiateGun(){
-      this.$gun.get(`${gunPrefix}:huddles`).once(async v => {
-        if(typeof(v) == 'undefined') await this.seedData()
-      })
       this.$gun.get(`${gunPrefix}:huddles`).map().on((node, key) => {
         this.huddles.push(node)
         this.huddles = Array.from(new Set(this.huddles))
@@ -150,12 +147,6 @@ export default {
       this.$gun.get(`${gunPrefix}:users`).map().on((node, key) => {
         this.users.push(node)
         this.users = Array.from(new Set(this.users))
-      })
-    },
-    async seedData(){
-      (await seedDatabase()).forEach(h => {
-        const newHuddle = this.$gun.get(`${gunPrefix}:huddles/${h.id}`).put(h)
-        this.$gun.get(`${gunPrefix}:huddles`).set(newHuddle)
       })
     },
     logout () {

@@ -52,8 +52,8 @@
         <div class="w-120 mt-8 md:block hidden md:mr-4">
           <div class="rounded-lg shadow p-6 bg-white w-full mb-4" v-if="myHuddles">
             <p class="text-black font-light mb-4">Your Huddles</p>
-            <div class="flex flex-col">
-              <router-link :to="huddle.type == 'public' ? '/h/' + huddle.slug : '/p/' + huddle.id" v-for="huddle in myHuddles" :key="huddle.id"  class="block w-full block no-underline" v-if="myHuddles.length">
+            <div class="flex flex-col" v-if="myHuddles.length">
+              <router-link :to="huddle.type == 'public' ? '/h/' + huddle.slug : '/p/' + huddle.id" v-for="huddle in myHuddles" :key="huddle.id"  class="block w-full block no-underline" >
                 <huddle-entry class="mb-4" :huddle="huddle" :full="false"></huddle-entry>
               </router-link>
               <p class="text-grey-dark text-center pt-6 pb-2 leading-normal" v-if="!myHuddles.length">Go join a Huddle!</p>
@@ -64,14 +64,14 @@
           <div class="w-full self-center text-black text-center py-2 px-4 flex justify-center items-center mb-2 h-12">
             <div class="sm:flex-grow hidden sm:flex">
               <div class="flex">
-                <div class="flex -mb-px mr-6">
+                <!-- <div class="flex -mb-px mr-6">
                   <p class="no-underline flex items-center text-white hover:opacity-100 opacity-75" :class="{ 'opacity-100' : feed == 0 }" @click="feed = 0">
                    <img src="../assets/save-white.svg" alt="" width="16"><span class="ml-2 text-sm cursor-pointer">My Library</span>
                   </p>
-                </div>
+                </div> -->
                 <div class="flex -mb-px">
                   <p class="no-underline flex items-center text-white hover:opacity-100 opacity-75" :class="{ 'opacity-100' : feed == 1 }" @click="feed = 1">
-                   <img src="../assets/hourglass.svg" alt="" width="10"><span class="ml-2 text-sm cursor-pointer">My Timeline</span>
+                   <img src="../assets/hourglass.svg" alt="" width="10"><span class="ml-2 text-sm cursor-pointer">My Feed</span>
                   </p>
                 </div>
               </div>
