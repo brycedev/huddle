@@ -20,8 +20,8 @@
           </div>
           <div class="rounded-lg shadow p-6 bg-white w-full mb-4">
             <p class="text-black font-light mb-4">Huddles</p>
-            <div class="flex flex-col">
-             <router-link :to="'/h/' + huddle.slug" v-for="huddle in displayedHuddles" :key="huddle.id"  class="block w-full block no-underline" v-if="displayedHuddles.length">
+            <div class="flex flex-col" v-if="displayedHuddles.length">
+             <router-link :to="'/h/' + huddle.slug" v-for="huddle in displayedHuddles" :key="huddle.id"  class="block w-full block no-underline" >
                 <huddle-entry class="mb-4" :huddle="huddle" :full="false"></huddle-entry>
               </router-link>
               <p class="text-grey-dark py-2 leading-normal" v-if="!displayedHuddles.length">This user doesn't belong to any huddles, yet.</p>
@@ -170,7 +170,7 @@ export default {
       return this.profile 
         ? this.profile.background !== ''
           ? { backgroundImage: `url('${this.profile.background}')` } 
-          : { } 
+          : false
         : false
     },
     showExpandedPost(){
@@ -178,9 +178,6 @@ export default {
     }
   },
   methods: {
-    blockUser(){
-
-    },
     fetchHuddles(){
       if(this.identity){
         this.postFragments = []
