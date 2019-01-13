@@ -56,7 +56,7 @@
           <div class="flex flex-col w-full mt-8" v-if="comments.length">
             <div class="w-full flex flex-col mb-6 opacity-90" v-for="comment in sortedComments" :key="comment.id">
               <div class="flex items-center mb-2">
-                <img class="w-5 h-5 rounded-full mr-2" :src="comment.avatar"/>
+                <img class="w-8 h-8 rounded-full mr-2" :src="comment.avatar"/>
                 <div class="flex flex-col">
                   <h3 class="font-normal text-grey-darkest text-sm tracking-wide mb-1">{{ comment.username.replace('.id.blockstack','') }}</h3>
                   <p class="text-grey-darkest font-light text-xs tracking-wide">{{ new Date(comment.createdAt).toLocaleTimeString() }}</p>

@@ -55,6 +55,10 @@ export default new Router({
       component: Huddle,
       children: [
         { 
+          path: 'join',
+          name: 'JoinHuddle'
+        },
+        { 
           path: 'new',
           name: 'CreatePostPublic'
         },

@@ -48,10 +48,12 @@
               <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
               <span>Request Invite</span>
             </div>
-            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" v-if="isPublic" @click="joinHuddle">
-              <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
-              <span>Join Huddle</span>
-            </div>
+            <router-link :to="`${$route.fullPath}/join`" class="block no-underline self-end " v-if="isPublic">
+              <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" >
+                <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
+                <span>Join Huddle</span>
+              </div>
+            </router-link>
           </div>
           <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in displayedPosts" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="isMember">
             <huddle-post :loaded="true" :post="post"></huddle-post>
@@ -92,7 +94,8 @@ export default {
       expandedPost: null,
       memberIds: [],
       posts: [],
-      postFragments: []
+      postFragments: [],
+      isMember: false,
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -154,6 +157,14 @@ export default {
     } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && from.name.includes('ExpandedHuddlePost')){
       this.expandedPost = null
       next()
+    } else if(to.name == 'JoinHuddle') {
+      next()
+      setTimeout(() => {
+        this.joinHuddle().then(() => {
+          this.$router.push(from.fullPath)
+          this.isMember = this.checkMembership()
+        })
+      }, 1200)
     } else {
       const isPublic = to.fullPath.includes('/h/')
       if(isPublic){
@@ -190,13 +201,6 @@ export default {
     isPrivate(){
       return this.huddle && this.huddle.type == 'private'
     },
-    isMember(){
-      return this.huddle && this.user 
-        ? this.isPublic && this.user.publicHuddles && this.user.privateHuddles
-          ? this.user.publicHuddles.includes(this.huddle.id)
-          : this.user.privateHuddles.map(h => h.id).includes(this.huddle.id)
-        : false
-    },
     members(){
       return this.user 
         ? this.users.filter(u => this.memberIds.includes(u.id)).filter(u => !this.user.preferences.filters.blockedUsers.includes(u.id))
@@ -210,6 +214,13 @@ export default {
     }
   },
   methods: {
+    checkMembership(){
+      return this.huddle && this.user 
+        ? this.isPublic && this.user.publicHuddles && this.user.privateHuddles
+          ? this.user.publicHuddles.includes(this.huddle.id)
+          : this.user.privateHuddles.map(h => h.id).includes(this.huddle.id)
+        : false
+    },
     async leaveHuddle(){
       this.user.publicHuddles = this.user.publicHuddles.filter(s => s !== this.huddle.id)
       const newPublicHuddles = JSON.stringify(this.user.publicHuddles)
@@ -219,16 +230,21 @@ export default {
       this.$router.push('/')
     },
     async joinHuddle(){
-      if(this.isPublic && this.user){
-        progress.start()
-        const newMember = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').set({ id: this.user.id })
-        this.user.publicHuddles.push(this.huddle.id)
-        const newPublicHuddles = JSON.stringify(this.user.publicHuddles)
-        await blockstack.putFile('publicHuddles.json', newPublicHuddles, { encrypt : false })
-        const data = blockstack.loadUserData()
-        await this.$parent.putUser(data)
-        progress.done()
-      }
+      return new Promise(async (resolve, reject) => {
+        if(this.isPublic && this.user){
+          progress.start()
+          const newMember = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('members').set({ id: this.user.id })
+          this.user.publicHuddles.push(this.huddle.id)
+          const newPublicHuddles = JSON.stringify(this.user.publicHuddles)
+          await blockstack.putFile('publicHuddles.json', newPublicHuddles, { encrypt : false })
+          const data = blockstack.loadUserData()
+          await this.$parent.putUser(data)
+          progress.done()
+          resolve()
+        } else {
+          resolve()
+        }
+      })
     },
     fetchMembers(){
       if(this.isPublic && this.user){
@@ -265,10 +281,17 @@ export default {
     $route(value){
       this.$parent.loadGaia()
       this.fetchMembers()
+      this.isMember = this.checkMembership()
     },
     huddle(newValue, oldValue) {
       this.fetchMembers()
       this.fetchPosts()
+      this.isMember = this.checkMembership()
+    },
+    isMember(value){
+      if(value){
+        this.fetchStuff()
+      }
     },
     postFragments(value){
       if(value && this.users){
