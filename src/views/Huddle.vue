@@ -274,13 +274,14 @@ export default {
       if(value && this.users){
         let posts = []
         value.forEach(async f => {
+          const user = this.users.find(u => u.id == f.u)
           if(f.u == this.user.id && this.user){
             posts.push(this.user.publicPosts.find(p => p.id == f.id))
           } else {
             blockstack.getFile(`publicPosts/${f.id}.json`, {
               decrypt: false,
               app: window.location.origin,
-              username: this.users.find(u => u.id == f.u).bi
+              username: user.bi
             }).then(post => {
               posts.push(JSON.parse(post))
             }).catch(err => {
@@ -294,7 +295,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-
-</style>
