@@ -165,7 +165,7 @@ export default {
       })
     },
     loadGaia(){
-      if(this.user && typeof(this.user.preferences) !== 'undefined'){
+      if(this.user && typeof(this.user.id) !== 'undefined'){
         return new Promise(async(resolve, reject) => {
           if(!this.user) resolve()
           // user exists, load their gaia storage
