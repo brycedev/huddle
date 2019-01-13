@@ -1,13 +1,17 @@
 require('setimmediate')
 const isDev = process.env.NODE_ENV == 'development'
-const dbPrefix = 'test123'
+const dbPrefix = isDev ? 'aweguapeiwoyaoipweuyaopiwh' : 'test123'
 
 import Vue from 'vue'
 import App from './App.vue'
 import gun from 'vue-gun'
 
 require('gun')
-require('gun/lib/unset.js')
+require('gun/lib/unset')
+require('gun/lib/radix')
+require('gun/lib/radisk')
+require('gun/lib/store')
+require('gun/lib/rindexed')
 import router from './router'
 import stash from 'vue-stash'
 import meta from 'vue-meta'
@@ -15,8 +19,10 @@ import portal from 'portal-vue'
 import tooltip from 'v-tooltip'
 
 Vue.config.productionTip = false
-Vue.use(gun, { peers: isDev ? ['http://localhost:8765/gun'] : ['https://friend.huddle.group/gun']})
-// Vue.use(gun)
+Vue.use(gun, { 
+  peers: isDev ? 'http://localhost:8765/gun' : 'https://friend.huddle.group/gun',
+  store: RindexedDB({})
+})
 Vue.use(meta)
 Vue.use(portal)
 Vue.use(stash)

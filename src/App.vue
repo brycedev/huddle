@@ -147,7 +147,6 @@ export default {
       this.$gun.get(`${gunPrefix}:users`).map().on((node, key) => {
         this.users.push(node)
         this.users = Array.from(new Set(this.users))
-        console.log(node)
       })
     },
     logout () {
@@ -169,7 +168,6 @@ export default {
       if(this.user){
         return new Promise(async(resolve, reject) => {
           if(!this.user) resolve()
-          if(this.isDev) console.log('loading user gaia storage: ', this.user.username)
           // user exists, load their gaia storage
           this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
           if(this.user.preferences && this.user.preferences.isPublic){

@@ -69,7 +69,6 @@
       </div>
       <img src="../assets/close.svg" alt="" class="cursor-pointer w-6 h-6 ml-4 hidden md:block" @click="close">
     </div>
-    
   </div>
 </template>
 
@@ -142,9 +141,10 @@
     },
     methods: {
       isSaved(){
-        if(this.user.publicLibrary.filter(s => s.p == this.post.id).length)
-          return true 
-        return false
+        return this.hasSaved ? this.hasSaved.v : false
+      },
+      hasSaved(){
+        return this.user.publicLibrary.find(s => s.p == this.post.id && s.h == this.post.huddle)
       },
       shareOnTwitter(){
         let shareURL = "https://twitter.com/share?"
@@ -164,24 +164,32 @@
         this.thoughtPromise.cancel()
       },
       async saveToLibrary(){
-        if(!this.isSaved()){
+        if(!this.saved){
+          // post is not currently saved
           this.saved = true
-          const save = { u: this.user.id, p: this.post.id, h: this.post.huddle }
-          this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').set(save)
-          this.user.publicLibrary.push({ p: save.p, h: save.h })
-          await blockstack.putFile('publicLibrary.json', JSON.stringify(Array.from(new Set(this.user.publicLibrary))), { encrypt : false })
+          if(!this.hasSaved()){
+            // post has never been saved before
+            const save = { id: uuid('save'), u: this.user.id, p: this.post.id, h: this.post.huddle, v: true }
+            const newSave = this.$gun.get(`${gunPrefix}:saves/${save.id}`).put(save)
+            this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').set(newSave)
+            this.user.publicLibrary.push({ id: save.id, p: save.p, h: save.h, v: true })
+            await blockstack.putFile('publicLibrary.json', JSON.stringify(this.user.publicLibrary), { encrypt : false })
+          } else {
+            // post has been saved before
+            let library = this.user.publicLibrary
+            library.forEach(s => { if(s.id == this.hasSaved().id) s.v = true })
+            this.$gun.get(`${gunPrefix}:saves/${this.hasSaved().id}`).put({ v: true })
+            await blockstack.putFile('publicLibrary.json', JSON.stringify(library), { encrypt : false })
+          }
           await this.$parent.loadGaia()
         } else {
-          // user has already saved to library
-          const save = this.user.publicLibrary.find(s => s.p == this.post.id)
-          if(save){
-            this.saved = false
-            save.u = this.user.id
-            this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').unset(save)
-            this.user.publicLibrary = this.user.publicLibrary.filter(s => s.p !== this.post.id)
-            await blockstack.putFile('publicLibrary.json', JSON.stringify(this.user.publicLibrary), { encrypt : false })
-            await this.$parent.loadGaia()
-          }
+          // post is currently saved, so unsave it
+          this.saved = false
+          let library = this.user.publicLibrary
+          library.forEach(s => { if(s.id == this.hasSaved().id) s.v = false })
+          const save = this.$gun.get(`${gunPrefix}:saves/${this.hasSaved().id}`).put({ v: false })
+          await blockstack.putFile('publicLibrary.json', JSON.stringify(library), { encrypt : false })
+          await this.$parent.loadGaia()
         }
       },
       clickPost(){

@@ -48,12 +48,10 @@
               <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
               <span>Request Invite</span>
             </div>
-            <router-link :to="`${$route.fullPath}/join`" class="block no-underline self-end " v-if="isPublic">
-              <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" >
-                <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
-                <span>Join Huddle</span>
-              </div>
-            </router-link>
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" @click="joinHuddle">
+              <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
+              <span>Join Huddle</span>
+            </div>
           </div>
           <router-link :to="`${$route.fullPath}/post/${post.id}`" v-for="post in displayedPosts" class="block md:mx-0 mx-2 no-underline" :key="post.id" v-if="isMember">
             <huddle-post :loaded="true" :post="post"></huddle-post>
@@ -157,14 +155,6 @@ export default {
     } else if(['HuddlePublic', 'HuddlePrivate'].includes(to.name) && from.name.includes('ExpandedHuddlePost')){
       this.expandedPost = null
       next()
-    } else if(to.name == 'JoinHuddle') {
-      next()
-      setTimeout(() => {
-        this.joinHuddle().then(() => {
-          this.$router.push(from.fullPath)
-          this.isMember = this.checkMembership()
-        })
-      }, 1200)
     } else {
       const isPublic = to.fullPath.includes('/h/')
       if(isPublic){
@@ -240,6 +230,7 @@ export default {
           const data = blockstack.loadUserData()
           await this.$parent.putUser(data)
           progress.done()
+          this.isMember = this.checkMembership()
           resolve()
         } else {
           resolve()

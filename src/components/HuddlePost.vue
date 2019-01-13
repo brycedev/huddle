@@ -56,7 +56,7 @@ export default {
     fetchSaves(){
       this.$gun.get(`${gunPrefix}:posts/${this.post.id}`).get('saves').map().on(save => {
         this.saves.push(save)
-        this.saves = Array.from(new Set(this.saves.filter(s => s !== null)))
+        this.saves = Array.from(new Set(this.saves.filter(s => s.v == true)))
       })
     }
   },
