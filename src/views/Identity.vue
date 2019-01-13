@@ -156,7 +156,7 @@ export default {
       return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => this.user.preferences.hideNSFW ? !p.isNSFW : true)
     },
     displayedSaves(){
-      return Array.from(new Set(this.posts)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => !this.user.preferences.filters.blockedUsers.includes(p.u)).filter(p => this.user.preferences.hideNSFW ? !p.isNSFW : true)
+      return Array.from(new Set(this.saves)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).filter(p => !this.user.preferences.filters.blockedUsers.includes(p.u)).filter(p => this.user.preferences.hideNSFW ? !p.isNSFW : true)
     },
     displayedHuddles(){
       return this.huddles.filter(h => this.personHuddles.includes(h.id))
@@ -215,7 +215,7 @@ export default {
           username: this.users.find(u => u.id == this.identity.id).bi
         }).then(file => {
           const allLibrary = JSON.parse(file)
-          allLibrary.forEach(l => {
+          allLibrary.filter(s => s.v == true).forEach(l => {
             this.$gun.get(`${gunPrefix}:huddles/${l.h}`).get('posts').map().on(post => {
               if(post.id == l.p){
                 this.saveFragments.push(post)

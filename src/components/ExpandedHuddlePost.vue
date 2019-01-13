@@ -262,7 +262,7 @@
       post(value) {
         this.comment = ''
         this.saved = this.post && this.user 
-          ? this.user.publicLibrary.filter(s => s.p == this.post.id).length ? true : false
+          ? this.user.publicLibrary.filter(s => s.p == this.post.id && s.v == true).length ? true : false
           : false
       },
       commentFragments(value){
