@@ -98,7 +98,7 @@ export default {
     }
   },
   beforeRouteEnter (to, from, next) {
-    next(vm => {
+    next(async vm => {
       const isPublic = to.fullPath.includes('/h/')
       if(isPublic){
         vm.huddle = vm.huddles.find(h => h.slug == to.params.slug)
@@ -122,12 +122,9 @@ export default {
             }, 100)
           })
         }
-        findPost.then(post => {
-          vm.expandedPost = post
-          if(!vm.expandedPost) vm.$router.push(`/h/${to.params.slug}`)
-          else document.getElementById('body').style.overflowY = 'hidden'
-        })
-        
+        vm.expandedPost = await findPost()
+        if(!vm.expandedPost) vm.$router.push(`/h/${to.params.slug}`)
+        else document.getElementById('body').style.overflowY = 'hidden'
       } else if(to.name.includes('CreatePost')){
         next(vm => {
           document.getElementById('body').style.overflowY = 'hidden'

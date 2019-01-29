@@ -183,7 +183,6 @@ export default {
             }
             const tempHuddles = []
             const privHuddles = JSON.parse(await blockstack.getFile('privateHuddles.json', { decrypt: true }))
-            console.log(privHuddles)
             privHuddles.forEach(h => {
               blockstack.getFile(`privateHuddles/${h}.json`, { decrypt: true })
               .then(file => {
