@@ -48,7 +48,7 @@
               <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
               <span>Request Invite</span>
             </div>
-            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" @click="joinHuddle">
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" @click="joinHuddle" v-if="isPublic">
               <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
               <span>Join Huddle</span>
             </div>
@@ -63,8 +63,9 @@
             <huddle-post :loaded="false" :post="{}" v-for="num in [1,2,3,4]" :key="num"></huddle-post>
           </template>
           <div class="rounded-lg shadow py-12 md:mx-0 mx-4 px-8 bg-white md:w-full flex flex-col items-center justify-center cursor-pointer" v-if="isMember && !displayedPosts.length">
-            <img class="px-8 w-96 mb-4" src="../assets/empty-post.svg" alt="Create an identity" width="100%">
-            <p class="text-grey-darker text-center md:font-thin md:text-xl font break" >No posts, yet. Start the conversation.</p>
+            <p class="mb-4 text-grey-darker text-center md:font-thin md:text-xl font break" >No posts, yet. Start the conversation.</p>
+            <img class="px-8 w-96" src="../assets/empty-post.svg" alt="Create an identity" width="100%">
+            
           </div>
         </div>
       </div>
@@ -97,12 +98,17 @@ export default {
     }
   },
   beforeRouteEnter (to, from, next) {
-    next(async vm => {
+    next(vm => {
       const isPublic = to.fullPath.includes('/h/')
       if(isPublic){
         vm.huddle = vm.huddles.find(h => h.slug == to.params.slug)
       } else {
-        vm.huddle = vm.user.privateHuddles.find(h => h.id === to.params.id)
+        if(vm.user){
+          vm.huddle = vm.user.privateHuddles.find(h => h.id == to.params.id)
+          if(!vm.huddle) next('/404')
+        } else{
+          next('/404')
+        }
       }
       if(to.name.includes('ExpandedHuddlePost')){
         let maxSearchTime = 12 // 12 * 100 = 1200 milliseconds == 1.2 seconds
@@ -116,9 +122,12 @@ export default {
             }, 100)
           })
         }
-        vm.expandedPost = await findPost()
-        if(!vm.expandedPost) vm.$router.push(`/h/${to.params.slug}`)
-        else document.getElementById('body').style.overflowY = 'hidden'
+        findPost.then(post => {
+          vm.expandedPost = post
+          if(!vm.expandedPost) vm.$router.push(`/h/${to.params.slug}`)
+          else document.getElementById('body').style.overflowY = 'hidden'
+        })
+        
       } else if(to.name.includes('CreatePost')){
         next(vm => {
           document.getElementById('body').style.overflowY = 'hidden'

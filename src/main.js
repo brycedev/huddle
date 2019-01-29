@@ -1,17 +1,20 @@
 require('setimmediate')
-const isDev = process.env.NODE_ENV == 'development'
-const dbPrefix = isDev ? 'aweguapeiwoyaoipweuyaopiwh' : 'test123'
+window.isDev = process.env.NODE_ENV == 'development'
+const dbPrefix = isDev ? 'awawekj.ke' : 'test123'
 
 import Vue from 'vue'
 import App from './App.vue'
 import gun from 'vue-gun'
 
+window.Vue = Vue
+window.jeffsum = require('jeffsum')
 require('gun')
 require('gun/lib/unset')
 require('gun/lib/radix')
 require('gun/lib/radisk')
 require('gun/lib/store')
 require('gun/lib/rindexed')
+require('gun/sea')
 import router from './router'
 import stash from 'vue-stash'
 import meta from 'vue-meta'

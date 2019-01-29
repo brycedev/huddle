@@ -21,6 +21,10 @@
               <div class="rounded-lg overlay absolute pin z-auto" :style="bgColor" v-if="!bgImage"></div>
             </div>
           </div>
+          <div class="w-full mb-6" v-if="bgImage">
+            <p class="text-black font-medium mb-6">Adjust your header hue.</p>
+            <input v-model="hue" type="range" max="359" class="w-full" v-tooltip.top="hue">
+          </div>
           <div class="w-full mb-6">
             <p class="text-black font-medium mb-6">Please enter a short description about yourself.</p>
             <textarea v-model="description" class="leading-loose h-32 block resize-none appearance-none text-grey-darker py-3 px-4 rounded-lg w-full bg-khak-grey outline-none text-normal mb-3" height="200"></textarea>
@@ -60,9 +64,9 @@ export default {
     bgColor(){
       return this.imageSrc == ''
         ? this.profile.background !== ''
-          ? {  backgroundColor: `hsla(${ this.profile.hue }, 35%, 27%, .64)` } 
+          ? {  backgroundColor: `hsla(${ this.hue }, 35%, 27%, .64)` } 
           : false
-        : {  backgroundColor: `hsla(${ this.profile.hue }, 35%, 27%, .64)` } 
+        : {  backgroundColor: `hsla(${ this.hue }, 35%, 27%, .64)` } 
     },
     bgImage(){
       return this.imageSrc == ''
@@ -90,7 +94,7 @@ export default {
     async updateProfile(){
       this.isUpdating = true
       const profile = {
-        hue: this.profile.hue !== this.hue ? this.hue : this.profile.hue,
+        hue: this.profile.hue !== parseInt(this.hue) ? parseInt(this.hue) : this.profile.hue,
         background: this.profile.background !== this.imageSrc ? this.imageSrc : this.profile.background,
         description: this.profile.description !== this.description ? this.description : this.profile.description
       }
@@ -107,14 +111,16 @@ export default {
         this.isChangingImage = false
       })
       FR.readAsDataURL(file)
+    },
+    async setData(){
+      this.profile = JSON.parse(await blockstack.getFile('profile.json', { decrypt: false }))
+      this.description = this.profile.description
+      this.imageSrc = this.profile.background
+      this.hue = this.profile.hue
     }
   },
   mounted(){
-    setTimeout(async () => {
-      this.profile = JSON.parse(await blockstack.getFile('profile.json', { decrypt: false }))
-      this.description = this.profile.description
-      this.background = this.profile.background
-    })
+    this.setData()
     let dragTimer
     let dropzone = document.getElementById('dropzone')
     ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {

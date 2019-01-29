@@ -56,14 +56,23 @@
 <script>
 export default {
   name: 'Onboard',
-  store: ['bus', 'isDev', 'user', 'users'],
+  store: ['bus', 'user', 'users'],
   data() {
     return {
       isCreating: false,
       participate: true,
       hideNSFW: true,
       username: '',
-      checkingUser: true
+      checkingUser: true,
+      newUser: false
+    }
+  },
+  beforeRouteLeave(to, from, next){
+    if(!this.newUser) {
+      next()
+    } else {
+      if(this.isCreating) next()
+      else next('/welcome')
     }
   },
   computed: {
@@ -85,7 +94,7 @@ export default {
         this.user.privateComments = []
         this.user.publicLibrary = []
         this.user.privateLibrary = []
-        console.log('instantiating user : ', this.user.username)
+        // console.log('instantiating user : ', this.user.username)
         // add user to the gundb instance
         let identity = {} 
         if(isPublic)
@@ -113,7 +122,7 @@ export default {
         const profile = { 
           description: '',
           hue: Math.floor(Math.random() * 357), 
-          background: this.isDev ? `https://picsum.photos/1280x720/?random=1` : ''
+          background: isDev ? `https://picsum.photos/1280x720/?random=1` : ''
         }
         const cleanArray = JSON.stringify([])
         await blockstack.putFile('preferences.json', JSON.stringify(this.user.preferences), { encrypt : true })
@@ -134,7 +143,7 @@ export default {
     async checkUser(){
       if(!this.$route.query.authResponse){
         if(blockstack.isUserSignedIn()){
-          const data = blockstack.loadUserData()
+          const data = blockstack.loadUserData()          
           data.bi = data.username ? data.username : false
           await this.$parent.putUser(data)
           this.bus.$emit('instantiated')
@@ -143,19 +152,20 @@ export default {
           this.$router.push(!['', '/welcome'].includes(window.entryRoute) ? window.entryRoute : '/')
         }
       }
-      if (blockstack.isSignInPending()) {
+      if(blockstack.isSignInPending()) {
         blockstack.handlePendingSignIn().then(async userData => {
           this.userData = userData
           this.userData.bi = userData.username ? userData.username : false
           this.userData.huddleUsername = this.userData.profile.name.replace(' ', '')
-          const hasFile = true
+          let hasFile = true
           let getFile
           try {
             getFile = await blockstack.getFile('preferences.json', { decrypt: true })
+            if(getFile === null) throw 'new user; blockstack null'
           } catch(err) {
             hasFile = false
           }
-          const file = JSON.parse(getFile)
+          const file = hasFile ? JSON.parse(getFile) : false
           if(file && file.isOnboarded && hasFile){
             if(this.users.find(u => u.id == userData.identityAddress)){ 
               this.userData.huddleUsername = file.username
@@ -179,12 +189,15 @@ export default {
               this.checkingUser = false
             }
           } else {
+            this.newUser = true
             await this.$parent.putUser(this.userData)
             this.$router.push('/welcome')
             this.checkingUser = false
           } 
         }).catch(err => {
+          console.log(err)
           // error trying to authenticate 
+          localStorage.clear()
         })
       }
     },
@@ -197,7 +210,7 @@ export default {
       else return 'bg-transparent text-grey-darker'
     },
     async createProfile(){
-      if(this.username !== ''){
+      if(this.username !== '' && !this.users.find(u => u.username == this.username)){
         this.isCreating = true
         setTimeout(async() => {
           this.userData.username = this.username

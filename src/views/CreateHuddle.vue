@@ -23,6 +23,9 @@
               <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForType('public')" @click="huddle.type = 'public'">
                 <p class="text-normal text-center">Public</p>
               </div>
+              <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForType('hybrid')" @click="huddle.type = 'hybrid'">
+                <p class="text-normal text-center">Hybrid</p>
+              </div>
               <div class="py-3 px-4 w-1/2 cursor-pointer subtle rounded-full" :class="styleForType('private')" @click="huddle.type = 'private'">
                 <p class="text-normal text-center">Private</p>
               </div>
@@ -106,30 +109,31 @@ export default {
         huddle.background = `https://picsum.photos/1920x1080/?random=${this.huddle.id}`
         huddle.createdAt = Date.now()
         huddle.updatedAt = Date.now()
-        if(this.huddle.type == 'public'){
-          huddle.slug = this.slugged
-          huddle.isProposed = true
-          huddle.isApproved = false
-        } else {
-          this.user.privateHuddles.push(huddle.id)
-          const newPrivateHuddle = JSON.stringify(huddle)
-          const newPrivateHuddles = JSON.stringify(this.user.privateHuddles)
-          await blockstack.putFile(`privateHuddles/${huddle.id}.json`, newPrivateHuddle, { encrypt : true })
-          await blockstack.putFile('privateHuddles.json', newPrivateHuddles, { encrypt : true })
-        }
         if(this.huddle.type !== 'private'){
+          huddle.slug = this.slugged
           const newHuddle = this.$gun.get(`${gunPrefix}:huddles/${huddle.id}`).put(huddle)
           this.$gun.get(`${gunPrefix}:huddles`).set(newHuddle)
         }
+        if(this.huddle.type == 'public'){
+          huddle.isProposed = true
+          huddle.isApproved = false
+        } else {
+          let privHuddles = this.user.privateHuddles.map(h => h.id)
+          privHuddles.push(huddle.id)
+          const newPrivateHuddle = JSON.stringify(huddle)
+          await blockstack.putFile(`privateHuddles/${huddle.id}.json`, newPrivateHuddle, { encrypt : true })
+          await blockstack.putFile('privateHuddles.json', JSON.stringify(privHuddles), { encrypt : true })
+        }
         if(this.huddle.type == 'public') this.$router.push(`/discover`)
-        else this.$router.push(`/p/${huddle.id}`)
+        if(this.huddle.type == 'hybrid') this.$router.push(`/h/${huddle.slug}`)
+        if(this.huddle.type == 'private') this.$router.push(`/p/${huddle.id}`)
       } else {
-        // can't submit
+        // submission error
       }
     }
   },
   mounted(){
-
+    this.huddle.description = jeffsum(3, 'sentences')
   },
   watch: {
     'huddle.type'(value){

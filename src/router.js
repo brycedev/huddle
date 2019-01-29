@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import About from './views/About.vue'
 import CreateHuddle from './views/CreateHuddle.vue'
 import Discover from './views/Discover.vue'
+import Admin from './views/Admin.vue'
 import Home from './views/Home.vue'
 import Huddle from './views/Huddle.vue'
 import EditProfile from './views/EditProfile.vue'
@@ -48,6 +49,11 @@ export default new Router({
       path: '/',
       name: 'Home',
       component: Home
+    },
+    {
+      path: '/pohjpqewo8gqwe9pnjqwcwp',
+      name: 'Admin',
+      component: Admin
     },
     {
       path: '/h/:slug',

@@ -1,7 +1,7 @@
 <template>
-  <div class="z-max fixed pin bg-smoke justify-center subtle" :class="open" @click.self="close">
+  <div class="z-max fixed pin bg-smoke justify-center subtle" :class="open" @click.self="close" id="dropper">
     <div class="flex justify-center mt-20">
-      <div class="rounded-lg shadow-lg p-6 px-8 bg-white w-full mb-4 max-w-smd relative">
+      <div class="rounded-lg shadow-lg p-6 px-8 bg-white w-full mb-4 max-w-smd relative" >
         <div class="w-full flex flex-col">
           <div class="flex w-full justify-between mb-6">
             <div class="flex flex-col flex-grow w-full">
@@ -71,7 +71,9 @@
         isGivingThought: false,
         thoughtPromise: null,
         timerInterval: null,
-        timer: 4
+        timer: 4,
+        imageSrc: '',
+        isDraggingImage: false
       }
     },
     computed: {
@@ -152,7 +154,39 @@
         this.close()
       },
       mounted(){
-        
+        let dragTimer
+        let dropzone = document.getElementById('dropper')
+        ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+          dropzone.addEventListener(eventName, e => {
+            e.preventDefault()
+            e.stopPropagation()
+          }, false)
+        })
+        dropzone.addEventListener('dragover', (e) => {
+          console.log(e)
+          let dt = e.dataTransfer
+          if (dt.types && (dt.types.indexOf ? dt.types.indexOf('Files') != -1 : dt.types.contains('Files'))) {
+            this.isDraggingImage = true
+            clearTimeout(dragTimer)
+          }
+        })
+        dropzone.addEventListener('dragleave', (e) => {
+          dragTimer = setTimeout(() => {
+            this.isDraggingImage = false
+          }, 25)
+        })
+        dropzone.addEventListener('drop', (e) => {
+          let dt = e.dataTransfer
+          let files = Array.from(dt.files)
+          this.isDraggingImage = false
+          const allowedTypes = ["image/gif", "image/jpeg", "image/png"]
+          const FR = new FileReader()
+          FR.addEventListener("load", e => {
+            this.imageSrc = e.target.result
+            console.log(this.imageSrc)
+          })
+          FR.readAsDataURL(files[0])
+        }, false)
       }
     },
     watch: {

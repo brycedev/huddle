@@ -84,7 +84,6 @@ export default {
         this.user.preferences.username = this.newSettings.username
         await blockstack.putFile('preferences.json', JSON.stringify(this.user.preferences), { encrypt : true })
         const thisUser = this.$gun.get(`${gunPrefix}:users/${this.user.id}`).put({ id: this.user.id, bi: this.user.bi, username: this.newSettings.username, avatar: this.user.avatar, public: true })
-        this.$gun.get(`${gunPrefix}:users`).set(thisUser)
         const data = blockstack.loadUserData()
         data.huddleUsername = this.newSettings.username
         await this.$parent.putUser(data)

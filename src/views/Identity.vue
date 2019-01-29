@@ -20,7 +20,7 @@
           </div>
           <div class="rounded-lg shadow p-6 bg-white w-full mb-4">
             <p class="text-black font-light mb-4">Huddles</p>
-            <div class="flex flex-col" v-if="displayedHuddles.length">
+            <div class="flex flex-col">
              <router-link :to="'/h/' + huddle.slug" v-for="huddle in displayedHuddles" :key="huddle.id"  class="block w-full block no-underline" >
                 <huddle-entry class="mb-4" :huddle="huddle" :full="false"></huddle-entry>
               </router-link>

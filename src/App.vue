@@ -103,7 +103,7 @@
 
 <script>
 export default {
-  store: ['bus', 'isDev', 'huddles', 'user', 'users'],
+  store: ['bus', 'huddles', 'user', 'users'],
   data() {
     return {
       scroll: 0,
@@ -137,7 +137,9 @@ export default {
   },
   methods: {
     toggleDropdown(){
-      this.showDropdown = !this.showDropdown
+      if(this.$route.name !== 'Onboard'){
+        this.showDropdown = !this.showDropdown
+      }
     },
     instantiateGun(){
       this.$gun.get(`${gunPrefix}:huddles`).map().on((node, key) => {
@@ -170,7 +172,6 @@ export default {
         if(exist){
           return new Promise(async(resolve, reject) => {
             if(!this.user) resolve()
-            console.log('loading gaia :', exist.username)
             // user exists, load their gaia storage
             this.user.preferences = JSON.parse(await blockstack.getFile('preferences.json', { decrypt: true }))
             if(this.user.preferences && this.user.preferences.isPublic){
@@ -182,6 +183,7 @@ export default {
             }
             const tempHuddles = []
             const privHuddles = JSON.parse(await blockstack.getFile('privateHuddles.json', { decrypt: true }))
+            console.log(privHuddles)
             privHuddles.forEach(h => {
               blockstack.getFile(`privateHuddles/${h}.json`, { decrypt: true })
               .then(file => {
@@ -218,9 +220,12 @@ export default {
     }
   },
   watch: {
-    $route(value){
+    $route(value, old){
       if(this.showDropdown) this.showDropdown = false
       if(this.user && value.name !== 'Onboard') this.loadGaia()
+      if(old.name == 'Onboard' && value.name == 'Home'){
+        
+      }
     }
   }
 }

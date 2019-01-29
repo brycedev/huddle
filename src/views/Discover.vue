@@ -6,7 +6,7 @@
           <h1 class="text-4xl text-white font-light max-w-sm text-center mb-4 flex z-50">
             Discover
           </h1>
-          <p class="text-white text-lg">{{ publicHuddles.length }} Public Communities</p>
+          <p class="text-white text-lg">{{ pubAndHybHuddles.length }} Public & Hybrid Communities</p>
         </div>
       </div>
     </div>
@@ -30,7 +30,7 @@
             </div>
           </div> -->
           <div class="flex flex-wrap">        
-            <div class="w-full lg:w-1/2 mb-4 px-2" v-for="huddle in publicHuddles" :key="huddle.id">
+            <div class="w-full lg:w-1/2 mb-4 px-2" v-for="huddle in pubAndHybHuddles" :key="huddle.id">
               <router-link :to="'/h/' + huddle.slug" class="block w-full no-underline">
                 <huddle-entry :huddle="huddle" :full="true"></huddle-entry>
               </router-link>
@@ -81,10 +81,10 @@ export default {
   },
   components: { HuddleEntry, ProposedEntry, ProposedVote  },
   computed: {
-    publicHuddles(){
+    pubAndHybHuddles(){
       return this.user && this.user.preferences 
-        ? this.huddles.filter(h => h.isApproved && h.type == 'public').filter(h => this.user.preferences.hideNSFW ? !h.isNSFW : true)
-        : this.huddles.filter(h => h.isApproved && h.type == 'public')
+        ? this.huddles.filter(h => h.isApproved && h.type == 'public' || h.type == 'hybrid').filter(h => this.user.preferences.hideNSFW ? !h.isNSFW : true)
+        : []
     },
     proposedHuddles(){
       return this.user && this.user.preferences 
