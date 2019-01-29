@@ -123,7 +123,9 @@ export default {
           const newPrivateHuddle = JSON.stringify(huddle)
           await blockstack.putFile(`privateHuddles/${huddle.id}.json`, newPrivateHuddle, { encrypt : true })
           await blockstack.putFile('privateHuddles.json', JSON.stringify(privHuddles), { encrypt : true })
-        }
+        
+        await this.$parent.instantiateGun()}
+        await this.$parent.loadGaia()
         if(this.huddle.type == 'public') this.$router.push(`/discover`)
         if(this.huddle.type == 'hybrid') this.$router.push(`/h/${huddle.slug}`)
         if(this.huddle.type == 'private') this.$router.push(`/p/${huddle.id}`)

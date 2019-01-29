@@ -87,6 +87,7 @@ export default {
         const data = blockstack.loadUserData()
         data.huddleUsername = this.newSettings.username
         await this.$parent.putUser(data)
+        await this.$parent.instantiateGun()
         this.isChangingUsername = false
       } else {
         // name is taken

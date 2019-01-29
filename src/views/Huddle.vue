@@ -44,11 +44,11 @@
             </div>
           </div>
           <div class="self-end flex items-center mr-4 md:mr-0 mb-4" v-if="!isMember">
-            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" v-if="isHybrid">
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" v-if="isHybrid" @click="showRequestInvite = true">
               <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
               <span>Request Invite</span>
             </div>
-            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" @click="joinHuddle" v-if="isPublic">
+            <div class="bg-white rounded-full text-black text-center py-2 px-4 cursor-pointer hidden md:flex items-center" @click="joinHuddle()" v-if="isPublic">
               <img src="../assets/request-invite-dark.svg" alt="" class="w-4 h-4 mr-2">
               <span>Join Huddle</span>
             </div>
@@ -82,11 +82,12 @@
 import CreatePost from '@/components/CreatePost.vue'
 import ExpandedHuddlePost from '@/components/ExpandedHuddlePost.vue'
 import HuddlePost from '@/components/HuddlePost.vue'
+import RequestInvite from '@/components/RequestInvite.vue'
 
 export default {
   name: 'Huddle',
-  store: ['huddles', 'user', 'users'],
-  components: { CreatePost, ExpandedHuddlePost, HuddlePost },
+  store: ['bus', 'huddles', 'user', 'users'],
+  components: { CreatePost, ExpandedHuddlePost, HuddlePost, RequestInvite },
   data() {
     return {
       huddle: null,
@@ -95,6 +96,7 @@ export default {
       posts: [],
       postFragments: [],
       isMember: false,
+      showRequestInvite: false
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -106,7 +108,7 @@ export default {
         if(vm.user){
           vm.huddle = vm.user.privateHuddles.find(h => h.id == to.params.id)
           if(!vm.huddle) next('/404')
-        } else{
+        } else {
           next('/404')
         }
       }
@@ -210,6 +212,9 @@ export default {
     }
   },
   methods: {
+    async requestInvite(){
+      
+    },  
     checkMembership(){
       return this.huddle && this.user && this.user.publicHuddles && this.user.privateHuddles
         ? this.isPublic && this.user.publicHuddles && this.user.privateHuddles

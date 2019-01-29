@@ -3,7 +3,8 @@
     <div class="flex justify-center mt-20" v-if="post !== null">
       <div class="rounded-lg shadow-lg p-6 px-8 bg-white w-full mb-4 max-w-md">
         <div class="w-full flex flex-col relative">
-          <div class="absolute pin bg-white subtle opacity-0 flex flex-col items-center justify-center z-50 pointer-events-none" :class="{ 'opacity-100 pointer-events-auto' : showReportPost }">
+          <div class="absolute pin bg-white z-50 opacity-0 subtle pointer-events-none" :class="{ 'opacity-100 pointer-events-auto' : showReportPost }"></div>
+          <div class="absolute pt-8 pin-t pin-l pin-r bg-white subtle opacity-0 flex flex-col items-center justify-center z-75 pointer-events-none" :class="{ 'opacity-100 pointer-events-auto' : showReportPost }">
             <h2 class="text-grey-darkest pb-4 leading-normal font-thin text-center max-w-xs">Are you sure you want to report this post?</h2>
             <div class="absolute w-6 h-6 pin-t pin-l opacity-75 hover:opacity-90 subtle" @click="showReportPost = false">
               <svg class="w-6 fill-current text-black cursor-pointer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M427 234.625H167.296l119.702-119.702L256 85 85 256l171 171 29.922-29.924-118.626-119.701H427v-42.75z"/></svg>
