@@ -54,6 +54,10 @@
 </template>
 
 <script>
+import crypto from "simple-crypto-js"
+const decryptECIES = require('blockstack/lib/encryption').decryptECIES
+const encryptECIES = require('blockstack/lib/encryption').encryptECIES
+
 export default {
   name: 'Onboard',
   store: ['bus', 'user', 'users'],
@@ -97,12 +101,13 @@ export default {
         // console.log('instantiating user : ', this.user.username)
         // add user to the gundb instance
         let identity = {} 
-        if(isPublic)
+        if(isPublic){
           identity = { id: this.user.id, bi: data.bi, username: this.user.username, avatar: this.user.avatar, public: true }
-        else
+          const newUser = this.$gun.get(`${gunPrefix}:users/${this.user.id}`).put(identity)
+          this.$gun.get(`${gunPrefix}:users`).set(newUser)
+        } else {
           identity = { id: this.user.id, bi: data.bi, public: false }
-        const newUser = this.$gun.get(`${gunPrefix}:users/${this.user.id}`).put(identity)
-        this.$gun.get(`${gunPrefix}:users`).set(newUser)
+        }
         // configure the user's gaia storage
         this.user.preferences = {
           isOnboarded: true,
@@ -132,17 +137,39 @@ export default {
         await blockstack.putFile('privateComments.json', cleanArray, { encrypt : true })
         await blockstack.putFile('privateLibrary.json', cleanArray, { encrypt : true })
         if(isPublic){
+          const aesKey = crypto.generateRandom()
+          const pubKey = blockstack.getPublicKeyFromPrivate(blockstack.loadUserData().appPrivateKey)
+          const encryptedAesKey = encryptECIES(pubKey, aesKey)
+          await blockstack.putFile('key.txt', pubKey, { encrypt : false })
+          await blockstack.putFile('keycrypt.json', encryptedAesKey, { encrypt : false })
           await blockstack.putFile('publicHuddles.json', cleanArray, { encrypt : false })
           await blockstack.putFile('publicPosts.json', cleanArray, { encrypt : false })
           await blockstack.putFile('publicComments.json', cleanArray, { encrypt : false })
           await blockstack.putFile('publicLibrary.json', cleanArray, { encrypt : false })
         }
+        this.user.aesKey = aesKey
         resolve()
       })
     },
     async checkUser(){
       if(!this.$route.query.authResponse){
         if(blockstack.isUserSignedIn()){
+          try {
+            // check for keys
+            const pubKey = await blockstack.getFile('key.txt')
+            const aesKey = await blockstack.getFile('keycrypt.json')
+            if(pubKey === null || aesKey === null){
+              throw 'no keys'
+            } else {
+              this.user.aesKey = decryptECIES(blockstack.loadUserData().appPrivateKey, JSON.parse(aesKey))
+            } 
+          } catch (error) {
+            const aesKey = crypto.generateRandom()
+            const pubKey = blockstack.getPublicKeyFromPrivate(blockstack.loadUserData().appPrivateKey)
+            const encryptedAesKey = encryptECIES(pubKey, aesKey)
+            await blockstack.putFile('key.txt', pubKey)
+            await blockstack.putFile('keycrypt.json', JSON.stringify(encryptedAesKey))
+          }
           const data = blockstack.loadUserData()          
           data.bi = data.username ? data.username : false
           await this.$parent.putUser(data)
@@ -176,6 +203,9 @@ export default {
               // seeding/testing - restore state
               const cleanArray = JSON.stringify([])
               await blockstack.putFile('preferences.json', JSON.stringify({}), { encrypt : true })
+              await blockstack.putFile('key.txt', '')
+              await blockstack.putFile('keycrypt.json', JSON.stringify(''))
+              await blockstack.putFile('hybridRequests.json', cleanArray, { encrypt : true })
               await blockstack.putFile('privateHuddles.json', cleanArray, { encrypt : true })
               await blockstack.putFile('privatePosts.json', cleanArray, { encrypt : true })
               await blockstack.putFile('privateComments.json', cleanArray, { encrypt : true })

@@ -8,6 +8,7 @@ import Home from './views/Home.vue'
 import Huddle from './views/Huddle.vue'
 import EditProfile from './views/EditProfile.vue'
 import Identity from './views/Identity.vue'
+import Notifications from './views/Notifications.vue'
 import Onboard from './views/Onboard.vue'
 import Settings from './views/Settings.vue'
 
@@ -103,6 +104,11 @@ export default new Router({
           name: 'ExpandedHuddlePostPrivate'
         }
       ]
+    },
+    {
+      path: '/notifications',
+      name: 'Notifications',
+      component: Notifications
     },
     {
       path: '/settings',

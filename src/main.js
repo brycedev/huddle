@@ -24,7 +24,8 @@ import tooltip from 'v-tooltip'
 Vue.config.productionTip = false
 Vue.use(gun, { 
   peers: isDev ? 'http://localhost:8765/gun' : 'https://friend.huddle.group/gun',
-  store: RindexedDB({})
+  store: RindexedDB({}),
+  file: false
 })
 Vue.use(meta)
 Vue.use(portal)

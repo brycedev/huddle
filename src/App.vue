@@ -102,6 +102,8 @@
 </template>
 
 <script>
+const decryptECIES = require('blockstack/lib/encryption').decryptECIES
+
 export default {
   store: ['bus', 'huddles', 'user', 'users'],
   data() {
@@ -189,6 +191,18 @@ export default {
                 tempHuddles.push(JSON.parse(file))
               })
             })
+            try {
+            // check for keys
+              const pubKey = await blockstack.getFile('key.txt')
+              const aesKey = await blockstack.getFile('keycrypt.json')
+              if(pubKey === null || aesKey === null){
+                throw 'no keys'
+              } else {
+                this.user.aesKey = decryptECIES(blockstack.loadUserData().appPrivateKey, JSON.parse(aesKey))
+              } 
+            } catch (error) {
+
+            }
             this.user.privateHuddles = tempHuddles
             this.user.privatePosts = JSON.parse(await blockstack.getFile('privatePosts.json', { decrypt: true }))
             this.user.privateComments = JSON.parse(await blockstack.getFile('privateComments.json', { decrypt: true }))

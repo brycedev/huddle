@@ -213,7 +213,31 @@ export default {
   },
   methods: {
     async requestInvite(){
-      
+      return new Promise(async (resolve, reject) => {
+        if(this.isHybrid && this.user){
+          progress.start()
+          const newInvite = this.$gun.get(`${gunPrefix}:huddles/${this.huddle.id}`).get('invites').set({ from: this.user.id, approved: false, created: Date.UTC(Date.now()) })
+          const inviteForFile = {
+            to: this.huddle.id,
+            created: Date.UTC(Date.now()),
+            approved: false
+          }
+          this.user.hybridRequests.push(inviteForFile)
+          blockstack.putFile(`hybridRequests.json`, JSON.stringify(this.user.hybridRequests), {encrypt: true})
+          .then(() => {
+            progress.done()
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          const data = blockstack.loadUserData()
+          await this.$parent.putUser(data)
+          progress.done()
+          resolve()
+        } else {
+          resolve()
+        }
+      })
     },  
     checkMembership(){
       return this.huddle && this.user && this.user.publicHuddles && this.user.privateHuddles
